@@ -1,37 +1,186 @@
-# mini-sglang-lru-touch
+<p align="center">
+<img width="400" src="/assets/logo.png">
+</p>
 
-mini-sglang 的两个版本快照：**LRU 时间戳刷新时机优化**（修改前 / 修改后），以及二者的差异记录。
+# Mini-SGLang
 
-## 分支
+A **lightweight yet high-performance** inference framework for Large Language Models.
 
-| 分支 | 内容 |
-| --- | --- |
-| `before` | 修改前版本（`Serving_V1/mini-sglang`） |
-| `after` | 修改后版本（`Serving_V1/Promotion/mini-sglang`） |
-| `main`（默认） | 本说明 + 变更记录 `CHANGES.md` + 原始差异补丁 `changes/before-after.patch` |
+---
 
-两个分支的项目文件都位于仓库根目录，均基于同一份上游代码：`sgl-project/mini-sglang` @ `9a91cfa`，且包含完全相同的本地改动（`core.py`、`message/backend.py`、`message/frontend.py`、`scheduler/scheduler.py`、`tests/core/test_cache_allocate.py`、`docs/features_zh.md`、`docs/structures_zh.md`、`python/test/`、`uv.lock` 等）。
+Mini-SGLang is a compact implementation of [SGLang](https://github.com/sgl-project/sglang), designed to demystify the complexities of modern LLM serving systems. With a compact codebase of **~5,000 lines of Python**, it serves as both a capable inference engine and a transparent reference for researchers and developers.
 
-二者的**唯一区别**是 4 个文件的改动，详见 [CHANGES.md](CHANGES.md)。
+## ✨ Key Features
 
-## 对比两个版本
+- **High Performance**: Achieves state-of-the-art throughput and latency with advanced optimizations.
+- **Lightweight & Readable**: A clean, modular, and fully type-annotated codebase that is easy to understand and modify.
+- **Advanced Optimizations**:
+  - **Radix Cache**: Reuses KV cache for shared prefixes across requests.
+  - **Chunked Prefill**: Reduces peak memory usage for long-context serving.
+  - **Overlap Scheduling**: Hides CPU scheduling overhead with GPU computation.
+  - **Tensor Parallelism**: Scales inference across multiple GPUs.
+  - **Optimized Kernels**: Integrates **FlashAttention** and **FlashInfer** for maximum efficiency.
+  - ...
+
+## 🚀 Quick Start
+
+> **⚠️ Platform Support**: Mini-SGLang currently supports **Linux only** (x86_64 and aarch64). Windows and macOS are not supported due to dependencies on Linux-specific CUDA kernels (`sgl-kernel`, `flashinfer`). We recommend using [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) on Windows or Docker for cross-platform compatibility.
+
+### 1. Environment Setup
+
+We recommend using `uv` for a fast and reliable installation (note that `uv` does not conflict with `conda`).
 
 ```bash
-git diff before after            # 在任意克隆中直接对比两个分支
-git diff before after --stat     # 只看文件级统计
+# Create a virtual environment (Python 3.10+ recommended)
+uv venv --python=3.12
+source .venv/bin/activate
 ```
 
-或使用本仓库携带的补丁：
+**Prerequisites**: Mini-SGLang relies on CUDA kernels that are JIT-compiled. Ensure you have the **NVIDIA CUDA Toolkit** installed and that its version matches your driver's version. You can check your driver's CUDA capability with `nvidia-smi`.
+
+### 2. Installation
+
+Install Mini-SGLang directly from the source:
 
 ```bash
-git apply --stat changes/before-after.patch
-git apply changes/before-after.patch   # 需在 after 分支工作区中执行
+git clone https://github.com/sgl-project/mini-sglang.git
+cd mini-sglang && uv venv --python=3.12 && source .venv/bin/activate
+uv pip install -e .
 ```
 
-## 获取代码
+<details>
+<summary><b>💡 Installing on Windows (WSL2)</b></summary>
+
+Since Mini-SGLang requires Linux-specific dependencies, Windows users should use WSL2:
+
+1. **Install WSL2** (if not already installed):
+   ```powershell
+   # In PowerShell (as Administrator)
+   wsl --install
+   ```
+
+2. **Install CUDA on WSL2**:
+   - Follow [NVIDIA's WSL2 CUDA guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
+   - Ensure your Windows GPU drivers support WSL2
+
+3. **Install Mini-SGLang in WSL2**:
+   ```bash
+   # Inside WSL2 terminal
+   git clone https://github.com/sgl-project/mini-sglang.git
+   cd mini-sglang && uv venv --python=3.12 && source .venv/bin/activate
+   uv pip install -e .
+   ```
+
+4. **Access from Windows**: The server will be accessible at `http://localhost:8000` from Windows browsers and applications.
+
+</details>
+
+<details>
+<summary><b>🐳 Running with Docker</b></summary>
+
+**Prerequisites**:
+- [Docker](https://docs.docker.com/get-docker/)
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+
+1. **Build the Docker image**:
+   ```bash
+   docker build -t minisgl .
+   ```
+
+2. **Run the server**:
+   ```bash
+   docker run --gpus all -p 1919:1919 \
+       minisgl --model Qwen/Qwen3-0.6B --host 0.0.0.0
+   ```
+
+3. **Run in interactive shell mode**:
+   ```bash
+   docker run -it --gpus all \
+       minisgl --model Qwen/Qwen3-0.6B --shell
+   ```
+
+4. **Using Docker Volumes for persistent caches** (recommended for faster subsequent startups):
+   ```bash
+   docker run --gpus all -p 1919:1919 \
+       -v huggingface_cache:/app/.cache/huggingface \
+       -v tvm_cache:/app/.cache/tvm-ffi \
+       -v flashinfer_cache:/app/.cache/flashinfer \
+       minisgl --model Qwen/Qwen3-0.6B --host 0.0.0.0
+   ```
+
+</details>
+
+### 3. Online Serving
+
+Launch an OpenAI-compatible API server with a single command.
 
 ```bash
-git clone https://github.com/luckywty/mini-sglang-lru-touch.git
-cd mini-sglang-lru-touch
-git checkout before   # 或 after
+# Deploy Qwen/Qwen3-0.6B on a single GPU
+python -m minisgl --model "Qwen/Qwen3-0.6B"
+
+# Deploy meta-llama/Llama-3.1-70B-Instruct on 4 GPUs with Tensor Parallelism, on port 30000
+python -m minisgl --model "meta-llama/Llama-3.1-70B-Instruct" --tp 4 --port 30000
 ```
+
+Once the server is running, you can send requests using standard tools like `curl` or any OpenAI-compatible client.
+
+### 4. Interactive Shell
+
+Chat with your model directly in the terminal by adding the `--shell` flag.
+
+```bash
+python -m minisgl --model "Qwen/Qwen3-0.6B" --shell
+```
+
+![shell-example](https://lmsys.org/images/blog/minisgl/shell.png)
+
+You can also use `/reset` to clear the chat history.
+
+## Benchmark
+
+### Offline inference
+
+See [bench.py](./benchmark/offline/bench.py) for more details. Set `MINISGL_DISABLE_OVERLAP_SCHEDULING=1` for ablation study on overlap scheduling.
+
+Test Configuration:
+
+- Hardware: 1xH200 GPU.
+- Model: Qwen3-0.6B, Qwen3-14B
+- Total Requests: 256 sequences
+- Input Length: Randomly sampled between 100-1024 tokens
+- Output Length: Randomly sampled between 100-1024 tokens
+
+![offline](https://lmsys.org/images/blog/minisgl/offline.png)
+
+### Online inference
+
+See [benchmark_qwen.py](./benchmark/online/bench_qwen.py) for more details.
+
+Test Configuration:
+
+- Hardware: 4xH200 GPU, connected by NVLink.
+- Model: Qwen3-32B
+- Dataset: [Qwen trace](https://github.com/alibaba-edu/qwen-bailian-usagetraces-anon/blob/main/qwen_traceA_blksz_16.jsonl), replaying first 1000 requests.
+
+Launch command:
+
+```bash
+# Mini-SGLang
+python -m minisgl --model "Qwen/Qwen3-32B" --tp 4 --cache naive
+
+# SGLang
+python3 -m sglang.launch_server --model "Qwen/Qwen3-32B" --tp 4 \
+    --disable-radix --port 1919 --decode-attention flashinfer
+```
+
+> **Note**: If you encounter network issues when downloading models from HuggingFace, try using `--model-source modelscope` to download from ModelScope instead:
+> ```bash
+> python -m minisgl --model "Qwen/Qwen3-32B" --tp 4 --model-source modelscope
+> ```
+
+![online](https://lmsys.org/images/blog/minisgl/online.png)
+
+## 📚 Learn More
+
+- **[Detailed Features](./docs/features.md)**: Explore all available features and command-line arguments.
+- **[System Architecture](./docs/structures.md)**: Dive deep into the design and data flow of Mini-SGLang.

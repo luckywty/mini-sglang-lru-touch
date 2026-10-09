@@ -1,14 +1,38 @@
-# 变更记录：修改前（before） → 修改后（after）
+# 变更记录：修改前（before） → 修改后（main）
 
-- 修改前：`Serving_V1/mini-sglang` → 分支 `before`
-- 修改后：`Serving_V1/Promotion/mini-sglang` → 分支 `after`
-- 共同基线：`sgl-project/mini-sglang` @ `9a91cfa`，两个分支均在此基础上带有**完全相同**的本地改动。
-- 差异范围：仅 4 个文件，原始补丁见 [`changes/before-after.patch`](changes/before-after.patch)。
+本仓库保存 mini-sglang 的两个版本快照及二者的差异记录：**LRU 时间戳刷新时机优化**。
+
+## 仓库结构
+
+| 分支 | 内容 |
+| --- | --- |
+| `main`（默认） | 修改后版本 `Serving_V1/Promotion/mini-sglang`（本文件 `CHANGES.md` 与补丁 `changes/before-after.patch` 位于根目录） |
+| `before` | 修改前版本 `Serving_V1/mini-sglang` |
+
+两个分支的项目文件都在仓库根目录，均基于同一份上游代码：`sgl-project/mini-sglang` @ `9a91cfa`，且包含**完全相同**的本地改动（`core.py`、`message/backend.py`、`message/frontend.py`、`scheduler/scheduler.py`、`tests/core/test_cache_allocate.py`、`docs/features_zh.md`、`docs/structures_zh.md`、`python/test/`、`uv.lock` 等）。
+
+二者的**唯一区别**是以下 4 个文件（+60 / -7）。
+
+## 对比两个版本
+
+```bash
+git diff before main            # 在任意克隆中直接对比
+git diff before main --stat     # 只看文件级统计
+```
+
+或使用本仓库携带的补丁（在 `before` 分支工作区执行，可复现 `main` 的代码改动）：
+
+```bash
+git apply --stat changes/before-after.patch
+git apply changes/before-after.patch
+```
+
+## 差异概览
 
 ```
 python/minisgl/kvcache/base.py        |  7 +++++++
 python/minisgl/kvcache/radix_cache.py | 45 +++++++++++++++++++++-------
-python/minisgl/scheduler/cache.py     | 12 ++++++++--
+python/minisgl/scheduler/cache.py     | 12 +++++++++-
 python/minisgl/scheduler/prefill.py   |  3 +++
 4 files changed, 60 insertions(+), 7 deletions(-)
 ```
@@ -100,7 +124,7 @@ self.cache_manager.touch(handle)
 
 ## 行为对比小结
 
-| 场景 | before | after |
+| 场景 | before | main（修改后） |
 | --- | --- | --- |
 | `match_prefix()` 查询 | 立即刷新命中路径时间戳 | 不刷新（只读） |
 | 请求通过准入检查、真正占用前缀 | 已在匹配时刷新 | 此时调用 `touch_handle()` 刷新整条路径 |
@@ -108,9 +132,9 @@ self.cache_manager.touch(handle)
 | 调度阶段估算前缀命中长度 | 只能用会改状态的 `match_prefix` | 可用无副作用的 `estimate_match_len` / `estimate_req` |
 | LRU 判序依赖的祖先时间戳 | 只刷到匹配末节点 | 刷到 root，避免 `evict()` 推堆时祖先过期 |
 
-## 两个分支共同的本地改动（相对上游 `9a91cfa`）
+## 两个版本共同的本地改动（相对上游 `9a91cfa`）
 
-以下文件在 before / after 中**完全一致**，不属于本次差异：
+以下文件在 before / main 中**完全一致**，不属于本次差异：
 
 - `python/minisgl/core.py`
 - `python/minisgl/message/backend.py`
