@@ -64,7 +64,33 @@ class MatchResult(NamedTuple):
     # TODO: support HiCache
 
 
+@dataclass(frozen=True)
+class MatchProbe:
+    cached_len: int
+    newly_protected_size: int  # evictable matched tokens that locking would protect
+
+
 class BasePrefixCache(ABC):
+    @abstractmethod
+    def probe_prefix(self, input_ids: torch.Tensor) -> MatchProbe:
+        """Inspect the match and its locking cost without modifying cache state.
+
+        The locking cost counts only matched tokens whose nodes are currently
+        evictable, including only the matched part of a partially matched edge.
+        """
+
+    def refresh_probe(self, probe: MatchProbe, input_ids: torch.Tensor) -> MatchProbe:
+        """Revalidate a speculative probe before admission, without cache mutations."""
+        return self.probe_prefix(input_ids)
+
+    @abstractmethod
+    def commit_match(self, probe: MatchProbe) -> BaseCacheHandle:
+        """Materialize a probe without repeating prefix matching.
+
+        The cache must not change between probing and committing. This may
+        split nodes, but does not lock the handle or refresh LRU timestamps.
+        """
+
     @abstractmethod
     def lock_handle(self, handle: BaseCacheHandle, unlock: bool = False) -> None:
         """
@@ -90,7 +116,7 @@ class BasePrefixCache(ABC):
     def match_prefix(self, input_ids: torch.Tensor) -> MatchResult:
         """
         Match prefix and return the indices of the matched prefix in the cache.
-        This operation will not modify the cache.
+        This operation may split nodes, but does not refresh LRU timestamps.
         The returned indices is only safe to use when the handle is locked.
 
         Args:

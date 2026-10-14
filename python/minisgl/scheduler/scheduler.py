@@ -61,7 +61,13 @@ class Scheduler(SchedulerIOMixin):
         )
         self.decode_manager = DecodeManager(config.page_size)
         self.prefill_manager = PrefillManager(
-            self.cache_manager, self.table_manager, self.decode_manager
+            self.cache_manager,
+            self.table_manager,
+            self.decode_manager,
+            schedule_policy=config.schedule_policy,
+            lpm_queue_threshold=config.lpm_queue_threshold,
+            fairness_max_wait_steps=config.fairness_max_wait_steps,
+            lpm_aging_tokens_per_pass=config.lpm_aging_tokens_per_pass,
         )
 
         # some alias for easy access
@@ -70,6 +76,13 @@ class Scheduler(SchedulerIOMixin):
         self.eos_token_id = self.tokenizer.eos_token_id
         self.token_pool = self.table_manager.token_pool
         self.prefill_budget = config.max_extend_tokens
+        self.batch_schedule_policy = config.batch_schedule_policy
+        self.max_consecutive_decodes = config.max_consecutive_decodes
+        self.protected_prefill_tokens = config.protected_prefill_tokens
+        self.adaptive_prefill_budget = config.adaptive_prefill_budget
+        self.target_batch_tokens = config.target_batch_tokens
+        self.min_chunk_tokens = config.min_chunk_tokens
+        self._consecutive_decode_batches = 0
         # self.config = config
 
         # Initialize the I/O mixin
@@ -110,7 +123,7 @@ class Scheduler(SchedulerIOMixin):
         for msg in self.receive_msg(blocking=blocking):
             self._process_one_msg(msg)
 
-        #self._schedule_next_batch()的策略：Prefill 优先，Prefill 没有可调度 Batch 时才尝试 Decode
+        # 根据配置的阶段策略选择 Prefill 或 Decode Batch。
         forward_input = self._schedule_next_batch()
         ongoing_data = None
         if forward_input is not None:
@@ -249,6 +262,8 @@ class Scheduler(SchedulerIOMixin):
                 logger.warning_rank0(
                     f"Adjust max_tokens to {max_output_len} for request {msg.uid}."
                 )
+            if not self.prefill_manager.runnable:
+                self._consecutive_decode_batches = 0
             self.prefill_manager.add_one_req(msg)
         elif isinstance(msg, AbortBackendMsg):
             logger.debug_rank0("Aborting request %d", msg.uid)
@@ -256,6 +271,8 @@ class Scheduler(SchedulerIOMixin):
             req_to_free = req_to_free or self.decode_manager.abort_req(msg.uid)
             if req_to_free is not None:
                 self._free_req_resources(req_to_free)
+            if not self.prefill_manager.runnable:
+                self._consecutive_decode_batches = 0
         else:
             logger.error(f"Unknown message type: {type(msg)}")
             raise NotImplementedError
@@ -279,13 +296,59 @@ class Scheduler(SchedulerIOMixin):
             write_tuple=write_mapping,
         )
 
-    def _schedule_next_batch(self) -> ForwardInput | None:
-        # TODO: support other policies: e.g. DECODE first
-        batch = (
-            self.prefill_manager.schedule_next_batch(self.prefill_budget)
-            or self.decode_manager.schedule_next_batch()
+    def _get_protected_prefill_budget(self) -> int:
+        """Use live decode request count as a load signal for a prefill-only batch.
+
+        This is not a shared prefill/decode batch budget or a KV reservation.
+        No per-request state changes, probes or page alignment happen here.
+        """
+        upper = min(self.prefill_budget, self.protected_prefill_tokens)
+        if not self.adaptive_prefill_budget:
+            return upper
+        decode_tokens = len(self.decode_manager.running_reqs)
+        return min(upper, max(self.min_chunk_tokens, self.target_batch_tokens - decode_tokens))
+
+    def _select_next_batch(self) -> Batch | None:
+        """Construct one batch before allocating its physical KV pages."""
+        if self.batch_schedule_policy == "prefill-first":
+            return (
+                self.prefill_manager.schedule_next_batch(self.prefill_budget)
+                or self.decode_manager.schedule_next_batch()
+            )
+
+        if not self.prefill_manager.runnable:
+            self._consecutive_decode_batches = 0
+            return self.decode_manager.schedule_next_batch()
+        if not self.decode_manager.runnable:
+            return self.prefill_manager.schedule_next_batch(self.prefill_budget)
+
+        if self._consecutive_decode_batches >= self.max_consecutive_decodes:
+            budget = self._get_protected_prefill_budget()
+            return (
+                self.prefill_manager.schedule_next_batch(budget)
+                or self.decode_manager.schedule_next_batch()
+            )
+        return (
+            self.decode_manager.schedule_next_batch()
+            or self.prefill_manager.schedule_next_batch(self.prefill_budget)
         )
+
+    def _schedule_next_batch(self) -> ForwardInput | None:
+        batch = self._select_next_batch()
         return self._prepare_batch(batch) if batch else None
+
+    def _record_batch_submission(self, batch: Batch) -> None:
+        """Count submissions, independent of overlap result-processing order.
+
+        K bounds the gap before a prefill attempt, not admission under resource
+        pressure. Failed protection attempts therefore never reset the streak.
+        """
+        if self.batch_schedule_policy != "decode-first-bounded":
+            return
+        if batch.is_prefill or not self.prefill_manager.runnable:
+            self._consecutive_decode_batches = 0
+        else:
+            self._consecutive_decode_batches += 1
 
     def _forward(self, forward_input: ForwardInput) -> ForwardOutput:
         batch, sample_args, input_mapping, output_mapping = forward_input
@@ -293,6 +356,7 @@ class Scheduler(SchedulerIOMixin):
         forward_output = self.engine.forward_batch(batch, sample_args)
         self.token_pool[output_mapping] = forward_output.next_tokens_gpu
         self.decode_manager.filter_reqs(forward_input.batch.reqs)
+        self._record_batch_submission(batch)
         return forward_output
 
 

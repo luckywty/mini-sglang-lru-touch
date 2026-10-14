@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
 import torch
 from minisgl.core import Batch, Req
 from minisgl.utils import init_logger
 
-from .utils import PendingReq
+from .utils import PendingReq, validate_prefill_policy
 
 if TYPE_CHECKING:
     from minisgl.kvcache import BaseCacheHandle
+    from minisgl.kvcache.base import MatchProbe
     from minisgl.message import UserMsg
 
     from .cache import CacheManager
@@ -44,26 +45,19 @@ class PrefillAdder:
     reserved_size: int  #已经被 Decode / in-flight 请求预留多少资源
     cache_manager: CacheManager #Prefix Cache
     table_manager: TableManager #Token Table 和 Page Table
+    match_probes: Dict[int, MatchProbe] = field(default_factory=dict)
 
     def _try_allocate_one(self, req: PendingReq) -> Tuple[BaseCacheHandle, int] | None:
         if self.table_manager.available_size == 0:
             return None
 
         # TODO: consider host cache match case
-        handle = self.cache_manager.match_req(req).cuda_handle
-        cached_len = handle.cached_len
-
-        # TODO: better estimate policy
-        extend_len = req.input_len - cached_len
-        estimated_len = extend_len + req.output_len#请求生命周期预计总消耗量。该请求从本次 Prefill 开始直到完成 Decode 生成，预计需要新增占用的物理 KV Cache 槽位总数
-
-        if estimated_len + self.reserved_size > self.cache_manager.available_size:
+        handle = self.cache_manager.try_match_and_lock(
+            req, reserved_size=self.reserved_size, probe=self.match_probes.pop(id(req), None)
+        )
+        if handle is None:
             return None
-        self.cache_manager.lock(handle)
-        if estimated_len + self.reserved_size > self.cache_manager.available_size:
-            return self.cache_manager.unlock(handle)
-        # 双重检查通过、前缀被真正采纳后才刷新 LRU 时间戳
-        self.cache_manager.touch(handle)
+        cached_len = handle.cached_len
 
         table_idx = self.table_manager.allocate()
         if cached_len > 0:  # NOTE: set the cached part
@@ -141,9 +135,80 @@ class PrefillManager:
     table_manager: TableManager
     decode_manager: DecodeManager
     pending_list: List[PendingReq] = field(default_factory=list)
+    schedule_policy: str = "fcfs"
+    lpm_queue_threshold: int = 128
+    fairness_max_wait_steps: int = 0
+    lpm_aging_tokens_per_pass: int = 0
+    schedule_step: int = field(default=0, init=False)
+    _next_arrival_order: int = field(default=0, init=False)
+
+    def __post_init__(self) -> None:
+        validate_prefill_policy(
+            self.schedule_policy,
+            self.lpm_queue_threshold,
+            self.fairness_max_wait_steps,
+            self.lpm_aging_tokens_per_pass,
+        )
 
     def add_one_req(self, req: UserMsg) -> None:
-        self.pending_list.append(PendingReq(req.uid, req.input_ids, req.sampling_params))
+        self.pending_list.append(
+            PendingReq(
+                req.uid,
+                req.input_ids,
+                req.sampling_params,
+                arrival_order=self._next_arrival_order,
+                arrival_step=self.schedule_step,
+            )
+        )
+        self._next_arrival_order += 1
+
+    def _get_candidates(
+        self, match_probes: Dict[int, MatchProbe] | None = None, prefill_budget: int | None = None
+    ) -> List[PendingReq]:
+        # 已准入的 chunked 请求先继续执行；新请求的基础队列保留到达顺序。
+        chunked_pending: List[PendingReq] = []
+        new_pending: List[PendingReq] = []
+        for req in self.pending_list:
+            (chunked_pending if req.chunked_req is not None else new_pending).append(req)
+
+        if (
+            self.schedule_policy == "fcfs"
+            or len(new_pending) > self.lpm_queue_threshold
+            or len(new_pending) < 2
+        ):
+            return chunked_pending + new_pending
+        if prefill_budget is not None and self.table_manager.available_size == 0:
+            # Existing chunks can continue, but no new request can obtain a table slot.
+            return chunked_pending + new_pending
+        if prefill_budget is not None and sum(
+            req.input_len - req.chunked_req.cached_len
+            for req in chunked_pending if req.chunked_req is not None
+        ) >= prefill_budget:
+            # Continuations consume this entire pass, so ordering new admissions has no benefit.
+            return chunked_pending + new_pending
+        if self.fairness_max_wait_steps > 0 and any(
+            self.schedule_step - req.arrival_step >= self.fairness_max_wait_steps
+            for req in new_pending
+        ):
+            # 等待过久时整轮退回 FCFS，避免新请求持续越过老请求。
+            return chunked_pending + new_pending
+
+        for req in new_pending:
+            probe = self.cache_manager.probe_req(req)
+            req.cached_len_est = probe.cached_len
+            if match_probes is not None:
+                match_probes[id(req)] = probe
+        aging_step = self.lpm_aging_tokens_per_pass if self.schedule_policy == "lpm-aging" else 0
+        if aging_step:
+            candidates = sorted(
+                new_pending,
+                key=lambda req: (
+                    -(req.cached_len_est + aging_step * req.waiting_passes), req.arrival_order
+                ),
+            )
+        else:
+            candidates = sorted(new_pending, key=lambda req: (-req.cached_len_est, req.arrival_order))
+        return chunked_pending + candidates
 
     def schedule_next_batch(self, prefill_budget: int) -> Batch | None:
         #在给定的 Token 算力预算内，
@@ -151,6 +216,13 @@ class PrefillManager:
         # 同时精准维护长 Prompt 的切块状态与队列优先级
         if len(self.pending_list) == 0:
             return None
+        # 各 TP rank 在同一调度位置计数，不使用本机时间参与排序。
+        self.schedule_step += 1
+        if prefill_budget <= 0:
+            return None
+        # Probes live for this call only; admission refreshes them against current cache state.
+        match_probes: Dict[int, MatchProbe] = {}
+        candidates = self._get_candidates(match_probes, prefill_budget=prefill_budget)
 
         # estimated offset due to in-flight decode
         adder = PrefillAdder(
@@ -158,21 +230,36 @@ class PrefillManager:
             reserved_size=self.decode_manager.inflight_tokens,
             cache_manager=self.cache_manager,
             table_manager=self.table_manager,
+            match_probes=match_probes,
         )
         reqs: List[Req] = []
         chunked_list: List[PendingReq] = []
-        for pending_req in self.pending_list:   #self.pending_list包含一整个请求req
+        scheduled_ids: set[int] = set()
+        admitted_new = False
+        for pending_req in candidates:
+            was_new = pending_req.chunked_req is None
             if req := adder.try_add_one(pending_req):   #req：Req/ChunkedReq
                 pending_req.chunked_req = None  #清除上一轮的状态
-                if isinstance(req, ChunkedReq):
+                if isinstance(req, ChunkedReq): #req会记录有多少cached_len,如果还有token没计算完成，那么就会将其加入pending_req.chunked_req = req
                     pending_req.chunked_req = req
                     chunked_list.append(pending_req)
                 reqs.append(req)
+                scheduled_ids.add(id(pending_req))
+                admitted_new |= was_new
             else:
                 break  # We cannot add more requests
         if len(reqs) == 0:
             return None
-        self.pending_list = chunked_list + self.pending_list[len(reqs) :]
+        # 候选已重排，按对象身份移除已调度项；不能按数量切掉原队列头部。
+        self.pending_list = chunked_list + [
+            req for req in self.pending_list if id(req) not in scheduled_ids
+        ]
+        # Effective waiting: a completed pass admitted at least one NEW request.
+        # No aging for empty/zero-budget/all-rejected/chunk-only passes or admitted requests.
+        if admitted_new and self.schedule_policy == "lpm-aging" and self.lpm_aging_tokens_per_pass > 0:
+            for pending_req in self.pending_list:
+                if pending_req.chunked_req is None:
+                    pending_req.waiting_passes += 1
         return Batch(reqs=reqs, phase="prefill")
 
     def abort_req(self, uid: int) -> Req | None:

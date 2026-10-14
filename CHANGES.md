@@ -1,3 +1,7 @@
+> 历史说明：本文记录的是 `before` 与更新前 `main`（`46fd05cc634530175de815024f3ba97e171407d3`）之间的 LRU touch 优化。当前 `main` 已继续同步四项调度/缓存优化及 Benchmark 规划；复现本文历史差异请使用 `git diff before 46fd05cc634530175de815024f3ba97e171407d3`，不要直接比较持续更新的 `main`。
+>
+> 最新资料：[四项优化审计](docs/mini_sglang_four_optimizations_review.md)、[Benchmark 设计](benchmark_plan.md)、[消融矩阵](ablation_matrix.md)、[Workload](workload_design.md)、[执行手册](benchmark_execution.md)、[成果指标](resume_metrics_plan.md)。历史补丁保留原样。
+
 # 变更记录：修改前（before） → 修改后（main）
 
 本仓库保存 mini-sglang 的两个版本快照及二者的差异记录：**LRU 时间戳刷新时机优化**。

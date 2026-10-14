@@ -1,6 +1,6 @@
 import torch
 
-from .base import BaseCacheHandle, BasePrefixCache, InsertResult, MatchResult, SizeInfo
+from .base import BaseCacheHandle, BasePrefixCache, InsertResult, MatchProbe, MatchResult, SizeInfo
 
 
 class NaiveCacheHandle(BaseCacheHandle):
@@ -22,6 +22,12 @@ class NaivePrefixCache(BasePrefixCache):
 
     def lock_handle(self, handle: BaseCacheHandle, unlock: bool = False) -> None:
         pass
+
+    def probe_prefix(self, input_ids: torch.Tensor) -> MatchProbe:
+        return MatchProbe(0, 0)
+
+    def commit_match(self, probe: MatchProbe) -> BaseCacheHandle:
+        return NaiveCacheHandle()
 
     def match_prefix(self, input_ids: torch.Tensor) -> MatchResult:
         return MatchResult(NaiveCacheHandle())

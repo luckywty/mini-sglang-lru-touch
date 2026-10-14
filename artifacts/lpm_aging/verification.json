@@ -1,0 +1,40 @@
+{
+  "tests": {
+    "tests": 106,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "existing_files_preserved_outside_scope": true,
+  "unexpected_changes": [],
+  "new_trailing_whitespace": [],
+  "python_3_10_syntax": "passed",
+  "reviewed_paths": [
+    "python/minisgl/kvcache/base.py",
+    "python/minisgl/kvcache/radix_cache.py",
+    "python/minisgl/scheduler/cache.py",
+    "python/minisgl/scheduler/utils.py",
+    "python/minisgl/scheduler/prefill.py",
+    "python/minisgl/scheduler/config.py",
+    "python/minisgl/scheduler/scheduler.py",
+    "python/minisgl/server/args.py",
+    "tests/core/test_prefill_policy.py",
+    "tests/core/test_prefill_benchmark.py",
+    "benchmarks/bench_prefill_policy.py",
+    "docs/lpm_aging.md"
+  ],
+  "file_sha256": {
+    "python/minisgl/kvcache/base.py": "df4c7e943e0cc1cbd3f095905256650961b2904c8c1f3b9b49b23e41d2517c57",
+    "python/minisgl/kvcache/radix_cache.py": "bd73c772289890b1939303162bf6784bfa506cb43b05ad2b2a9aae07aea87590",
+    "python/minisgl/scheduler/cache.py": "737965b88affa1b62b5bede98be3a87a4452598eeeafc4dc2c5b7c9a50cf9e27",
+    "python/minisgl/scheduler/utils.py": "a2a4e3064c0a35b0b50d2162a4f9b14c2caa6acb614cc4cc52c5cead114e0a3c",
+    "python/minisgl/scheduler/prefill.py": "ce41b25ee28a7a62f22a724e5fe7cbc2f26fb2b3ab6ba7b07780d27562bbaa14",
+    "python/minisgl/scheduler/config.py": "292ed322779b6fb5389fe143d2f6a84c21739cfe475e5a3c83795ffcace946ca",
+    "python/minisgl/scheduler/scheduler.py": "cbb700b6a1e7cdd6d05b9d73fd6b800f388af23dd4ef6ce30304eb3ec34e273f",
+    "python/minisgl/server/args.py": "80b0500310c999c2fb4687dc2fb4c305ac88d9b27af1114f5fc0aadf3a647971",
+    "tests/core/test_prefill_policy.py": "236a3fb069ec2f3be4b33b7b04627ca2e980610b46a8d63ad2a6300789abdf94",
+    "tests/core/test_prefill_benchmark.py": "69b02dfcf94b9620f84ebce70284118b0d4ee8e08d56a41aa272eb9ccd0a6bab",
+    "benchmarks/bench_prefill_policy.py": "d0646fbc2c36a438dbf25ad80a7a139c3dc97fbe590c22279acd368f3c364703",
+    "docs/lpm_aging.md": "9c95a84e10f145b98b93f20c9cf8814aab5994d63fbf92d711a005cbda1a25fb"
+  }
+}

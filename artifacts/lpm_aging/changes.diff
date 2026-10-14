@@ -1,0 +1,1442 @@
+--- before/python/minisgl/kvcache/base.py
++++ after/python/minisgl/kvcache/base.py
+@@ -78,6 +78,10 @@
+         The locking cost counts only matched tokens whose nodes are currently
+         evictable, including only the matched part of a partially matched edge.
+         """
++
++    def refresh_probe(self, probe: MatchProbe, input_ids: torch.Tensor) -> MatchProbe:
++        """Revalidate a speculative probe before admission, without cache mutations."""
++        return self.probe_prefix(input_ids)
+ 
+     @abstractmethod
+     def commit_match(self, probe: MatchProbe) -> BaseCacheHandle:
+--- before/python/minisgl/kvcache/radix_cache.py
++++ after/python/minisgl/kvcache/radix_cache.py
+@@ -2,7 +2,7 @@
+ 
+ import heapq
+ import time
+-from dataclasses import dataclass
++from dataclasses import dataclass, replace
+ from typing import Any, Callable, Dict, List, Tuple, TypeAlias
+ 
+ import torch
+@@ -107,6 +107,7 @@
+ class RadixMatchProbe(MatchProbe):
+     node: RadixTreeNode
+     matched_in_node: int
++    structure_version: int
+ 
+ 
+ class RadixPrefixCache(BasePrefixCache):
+@@ -118,6 +119,7 @@
+         self.empty_tensor = torch.empty(0, dtype=torch.int32, device=device)
+         self.evictable_size = 0
+         self.protected_size = 0
++        self._structure_version = 0
+         self.root_node = RadixTreeNode(self.key_fn)
+         self.root_node.ref_count = 1  # root is always protected
+ 
+@@ -195,14 +197,36 @@
+             if match_len != node.length:
+                 # partial edge: count fully-matched pages only, do not split
+                 break
+-        return RadixMatchProbe(prefix_len, newly_protected_size, node, matched_in_node)
++        return RadixMatchProbe(
++            prefix_len, newly_protected_size, node, matched_in_node, self._structure_version
++        )
++
++    def refresh_probe(self, probe: MatchProbe, input_ids: torch.Tensor) -> RadixMatchProbe:
++        # 插入、分裂、淘汰会使节点位置失效；引用计数变化只需重算加锁成本。
++        if not isinstance(probe, RadixMatchProbe) or probe.structure_version != self._structure_version:
++            return self.probe_prefix(input_ids)
++        node = probe.node
++        matched_len = probe.matched_in_node
++        newly_protected_size = 0
++        while not node.is_root():
++            if node.ref_count == 0:
++                newly_protected_size += matched_len
++            node = node.parent
++            if not node.is_root():
++                matched_len = node.length
++        assert node is self.root_node, "Probe belongs to a different prefix cache"
++        if newly_protected_size == probe.newly_protected_size:
++            return probe
++        return replace(probe, newly_protected_size=newly_protected_size)
+ 
+     def commit_match(self, probe: MatchProbe) -> RadixCacheHandle:
+         assert isinstance(probe, RadixMatchProbe)
++        assert probe.structure_version == self._structure_version, "Refresh stale probe before commit"
+         node = probe.node
+         # 准入通过后直接使用探测记录的位置，不再从 root 遍历或比较 token。
+         if not node.is_root() and probe.matched_in_node != node.length:
+             node = node.split_at(probe.matched_in_node)
++            self._structure_version += 1
+         return RadixCacheHandle(probe.cached_len, node)
+ 
+     def insert_prefix(self, input_ids: torch.Tensor, indices: torch.Tensor) -> InsertResult:
+@@ -227,6 +251,7 @@
+             new_node = RadixTreeNode(self.key_fn)
+             new_node.set_key_value(input_ids[prefix_len:], indices[prefix_len:].clone())
+             new_node.set_parent(node)
++            self._structure_version += 1
+             self.evictable_size += new_node.length
+             node = new_node
+         return InsertResult(prefix_len, RadixCacheHandle(insert_len, node))
+@@ -254,6 +279,7 @@
+             self.evictable_size -= node.length
+             parent = node.parent
+             del parent.children[self.key_fn(node._key)]
++            self._structure_version += 1
+             # NOTE: root is always protected, so won't be evicted
+             if parent.is_leaf() and parent.ref_count == 0:
+                 heapq.heappush(leave_nodes, parent) #系统立即将其动态推入最小堆
+@@ -314,6 +340,7 @@
+             # need to split the node if not fully matched
+             if match_len != node.length:
+                 node = node.split_at(match_len) #返回的是分裂点之前（前半段）的那个节点
++                self._structure_version += 1
+                 return node, prefix_len
+ 
+         return node, prefix_len
+--- before/python/minisgl/scheduler/cache.py
++++ after/python/minisgl/scheduler/cache.py
+@@ -37,9 +37,19 @@
+         assert input_len > 0, "Input length must be greater than 0."
+         return self.prefix_cache.probe_prefix(req.input_ids[: input_len - 1])
+ 
+-    def try_match_and_lock(self, req: PendingReq, reserved_size: int) -> BaseCacheHandle | None:
++    def try_match_and_lock(
++        self, req: PendingReq, reserved_size: int, probe: MatchProbe | None = None
++    ) -> BaseCacheHandle | None:
++        """Admit using real matched KV length; an optional probe must be for this request's input.
++
++        Refresh its tree position/protection cost before checking capacity. The
++        current scheduler is serial between refresh, split and locking.
++        """
+         # 当前调度器串行执行；探测到提交之间没有其他缓存修改或淘汰。
+-        probe = self.probe_req(req)
++        if probe is None:
++            probe = self.probe_req(req)
++        else:
++            probe = self.prefix_cache.refresh_probe(probe, req.input_ids[: req.input_len - 1])
+         required_size = req.input_len - probe.cached_len + req.output_len + reserved_size
+         available_after_lock = self.available_size - probe.newly_protected_size
+         if required_size > available_after_lock:
+--- before/python/minisgl/scheduler/utils.py
++++ after/python/minisgl/scheduler/utils.py
+@@ -20,6 +20,7 @@
+     arrival_order: int = 0
+     arrival_step: int = 0
+     cached_len_est: int = 0
++    waiting_passes: int = 0  # completed passes admitting another new request
+ 
+     @property
+     def input_len(self) -> int:
+@@ -31,14 +32,19 @@
+ 
+ 
+ def validate_prefill_policy(
+-    schedule_policy: str, lpm_queue_threshold: int, fairness_max_wait_steps: int
++    schedule_policy: str,
++    lpm_queue_threshold: int,
++    fairness_max_wait_steps: int,
++    lpm_aging_tokens_per_pass: int = 0,
+ ) -> None:
+-    if schedule_policy not in ("fcfs", "lpm"):
+-        raise ValueError("schedule_policy must be 'fcfs' or 'lpm'")
++    if schedule_policy not in ("fcfs", "lpm", "lpm-aging"):
++        raise ValueError("schedule_policy must be 'fcfs', 'lpm' or 'lpm-aging'")
+     if lpm_queue_threshold <= 0:
+         raise ValueError("lpm_queue_threshold must be positive")
+-    if fairness_max_wait_steps <= 0:
+-        raise ValueError("fairness_max_wait_steps must be positive")
++    if fairness_max_wait_steps < 0:
++        raise ValueError("fairness_max_wait_steps must be nonnegative (0 disables the fallback)")
++    if lpm_aging_tokens_per_pass < 0:
++        raise ValueError("lpm_aging_tokens_per_pass must be nonnegative")
+ 
+ 
+ @dataclass
+--- before/python/minisgl/scheduler/prefill.py
++++ after/python/minisgl/scheduler/prefill.py
+@@ -1,7 +1,7 @@
+ from __future__ import annotations
+ 
+ from dataclasses import dataclass, field
+-from typing import TYPE_CHECKING, List, Tuple
++from typing import TYPE_CHECKING, Dict, List, Tuple
+ 
+ import torch
+ from minisgl.core import Batch, Req
+@@ -11,6 +11,7 @@
+ 
+ if TYPE_CHECKING:
+     from minisgl.kvcache import BaseCacheHandle
++    from minisgl.kvcache.base import MatchProbe
+     from minisgl.message import UserMsg
+ 
+     from .cache import CacheManager
+@@ -44,13 +45,16 @@
+     reserved_size: int  #已经被 Decode / in-flight 请求预留多少资源
+     cache_manager: CacheManager #Prefix Cache
+     table_manager: TableManager #Token Table 和 Page Table
++    match_probes: Dict[int, MatchProbe] = field(default_factory=dict)
+ 
+     def _try_allocate_one(self, req: PendingReq) -> Tuple[BaseCacheHandle, int] | None:
+         if self.table_manager.available_size == 0:
+             return None
+ 
+         # TODO: consider host cache match case
+-        handle = self.cache_manager.try_match_and_lock(req, reserved_size=self.reserved_size)
++        handle = self.cache_manager.try_match_and_lock(
++            req, reserved_size=self.reserved_size, probe=self.match_probes.pop(id(req), None)
++        )
+         if handle is None:
+             return None
+         cached_len = handle.cached_len
+@@ -133,13 +137,17 @@
+     pending_list: List[PendingReq] = field(default_factory=list)
+     schedule_policy: str = "fcfs"
+     lpm_queue_threshold: int = 128
+-    fairness_max_wait_steps: int = 64
++    fairness_max_wait_steps: int = 0
++    lpm_aging_tokens_per_pass: int = 0
+     schedule_step: int = field(default=0, init=False)
+     _next_arrival_order: int = field(default=0, init=False)
+ 
+     def __post_init__(self) -> None:
+         validate_prefill_policy(
+-            self.schedule_policy, self.lpm_queue_threshold, self.fairness_max_wait_steps
++            self.schedule_policy,
++            self.lpm_queue_threshold,
++            self.fairness_max_wait_steps,
++            self.lpm_aging_tokens_per_pass,
+         )
+ 
+     def add_one_req(self, req: UserMsg) -> None:
+@@ -154,16 +162,31 @@
+         )
+         self._next_arrival_order += 1
+ 
+-    def _get_candidates(self) -> List[PendingReq]:
++    def _get_candidates(
++        self, match_probes: Dict[int, MatchProbe] | None = None, prefill_budget: int | None = None
++    ) -> List[PendingReq]:
+         # 已准入的 chunked 请求先继续执行；新请求的基础队列保留到达顺序。
+         chunked_pending: List[PendingReq] = []
+         new_pending: List[PendingReq] = []
+         for req in self.pending_list:
+             (chunked_pending if req.chunked_req is not None else new_pending).append(req)
+ 
+-        if self.schedule_policy == "fcfs" or len(new_pending) > self.lpm_queue_threshold:
+-            return chunked_pending + new_pending
+-        if any(
++        if (
++            self.schedule_policy == "fcfs"
++            or len(new_pending) > self.lpm_queue_threshold
++            or len(new_pending) < 2
++        ):
++            return chunked_pending + new_pending
++        if prefill_budget is not None and self.table_manager.available_size == 0:
++            # Existing chunks can continue, but no new request can obtain a table slot.
++            return chunked_pending + new_pending
++        if prefill_budget is not None and sum(
++            req.input_len - req.chunked_req.cached_len
++            for req in chunked_pending if req.chunked_req is not None
++        ) >= prefill_budget:
++            # Continuations consume this entire pass, so ordering new admissions has no benefit.
++            return chunked_pending + new_pending
++        if self.fairness_max_wait_steps > 0 and any(
+             self.schedule_step - req.arrival_step >= self.fairness_max_wait_steps
+             for req in new_pending
+         ):
+@@ -171,8 +194,20 @@
+             return chunked_pending + new_pending
+ 
+         for req in new_pending:
+-            req.cached_len_est = self.cache_manager.estimate_req(req)
+-        candidates = sorted(new_pending, key=lambda req: (-req.cached_len_est, req.arrival_order))
++            probe = self.cache_manager.probe_req(req)
++            req.cached_len_est = probe.cached_len
++            if match_probes is not None:
++                match_probes[id(req)] = probe
++        aging_step = self.lpm_aging_tokens_per_pass if self.schedule_policy == "lpm-aging" else 0
++        if aging_step:
++            candidates = sorted(
++                new_pending,
++                key=lambda req: (
++                    -(req.cached_len_est + aging_step * req.waiting_passes), req.arrival_order
++                ),
++            )
++        else:
++            candidates = sorted(new_pending, key=lambda req: (-req.cached_len_est, req.arrival_order))
+         return chunked_pending + candidates
+ 
+     def schedule_next_batch(self, prefill_budget: int) -> Batch | None:
+@@ -185,7 +220,9 @@
+         self.schedule_step += 1
+         if prefill_budget <= 0:
+             return None
+-        candidates = self._get_candidates()
++        # Probes live for this call only; admission refreshes them against current cache state.
++        match_probes: Dict[int, MatchProbe] = {}
++        candidates = self._get_candidates(match_probes, prefill_budget=prefill_budget)
+ 
+         # estimated offset due to in-flight decode
+         adder = PrefillAdder(
+@@ -193,11 +230,14 @@
+             reserved_size=self.decode_manager.inflight_tokens,
+             cache_manager=self.cache_manager,
+             table_manager=self.table_manager,
++            match_probes=match_probes,
+         )
+         reqs: List[Req] = []
+         chunked_list: List[PendingReq] = []
+         scheduled_ids: set[int] = set()
++        admitted_new = False
+         for pending_req in candidates:
++            was_new = pending_req.chunked_req is None
+             if req := adder.try_add_one(pending_req):   #req：Req/ChunkedReq
+                 pending_req.chunked_req = None  #清除上一轮的状态
+                 if isinstance(req, ChunkedReq): #req会记录有多少cached_len,如果还有token没计算完成，那么就会将其加入pending_req.chunked_req = req
+@@ -205,6 +245,7 @@
+                     chunked_list.append(pending_req)
+                 reqs.append(req)
+                 scheduled_ids.add(id(pending_req))
++                admitted_new |= was_new
+             else:
+                 break  # We cannot add more requests
+         if len(reqs) == 0:
+@@ -213,6 +254,12 @@
+         self.pending_list = chunked_list + [
+             req for req in self.pending_list if id(req) not in scheduled_ids
+         ]
++        # Effective waiting: a completed pass admitted at least one NEW request.
++        # No aging for empty/zero-budget/all-rejected/chunk-only passes or admitted requests.
++        if admitted_new and self.schedule_policy == "lpm-aging" and self.lpm_aging_tokens_per_pass > 0:
++            for pending_req in self.pending_list:
++                if pending_req.chunked_req is None:
++                    pending_req.waiting_passes += 1
+         return Batch(reqs=reqs, phase="prefill")
+ 
+     def abort_req(self, uid: int) -> Req | None:
+--- before/python/minisgl/scheduler/config.py
++++ after/python/minisgl/scheduler/config.py
+@@ -20,14 +20,18 @@
+     offline_mode: bool = False
+     schedule_policy: str = "fcfs"
+     lpm_queue_threshold: int = 128
+-    fairness_max_wait_steps: int = 64
++    fairness_max_wait_steps: int = 0  # optional legacy FCFS timeout fallback
++    lpm_aging_tokens_per_pass: int = 0
+ 
+     # networking config
+     _unique_suffix: str = field(default_factory=_get_pid_suffix)
+ 
+     def __post_init__(self) -> None:
+         validate_prefill_policy(
+-            self.schedule_policy, self.lpm_queue_threshold, self.fairness_max_wait_steps
++            self.schedule_policy,
++            self.lpm_queue_threshold,
++            self.fairness_max_wait_steps,
++            self.lpm_aging_tokens_per_pass,
+         )
+ 
+     @property
+--- before/python/minisgl/scheduler/scheduler.py
++++ after/python/minisgl/scheduler/scheduler.py
+@@ -67,6 +67,7 @@
+             schedule_policy=config.schedule_policy,
+             lpm_queue_threshold=config.lpm_queue_threshold,
+             fairness_max_wait_steps=config.fairness_max_wait_steps,
++            lpm_aging_tokens_per_pass=config.lpm_aging_tokens_per_pass,
+         )
+ 
+         # some alias for easy access
+--- before/python/minisgl/server/args.py
++++ after/python/minisgl/server/args.py
+@@ -58,6 +58,13 @@
+     return result
+ 
+ 
++def _nonnegative_int(value: str) -> int:
++    result = int(value)
++    if result < 0:
++        raise argparse.ArgumentTypeError("must be a nonnegative integer")
++    return result
++
++
+ def parse_args(args: List[str], run_shell: bool = False) -> Tuple[ServerArgs, bool]:
+     """
+     Parse command line arguments and return an EngineConfig.
+@@ -219,7 +226,7 @@
+ 
+     parser.add_argument(
+         "--schedule-policy",
+-        choices=["fcfs", "lpm"],
++        choices=["fcfs", "lpm", "lpm-aging"],
+         default=ServerArgs.schedule_policy,
+         help="Prefill admission order. LPM prioritizes cached prefixes with FCFS fallbacks.",
+     )
+@@ -232,10 +239,17 @@
+     )
+ 
+     parser.add_argument(
++        "--lpm-aging-tokens-per-pass",
++        type=_nonnegative_int,
++        default=ServerArgs.lpm_aging_tokens_per_pass,
++        help="Virtual matched tokens per effective waiting pass in lpm-aging; 0 disables aging.",
++    )
++
++    parser.add_argument(
+         "--fairness-max-wait-steps",
+-        type=_positive_int,
++        type=_nonnegative_int,
+         default=ServerArgs.fairness_max_wait_steps,
+-        help="Fall back to FCFS when a new request has waited this many scheduling passes; not seconds.",
++        help="Optional FCFS timeout in scheduling passes (not seconds); 0 disables this fallback.",
+     )
+ 
+     parser.add_argument(
+--- before/tests/core/test_prefill_policy.py
++++ after/tests/core/test_prefill_policy.py
+@@ -0,0 +1,529 @@
++from __future__ import annotations
++
++from unittest.mock import Mock
++
++import pytest
++import torch
++
++import minisgl.core as core
++from minisgl.core import Batch, SamplingParams
++from minisgl.distributed import DistributedInfo
++from minisgl.kvcache.radix_cache import RadixTreeNode
++from minisgl.message import UserMsg
++from minisgl.scheduler.cache import CacheManager
++from minisgl.scheduler.config import SchedulerConfig
++from minisgl.scheduler.decode import DecodeManager
++from minisgl.scheduler.prefill import ChunkedReq, PrefillAdder, PrefillManager
++from minisgl.scheduler.table import TableManager
++from minisgl.server.args import parse_args
++
++
++@pytest.fixture(autouse=True)
++def cpu_context(monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    monkeypatch.setattr(torch.Tensor, "pin_memory", lambda tensor: tensor)
++    original_empty = torch.empty
++
++    def cpu_empty(*args, **kwargs):
++        kwargs.pop("pin_memory", None)
++        return original_empty(*args, **kwargs)
++
++    monkeypatch.setattr(torch, "empty", cpu_empty)
++
++
++def make_manager(policy="fcfs", page_size=1, cache_type="radix", **kwargs):
++    if core._GLOBAL_CTX is None:
++        core.set_global_ctx(core.Context(page_size=page_size))
++    page_table = torch.full((4, 64), -1, dtype=torch.int32)
++    cache = CacheManager(64, page_size, page_table, type=cache_type)
++    return PrefillManager(
++        cache, TableManager(4, page_table), DecodeManager(page_size), schedule_policy=policy, **kwargs
++    )
++
++
++def cache_prefix(manager, input_ids, length):
++    cache = manager.cache_manager
++    assert length % cache.page_size == 0
++    indices = cache._page_to_token(cache._allocate(length // cache.page_size))
++    result = cache.prefix_cache.insert_prefix(input_ids[:length], indices)
++    cache._free(indices[:result.cached_len])
++    return result.handle
++
++
++def enqueue(manager, uid, cached=0, output_len=1, input_ids=None):
++    if input_ids is None:
++        length = max(8, 3 * manager.cache_manager.page_size + 1)
++        input_ids = torch.arange(uid * 1000, uid * 1000 + length, dtype=torch.int32)
++    if cached:
++        cache_prefix(manager, input_ids, cached)
++    manager.add_one_req(UserMsg(uid, input_ids, SamplingParams(max_tokens=output_len)))
++    return manager.pending_list[-1]
++
++
++def uids(reqs):
++    return [req.uid for req in reqs]
++
++
++def finish_batch(manager, batch):
++    manager.cache_manager.allocate_paged(batch.reqs)
++    for req in batch.reqs:
++        req.cached_len = req.device_len  # model-free completion of computed KV positions
++        if not isinstance(req, ChunkedReq):
++            manager.cache_manager.cache_req(req, finished=True)
++            manager.table_manager.free(req.table_idx)
++
++
++def snapshot(manager):
++    cache = manager.cache_manager.prefix_cache
++
++    def visit(node):
++        return (
++            id(node), node.timestamp, node.ref_count,
++            None if node.is_root() else node._key.tolist(),
++            None if node.is_root() else node.value.tolist(),
++            [(key, visit(child)) for key, child in node.children.items()],
++        )
++
++    return (
++        visit(cache.root_node), cache.size_info, cache._structure_version,
++        RadixTreeNode.counter, manager.cache_manager.free_slots.tolist(),
++    )
++
++
++@pytest.mark.parametrize("policy", ["fcfs", "lpm", "lpm-aging"])
++def test_policy_sorting_and_zero_aging(policy):
++    manager = make_manager(policy)
++    enqueue(manager, 90)
++    enqueue(manager, 10, 6)
++    expected = [90, 10] if policy == "fcfs" else [10, 90]
++    assert uids(manager._get_candidates()) == expected
++    assert uids(manager.pending_list) == [90, 10]
++    assert [req.waiting_passes for req in manager.pending_list] == [0, 0]
++
++
++def test_aging_composes_with_match_and_does_not_change_real_length():
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    older = enqueue(manager, 90, 4)
++    enqueue(manager, 10, 6)
++    older.waiting_passes = 2  # effective score 8, greater than 6
++    assert uids(manager._get_candidates()) == [90, 10]
++    assert older.cached_len_est == 4
++    batch = manager.schedule_next_batch(4)
++    assert uids(batch.reqs) == [90]
++    assert batch.reqs[0].cached_len == 4  # never the virtual score of 8
++    assert older.waiting_passes == 2
++    finish_batch(manager, batch)
++    manager.cache_manager.check_integrity()
++
++
++@pytest.mark.parametrize("policy,aging", [("lpm", 100), ("lpm-aging", 0)])
++def test_disabled_aging_does_not_bias_order_or_write_counters(policy, aging):
++    manager = make_manager(policy, lpm_aging_tokens_per_pass=aging)
++    cold = enqueue(manager, 90)
++    hot = enqueue(manager, 10, 6)
++    cold.waiting_passes = 100
++    assert uids(manager._get_candidates()) == [10, 90]
++    manager.schedule_next_batch(2)
++    assert (cold.waiting_passes, hot.waiting_passes) == (100, 0)
++
++
++@pytest.mark.parametrize("policy", ["lpm", "lpm-aging"])
++def test_stable_ties_follow_arrival_order(policy):
++    manager = make_manager(policy, lpm_aging_tokens_per_pass=2)
++    first = enqueue(manager, 90, 4)
++    second = enqueue(manager, 10, 6)
++    if policy == "lpm-aging":
++        first.waiting_passes = 1  # 4 + 2 == 6
++    else:
++        cache_prefix(manager, first.input_ids, 6)
++    assert first.arrival_order < second.arrival_order
++    assert uids(manager._get_candidates()) == [90, 10]
++
++
++def test_reordered_admission_removes_only_selected_requests():
++    manager = make_manager("lpm")
++    enqueue(manager, 10)
++    enqueue(manager, 20, 2)
++    enqueue(manager, 30, 6)
++    assert uids(manager.schedule_next_batch(2).reqs) == [30]
++    assert uids(manager.pending_list) == [10, 20]
++    enqueue(manager, 40, 7)
++    assert uids(manager.schedule_next_batch(1).reqs) == [40]
++    assert uids(manager.pending_list) == [10, 20]
++
++
++@pytest.mark.parametrize("policy", ["lpm", "lpm-aging"])
++@pytest.mark.parametrize("length", [128, 129])
++def test_queue_fallback_boundary_and_no_sorting_probes(policy, length, monkeypatch):
++    manager = make_manager(policy, lpm_aging_tokens_per_pass=2)
++    for uid in range(length):
++        enqueue(manager, uid)
++    spy = Mock(wraps=manager.cache_manager.probe_req)
++    monkeypatch.setattr(manager.cache_manager, "probe_req", spy)
++    assert uids(manager._get_candidates()) == list(range(length))
++    assert spy.call_count == (length if length == 128 else 0)
++
++
++def test_fcfs_fallback_uses_original_order_after_lpm_reordering():
++    manager = make_manager("lpm", lpm_queue_threshold=2)
++    enqueue(manager, 90)
++    enqueue(manager, 10, 6)
++    assert uids(manager._get_candidates()) == [10, 90]
++    enqueue(manager, 20, 7)
++    assert uids(manager._get_candidates()) == [90, 10, 20]
++
++
++def test_cold_request_overtakes_continuous_fresh_hot_arrivals():
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    cold = enqueue(manager, 90)
++    for waiting in range(3):
++        hot = enqueue(manager, waiting + 1, 6)
++        assert cold.waiting_passes == waiting
++        batch = manager.schedule_next_batch(2)
++        assert uids(batch.reqs) == [hot.uid]
++        assert cold.waiting_passes == waiting + 1
++        assert hot.waiting_passes == 0
++        finish_batch(manager, batch)
++    enqueue(manager, 10, 6)
++    assert uids(manager._get_candidates())[0] == cold.uid  # score 6, arrival tie-break
++    batch = manager.schedule_next_batch(2)
++    assert batch.reqs[0].uid == cold.uid
++    assert isinstance(batch.reqs[0], ChunkedReq)
++    assert batch.reqs[0].cached_len == 0
++    assert cold.waiting_passes == 3
++
++
++def test_counter_is_updated_once_after_an_effective_pass():
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    cold = enqueue(manager, 90)
++    enqueue(manager, 10, 6)
++    manager._get_candidates()
++    manager._get_candidates()
++    assert cold.waiting_passes == 0
++    batch = manager.schedule_next_batch(2)
++    assert cold.waiting_passes == 1
++    manager._get_candidates()
++    assert cold.waiting_passes == 1
++    finish_batch(manager, batch)
++
++
++def test_multiple_new_admissions_still_count_as_one_waiting_pass():
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    cold = enqueue(manager, 90)
++    enqueue(manager, 10, 6)
++    enqueue(manager, 20, 6)
++    batch = manager.schedule_next_batch(4)
++    assert uids(batch.reqs) == [10, 20]
++    assert cold.waiting_passes == 1
++
++
++def test_no_table_slots_skips_sorting_probes(monkeypatch):
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    enqueue(manager, 90)
++    enqueue(manager, 10, 6)
++    for _ in range(4):
++        manager.table_manager.allocate()
++    spy = Mock(wraps=manager.cache_manager.probe_req)
++    monkeypatch.setattr(manager.cache_manager, "probe_req", spy)
++    assert manager.schedule_next_batch(8) is None
++    spy.assert_not_called()
++
++
++@pytest.mark.parametrize("blocked", ["empty", "zero_budget", "table", "kv"])
++def test_no_opportunity_does_not_age(blocked):
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    if blocked == "empty":
++        assert manager.schedule_next_batch(8) is None
++        return
++    cold = enqueue(manager, 90, output_len=1000 if blocked == "kv" else 1)
++    enqueue(manager, 10)
++    if blocked == "table":
++        for _ in range(4):
++            manager.table_manager.allocate()
++    for _ in range(4):
++        assert manager.schedule_next_batch(0 if blocked == "zero_budget" else 8) is None
++        assert cold.waiting_passes == 0
++
++
++def test_sorting_overtake_does_not_guarantee_resource_admission():
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    cold = enqueue(manager, 90, output_len=1000)
++    enqueue(manager, 10, 6)
++    cold.waiting_passes = 100
++    assert manager._get_candidates()[0] is cold
++    assert manager.schedule_next_batch(8) is None  # required KV exceeds capacity
++    assert cold.waiting_passes == 100
++    assert uids(manager.pending_list) == [90, 10]
++
++
++def test_chunk_only_pass_does_not_age_and_preserves_resources():
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    chunk_pending = enqueue(manager, 90)
++    batch = manager.schedule_next_batch(2)
++    finish_batch(manager, batch)
++    arrival = (chunk_pending.arrival_order, chunk_pending.arrival_step)
++    waiting = enqueue(manager, 10, 6)
++    available_tables = manager.table_manager.available_size
++    for _ in range(2):
++        batch = manager.schedule_next_batch(2)
++        assert uids(batch.reqs) == [90]
++        assert waiting.waiting_passes == 0
++        assert chunk_pending.waiting_passes == 0
++        assert manager.table_manager.available_size == available_tables
++        finish_batch(manager, batch)
++    assert (chunk_pending.arrival_order, chunk_pending.arrival_step) == arrival
++    batch = manager.schedule_next_batch(4)
++    assert uids(batch.reqs) == [90, 10]
++    finish_batch(manager, batch)
++    assert not manager.pending_list
++    assert manager.table_manager.available_size == 4
++    assert manager.cache_manager.prefix_cache.size_info.protected_size == 0
++    manager.cache_manager.check_integrity()
++
++
++def test_abort_removes_aging_state_and_frees_chunk_via_existing_lifecycle():
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2)
++    old = enqueue(manager, 90)
++    old.waiting_passes = 5
++    assert manager.abort_req(90) is None
++    fresh = enqueue(manager, 90)
++    assert fresh.waiting_passes == 0 and fresh.arrival_order > old.arrival_order
++    batch = manager.schedule_next_batch(2)
++    finish_batch(manager, batch)
++    chunk = manager.abort_req(90)
++    assert isinstance(chunk, ChunkedReq)
++    manager.cache_manager.cache_req(chunk, finished=True)
++    manager.table_manager.free(chunk.table_idx)
++    assert not manager.pending_list
++    assert manager.table_manager.available_size == 4
++    manager.cache_manager.check_integrity()
++
++
++@pytest.mark.parametrize("policy", ["fcfs", "lpm", "lpm-aging"])
++def test_single_request_and_naive_cache(policy):
++    manager = make_manager(policy, cache_type="naive", lpm_aging_tokens_per_pass=2)
++    req = enqueue(manager, 90)
++    assert uids(manager.schedule_next_batch(8).reqs) == [90]
++    assert req.waiting_passes == 0 and not manager.pending_list
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++@pytest.mark.parametrize("kind", ["empty", "miss", "partial", "divergent", "full", "duplicate"])
++def test_read_only_probe_matches_real_prefix_without_mutations(page_size, kind):
++    manager = make_manager(page_size=page_size)
++    ids = torch.arange(3 * page_size, dtype=torch.int32)
++    cache_prefix(manager, ids, len(ids))
++    if kind == "empty":
++        query = ids[:0]
++    elif kind == "miss":
++        query = torch.tensor([999], dtype=torch.int32)
++    elif kind == "partial":
++        query = ids[:page_size + 1]
++    elif kind == "divergent":
++        query = torch.cat([ids[:2 * page_size], torch.tensor([999], dtype=torch.int32)])
++    else:
++        query = ids
++    before = snapshot(manager)
++    cache = manager.cache_manager.prefix_cache
++    for _ in range(2):
++        probe = cache.probe_prefix(query)
++        assert cache.estimate_match_len(query.tolist()) == probe.cached_len
++        assert snapshot(manager) == before
++    assert cache.match_prefix(query).cuda_handle.cached_len == probe.cached_len
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++@pytest.mark.parametrize("change", ["evict", "insert", "split"])
++def test_stale_sorting_probe_is_revalidated_at_admission(page_size, change):
++    manager = make_manager(page_size=page_size)
++    pending = enqueue(manager, 90)
++    cache = manager.cache_manager
++    if change != "insert":
++        cache_prefix(manager, pending.input_ids, 3 * page_size)
++    pending.input_ids = pending.input_ids[:page_size + 1]
++    probe = cache.probe_req(pending)
++    if change == "evict":
++        cache._free(cache.prefix_cache.evict(3 * page_size))
++        expected = 0
++    elif change == "insert":
++        cache_prefix(manager, pending.input_ids, page_size)
++        expected = page_size
++    else:
++        cache.prefix_cache.match_prefix(torch.arange(90000, 90000 + 2 * page_size, dtype=torch.int32))
++        expected = page_size
++    handle = cache.try_match_and_lock(pending, 0, probe=probe)
++    assert handle.cached_len == expected
++    cache.unlock(handle)
++    cache.check_integrity()
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++def test_reference_count_changes_refresh_cost_without_comparing_tokens(page_size, monkeypatch):
++    manager = make_manager(page_size=page_size)
++    pending = enqueue(manager, 90, cached=2 * page_size)
++    cache = manager.cache_manager
++    probe = cache.probe_req(pending)
++    other = cache.prefix_cache.commit_match(probe)
++    cache.lock(other)
++    pending.sampling_params.max_tokens = cache.available_size - (pending.input_len - probe.cached_len)
++
++    def no_compare(*args):
++        pytest.fail("Unchanged structure must reuse the token match")
++
++    monkeypatch.setattr(RadixTreeNode, "get_match_len", no_compare)
++    handle = cache.try_match_and_lock(pending, 0, probe=probe)
++    assert handle is not None
++    cache.unlock(handle)
++    cache.unlock(other)
++    cache.check_integrity()
++
++
++def test_sorting_probes_are_reused_for_shared_prefix_admission(monkeypatch):
++    manager = make_manager("lpm")
++    ids = torch.arange(8, dtype=torch.int32)
++    cache_prefix(manager, ids, 6)
++    for uid in range(3):
++        enqueue(manager, uid, input_ids=ids)
++    original = RadixTreeNode.get_match_len
++    calls = []
++
++    def compare(node, query):
++        calls.append(node.uuid)
++        return original(node, query)
++
++    monkeypatch.setattr(RadixTreeNode, "get_match_len", compare)
++    batch = manager.schedule_next_batch(6)
++    assert len(batch.reqs) == 3 and len(calls) == 3
++    assert [req.cached_len for req in batch.reqs] == [6, 6, 6]
++
++
++def legacy_fcfs(manager, budget):
++    """Reference queue/slicing algorithm before policy ordering was introduced."""
++    adder = PrefillAdder(budget, manager.decode_manager.inflight_tokens,
++                         manager.cache_manager, manager.table_manager)
++    reqs, chunks = [], []
++    for pending in manager.pending_list:
++        req = adder.try_add_one(pending)
++        if req is None:
++            break
++        pending.chunked_req = req if isinstance(req, ChunkedReq) else None
++        if pending.chunked_req is not None:
++            chunks.append(pending)
++        reqs.append(req)
++    if not reqs:
++        return None
++    manager.pending_list = chunks + manager.pending_list[len(reqs):]
++    return Batch(reqs, "prefill")
++
++
++def test_default_fcfs_matches_legacy_batches_chunks_and_resources():
++    managers = [make_manager(), make_manager()]
++    for manager in managers:
++        enqueue(manager, 90, 2)
++        enqueue(manager, 10, 6)
++        enqueue(manager, 20)
++    for budget in [3, 3, 2, 8, 8]:
++        actual = managers[0].schedule_next_batch(budget)
++        expected = legacy_fcfs(managers[1], budget)
++        assert (actual is None) == (expected is None)
++        if actual is not None:
++            describe = lambda batch: [(r.uid, r.cached_len, r.device_len, type(r)) for r in batch.reqs]
++            assert describe(actual) == describe(expected)
++            finish_batch(managers[0], actual)
++            finish_batch(managers[1], expected)
++        assert uids(managers[0].pending_list) == uids(managers[1].pending_list)
++        assert managers[0].table_manager.available_size == managers[1].table_manager.available_size
++        assert managers[0].cache_manager.prefix_cache.size_info == managers[1].cache_manager.prefix_cache.size_info
++    for manager in managers:
++        assert not manager.pending_list
++        manager.cache_manager.check_integrity()
++
++
++def test_identical_rank_inputs_have_identical_aging_decisions():
++    managers = [make_manager("lpm-aging", lpm_aging_tokens_per_pass=2) for _ in range(2)]
++    for manager in managers:
++        cold = enqueue(manager, 90)
++        enqueue(manager, 10, 6)
++        cold.waiting_passes = 3
++    assert [uids(m._get_candidates()) for m in managers] == [[90, 10], [90, 10]]
++
++
++def test_unlock_refreshes_protection_cost_before_capacity_check():
++    manager = make_manager()
++    pending = enqueue(manager, 90, cached=6, output_len=57)
++    cache = manager.cache_manager
++    other = cache.prefix_cache.match_prefix(pending.input_ids[:-1]).cuda_handle
++    cache.lock(other)
++    probe = cache.probe_req(pending)
++    assert probe.newly_protected_size == 0
++    cache.unlock(other)
++    before = snapshot(manager)
++    assert cache.try_match_and_lock(pending, 0, probe=probe) is None
++    assert snapshot(manager) == before
++
++
++def test_split_by_first_admission_invalidates_later_sorting_probe():
++    manager = make_manager("lpm")
++    ids = torch.arange(12, dtype=torch.int32)
++    cache_prefix(manager, ids, 12)
++    enqueue(manager, 90, input_ids=ids[:5])
++    enqueue(manager, 10, input_ids=ids[:9])
++    batch = manager.schedule_next_batch(2)
++    assert uids(batch.reqs) == [10, 90]
++    assert [req.cached_len for req in batch.reqs] == [8, 4]
++    assert [len(req.cache_handle.get_matched_indices()) for req in batch.reqs] == [8, 4]
++    assert manager.cache_manager.prefix_cache.size_info.protected_size == 8
++    finish_batch(manager, batch)
++    manager.cache_manager.check_integrity()
++
++
++def test_queue_fallback_ages_only_after_a_real_new_admission(monkeypatch):
++    manager = make_manager("lpm-aging", lpm_aging_tokens_per_pass=2, lpm_queue_threshold=2)
++    for uid in range(3):
++        enqueue(manager, uid)
++    spy = Mock(wraps=manager.cache_manager.probe_req)
++    monkeypatch.setattr(manager.cache_manager, "probe_req", spy)
++    batch = manager.schedule_next_batch(8)
++    assert uids(batch.reqs) == [0]
++    assert spy.call_count == 1  # admission probe only; no queue-wide sorting probe
++    assert [req.waiting_passes for req in manager.pending_list] == [1, 1]
++
++
++def test_optional_legacy_timeout_remains_available():
++    manager = make_manager("lpm", fairness_max_wait_steps=2)
++    enqueue(manager, 90)
++    enqueue(manager, 10, 6)
++    manager.schedule_step = 2
++    assert uids(manager._get_candidates()) == [90, 10]
++
++
++def test_cli_settings_and_defaults():
++    common = ["--model-path", "test-model", "--dtype", "float32"]
++    default, _ = parse_args(common)
++    assert default.schedule_policy == "fcfs" and default.lpm_aging_tokens_per_pass == 0
++    assert default.fairness_max_wait_steps == 0
++    configured, _ = parse_args(common + [
++        "--schedule-policy", "lpm-aging", "--lpm-aging-tokens-per-pass", "8",
++        "--lpm-queue-threshold", "32", "--fairness-max-wait-steps", "0",
++    ])
++    assert (configured.schedule_policy, configured.lpm_aging_tokens_per_pass) == ("lpm-aging", 8)
++    assert configured.lpm_queue_threshold == 32
++
++
++@pytest.mark.parametrize("kwargs", [
++    {"schedule_policy": "unknown"}, {"lpm_queue_threshold": 0},
++    {"lpm_aging_tokens_per_pass": -1}, {"fairness_max_wait_steps": -1},
++])
++def test_invalid_config_is_rejected(kwargs):
++    with pytest.raises(ValueError):
++        SchedulerConfig("test-model", DistributedInfo(0, 1), torch.float32, **kwargs)
++
++
++@pytest.mark.parametrize("flag,value", [
++    ("--schedule-policy", "unknown"), ("--lpm-queue-threshold", "0"),
++    ("--lpm-aging-tokens-per-pass", "-1"), ("--fairness-max-wait-steps", "-1"),
++])
++def test_invalid_cli_is_rejected(flag, value):
++    with pytest.raises(SystemExit) as error:
++        parse_args(["--model-path", "test-model", "--dtype", "float32", flag, value])
++    assert error.value.code == 2
+--- before/tests/core/test_prefill_benchmark.py
++++ after/tests/core/test_prefill_benchmark.py
+@@ -0,0 +1,28 @@
++from __future__ import annotations
++
++import importlib.util
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++import minisgl.core as core
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++def test_benchmark_simulation_is_deterministic_and_preserves_resources(page_size, monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    path = Path(__file__).resolve().parents[2] / "benchmarks/bench_prefill_policy.py"
++    spec = importlib.util.spec_from_file_location("prefill_benchmark", path)
++    benchmark = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(benchmark)
++    args = SimpleNamespace(
++        stream_prefix=8, stream_steps=8, arrivals_per_pass=1,
++        page_size=page_size, aging_tokens_per_pass=2, budget=1,
++    )
++    with benchmark.cpu_transfers():
++        rows = [benchmark.simulate(policy, "mixed", args) for policy in benchmark.POLICIES]
++    assert [r["cold_first_admission_pass"] for r in rows] == [1, 9, 5]
++    assert all(r["computed_prefill_tokens"] == 17 for r in rows)
++    assert all(r["resource_integrity"] == "passed" for r in rows)
++    assert len({r["cache_hit_ratio"] for r in rows}) == 1
+--- before/benchmarks/bench_prefill_policy.py
++++ after/benchmarks/bench_prefill_policy.py
+@@ -0,0 +1,305 @@
++"""CPU scheduler benchmark: real radix matching/admission, model-free KV lifecycle.
++
++Run with PYTHONPATH=python. No model, attention, sampling, or CUDA graph runs.
++Scheduling microseconds and simulated admission passes are NOT GPU TTFT/throughput.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import math
++import os
++import platform
++import random
++import statistics
++import subprocess
++import time
++from contextlib import contextmanager
++from pathlib import Path
++from unittest.mock import patch
++
++import torch
++
++import minisgl.core as core
++from minisgl.core import SamplingParams
++from minisgl.message import UserMsg
++from minisgl.scheduler.cache import CacheManager
++from minisgl.scheduler.decode import DecodeManager
++from minisgl.scheduler.prefill import ChunkedReq, PrefillManager
++from minisgl.scheduler.table import TableManager
++
++
++POLICIES = ("fcfs", "lpm", "lpm-aging")
++
++
++@contextmanager
++def cpu_transfers():
++    """Replace only pinning in this benchmark; retain actual tensor copies/allocator."""
++    empty = torch.empty
++
++    def unpinned_empty(*args, **kwargs):
++        kwargs.pop("pin_memory", None)
++        return empty(*args, **kwargs)
++
++    with patch.object(torch.Tensor, "pin_memory", lambda tensor: tensor), patch.object(
++        torch, "empty", unpinned_empty
++    ):
++        yield
++
++
++def percentile(values, fraction):
++    ordered = sorted(values)
++    return ordered[max(0, math.ceil(len(ordered) * fraction) - 1)] if ordered else None
++
++
++def make_manager(policy, prefix_len, page_size, aging, capacity, table_slots=4):
++    core._GLOBAL_CTX = core.Context(page_size=page_size)
++    page_table = torch.full((table_slots, prefix_len + 16), -1, dtype=torch.int32)
++    cache = CacheManager(capacity, page_size, page_table, type="radix")
++    manager = PrefillManager(
++        cache, TableManager(table_slots, page_table), DecodeManager(page_size),
++        schedule_policy=policy, lpm_aging_tokens_per_pass=aging,
++        fairness_max_wait_steps=0, lpm_queue_threshold=128,
++    )
++    hot_prefix = torch.arange(prefix_len, dtype=torch.int32)
++    indices = cache._page_to_token(cache._allocate(prefix_len // page_size))
++    cache.prefix_cache.insert_prefix(hot_prefix, indices)
++    return manager, hot_prefix
++
++
++def hot_tokens(prefix, uid):
++    return torch.cat([prefix, torch.tensor([2_000_000 + uid], dtype=torch.int32)])
++
++
++def cold_tokens(prefix_len, uid):
++    start = 1_000_000 + uid * (prefix_len + 1024)
++    return torch.arange(start, start + prefix_len + 1, dtype=torch.int32)
++
++
++def enqueue(manager, uid, ids):
++    manager.add_one_req(UserMsg(uid, ids, SamplingParams(max_tokens=1)))
++    return manager.pending_list[-1]
++
++
++def microbenchmark(policy, prefix_len, queue_len, page_size, trials, seed):
++    aging = max(1, prefix_len // 8)
++    manager, prefix = make_manager(
++        policy, prefix_len, page_size, aging, prefix_len // page_size + 64
++    )
++    rng = random.Random(seed)
++    for uid in range(queue_len):
++        ids = hot_tokens(prefix, uid) if rng.random() < 0.75 else cold_tokens(prefix_len, uid)
++        req = enqueue(manager, uid, ids)
++        req.waiting_passes = rng.randrange(16)
++    # Warm native compare/module loading before measurements, including FCFS runs.
++    warm = enqueue(manager, -1, hot_tokens(prefix, 0))
++    manager.cache_manager.probe_req(warm)
++    manager.abort_req(-1)
++    for _ in range(10):
++        manager._get_candidates({})
++    durations = []
++    for _ in range(trials):
++        start = time.perf_counter_ns()
++        manager._get_candidates({})
++        durations.append((time.perf_counter_ns() - start) / 1000)
++    manager.cache_manager.check_integrity()
++    return {
++        "policy": policy, "prefix_tokens": prefix_len, "queue_len": queue_len,
++        "page_size": page_size, "aging_tokens_per_pass": aging, "trials": trials,
++        "median_us": statistics.median(durations), "p95_us": percentile(durations, 0.95),
++        "sorting_probes_per_call": queue_len if policy != "fcfs" and 1 < queue_len <= 128 else 0,
++    }
++
++
++def simulate(policy, workload, args):
++    prefix_len = args.stream_prefix
++    requests = args.stream_steps * args.arrivals_per_pass + (workload == "mixed")
++    capacity = math.ceil((prefix_len + 1) * (requests + 2) / args.page_size) + 16
++    manager, prefix = make_manager(
++        policy, prefix_len, args.page_size, args.aging_tokens_per_pass, capacity
++    )
++    warm = enqueue(manager, -1, hot_tokens(prefix, 0))
++    manager.cache_manager.probe_req(warm)
++    manager.abort_req(-1)
++    arrivals, first_admission, completion = {}, {}, {}
++    kinds, lengths, matched_at_admission = {}, {}, {}
++    next_uid = 0
++    if workload == "mixed":
++        enqueue(manager, 0, cold_tokens(prefix_len, 0))
++        arrivals[0], kinds[0], lengths[0] = 0, "cold", prefix_len + 1
++        next_uid = 1
++    durations, computed_tokens, completed_in_window, max_queue = [], 0, 0, 0
++    # Every request is finite and all output is one token; protect against a stuck head.
++    max_passes = args.stream_steps + math.ceil(requests * (prefix_len + 1) / args.budget) + requests
++    for step in range(1, max_passes + 1):
++        if step <= args.stream_steps:
++            for _ in range(args.arrivals_per_pass):
++                uid = next_uid
++                next_uid += 1
++                kind = "cold" if workload == "cold-only" else "hot"
++                ids = cold_tokens(prefix_len, uid) if kind == "cold" else hot_tokens(prefix, uid)
++                enqueue(manager, uid, ids)
++                arrivals[uid], kinds[uid], lengths[uid] = step, kind, len(ids)
++        max_queue = max(max_queue, len(manager.pending_list))
++        start = time.perf_counter_ns()
++        batch = manager.schedule_next_batch(args.budget)
++        durations.append((time.perf_counter_ns() - start) / 1000)
++        if batch is None:
++            if manager.pending_list:
++                raise RuntimeError("No progress in the model-free workload; check admission constraints")
++            if step >= args.stream_steps:
++                break
++            continue
++        # Physical page allocation and completion run outside the measured scheduling interval.
++        manager.cache_manager.allocate_paged(batch.reqs)
++        for req in batch.reqs:
++            if req.uid not in first_admission:
++                first_admission[req.uid] = step
++                matched_at_admission[req.uid] = req.cache_handle.cached_len
++            computed_tokens += req.extend_len
++            req.cached_len = req.device_len
++            if not isinstance(req, ChunkedReq):
++                manager.cache_manager.cache_req(req, finished=True)
++                manager.table_manager.free(req.table_idx)
++                completion[req.uid] = step
++                completed_in_window += step <= args.stream_steps
++        if step >= args.stream_steps and not manager.pending_list:
++            break
++    else:
++        raise RuntimeError("Workload did not drain within the finite-pass bound")
++    assert len(completion) == len(arrivals) == requests
++    assert manager.table_manager.available_size == 4
++    assert manager.cache_manager.prefix_cache.size_info.protected_size == 0
++    manager.cache_manager.check_integrity()
++    hot_wait = [first_admission[u] - arrivals[u] for u in arrivals if kinds[u] == "hot"]
++    cold_wait = [first_admission[u] - arrivals[u] for u in arrivals if kinds[u] == "cold"]
++    return {
++        "policy": policy, "workload": workload, "requests": requests,
++        "drain_pass": max(completion.values()), "max_queue": max_queue,
++        "cold_first_admission_pass": first_admission.get(0) if workload == "mixed" else None,
++        "cold_completion_pass": completion.get(0) if workload == "mixed" else None,
++        "hot_wait_p95_passes": percentile(hot_wait, 0.95),
++        "cold_wait_p95_passes": percentile(cold_wait, 0.95),
++        "completed_in_arrival_window": completed_in_window,
++        "cached_tokens_at_admission": sum(matched_at_admission.values()),
++        "prompt_tokens": sum(lengths.values()), "computed_prefill_tokens": computed_tokens,
++        "cache_hit_ratio": sum(matched_at_admission.values()) / sum(lengths.values()),
++        "scheduling_mean_us": statistics.mean(durations),
++        "scheduling_median_us": statistics.median(durations),
++        "scheduling_p95_us": percentile(durations, 0.95),
++        "resource_integrity": "passed",
++    }
++
++
++def positive(value):
++    parsed = int(value)
++    if parsed <= 0:
++        raise argparse.ArgumentTypeError("must be positive")
++    return parsed
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--seed", type=int, default=31723)
++    parser.add_argument("--trials", type=positive, default=100)
++    parser.add_argument("--repeats", type=positive, default=3)
++    parser.add_argument("--prefix-lengths", type=positive, nargs="+", default=[64, 1024])
++    parser.add_argument("--queue-lengths", type=positive, nargs="+", default=[8, 32, 128, 129, 256])
++    parser.add_argument("--page-size", type=positive, default=1)
++    parser.add_argument("--stream-prefix", type=positive, default=64)
++    parser.add_argument("--stream-steps", type=positive, default=32)
++    parser.add_argument("--arrivals-per-pass", type=positive, default=4)
++    parser.add_argument("--budget", type=positive, default=4)
++    parser.add_argument("--aging-tokens-per-pass", type=positive, default=8)
++    parser.add_argument("--output", type=Path, default=Path("artifacts/lpm_aging/benchmark.json"))
++    args = parser.parse_args()
++    if any(n % args.page_size for n in args.prefix_lengths + [args.stream_prefix]):
++        parser.error("prefix lengths must be page aligned")
++    torch.set_num_threads(1)
++    torch.manual_seed(args.seed)
++    cpu = next((line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines()
++                if line.startswith("model name")), platform.processor())
++    metadata = {
++        "platform": platform.platform(), "cpu": cpu, "logical_cpus": os.cpu_count(),
++        "python": platform.python_version(), "torch": torch.__version__, "torch_threads": 1,
++        "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
++        "dirty_worktree": bool(subprocess.check_output(["git", "status", "--porcelain"], text=True)),
++        "cuda_available": torch.cuda.is_available(),
++        "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
++        "scope": "CPU scheduler and model-free allocator simulation; no GPU inference",
++        "parameters": {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
++    }
++    micro, runs = [], []
++    with cpu_transfers():
++        for prefix_len in args.prefix_lengths:
++            for queue_len in args.queue_lengths:
++                for policy in POLICIES:
++                    micro.append(microbenchmark(
++                        policy, prefix_len, queue_len, args.page_size, args.trials, args.seed
++                    ))
++            print(f"Measured candidate ordering: prefix={prefix_len}", flush=True)
++        rng = random.Random(args.seed)
++        cases = [(workload, policy) for workload in ("hot-only", "mixed", "cold-only")
++                 for policy in POLICIES]
++        for repeat in range(args.repeats):
++            rng.shuffle(cases)  # Avoid measuring every policy in a fixed thermal/load order.
++            for workload, policy in cases:
++                row = simulate(policy, workload, args)
++                row["repeat"] = repeat
++                runs.append(row)
++            print(f"Simulated all workloads/policies: repeat={repeat + 1}, resources passed", flush=True)
++    summary = []
++    for workload in ("hot-only", "mixed", "cold-only"):
++        for policy in POLICIES:
++            group = [r for r in runs if r["policy"] == policy and r["workload"] == workload]
++            row = {k: v for k, v in group[0].items() if k != "repeat"}
++            for key in ("scheduling_mean_us", "scheduling_median_us", "scheduling_p95_us"):
++                row[key] = statistics.median(r[key] for r in group)
++            row["min_run_mean_us"] = min(r["scheduling_mean_us"] for r in group)
++            row["max_run_mean_us"] = max(r["scheduling_mean_us"] for r in group)
++            row["repeats"] = args.repeats
++            summary.append(row)
++    args.output.parent.mkdir(parents=True, exist_ok=True)
++    args.output.write_text(json.dumps({
++        "metadata": metadata, "ordering_microbenchmark": micro,
++        "simulation_summary": summary, "simulation_runs": runs,
++    }, indent=2) + "\n")
++    lines = [
++        "# CPU 调度 Benchmark", "",
++        f"环境：{metadata['cpu']}；Python {metadata['python']}；Torch {metadata['torch']}；1 个 Torch 线程。",
++        "",
++        "真实 RadixCache/PrefillManager/页分配器；CPU 拷贝不 pin；无模型、Attention、采样或 GPU 推理。",
++        "调度耗时不包含页分配和模拟完成；轮数不是秒数或 GPU TTFT。固定种子，原生内核预热后测量。",
++        "",
++        "## 候选排序（中位数 / p95，微秒）", "",
++        "| 前缀 token | 队列 | 策略 | 中位数 | p95 | 排序探测次数 |",
++        "|---:|---:|---|---:|---:|---:|",
++    ]
++    for row in micro:
++        lines.append(f"| {row['prefix_tokens']} | {row['queue_len']} | {row['policy']} | "
++                     f"{row['median_us']:.2f} | {row['p95_us']:.2f} | {row['sorting_probes_per_call']} |")
++    lines += [
++        "", "## 有限请求流与真实缓存生命周期模拟", "",
++        "| 负载 | 策略 | 冷请求首次准入轮 | 冷请求完成轮 | hot 等待 p95（轮） | "
++        "总 Prefill token | 缓存命中率 | 调度均值（µs） | 各次运行均值范围（µs） |",
++        "|---|---|---:|---:|---:|---:|---:|---:|---|",
++    ]
++    for row in summary:
++        lines.append(f"| {row['workload']} | {row['policy']} | {row['cold_first_admission_pass']} | "
++                     f"{row['cold_completion_pass']} | {row['hot_wait_p95_passes']} | "
++                     f"{row['computed_prefill_tokens']} | {100 * row['cache_hit_ratio']:.2f}% | "
++                     f"{row['scheduling_mean_us']:.2f} | "
++                     f"{row['min_run_mean_us']:.2f}–{row['max_run_mean_us']:.2f} |")
++    lines += [
++        "", f"{len(runs)} 个模拟运行均检查排空、表槽归还、protected_size=0 和缓存页总量守恒。",
++        "所有有限请求流排空后才比较总计算量。混合负载中 Aging 提前服务冷请求，"
++        "代价是 hot 请求可能等待 chunk 续算；不能据此声称总体吞吐提升。",
++        "CPU 时间受宿主负载和频率变化影响，原始重复运行在 JSON 中；不报告 GPU 性能收益。", "",
++    ]
++    args.output.with_suffix(".md").write_text("\n".join(lines))
++    print(json.dumps(summary, indent=2))
++    print(f"Saved {args.output}")
++
++
++if __name__ == "__main__":
++    main()
+--- before/docs/lpm_aging.md
++++ after/docs/lpm_aging.md
+@@ -0,0 +1,166 @@
++# Prefill LPM 与 Pass-based Aging
++
++实现参考 [SGLang PR #31723](https://github.com/sgl-project/sglang/pull/31723)，
++核对的 PR head 为 `622dcea784f1da8a8f90a1bd3baa89d5c7b853af`。
++这里适配的是 mini-SGLang 的实际准入生命周期，而不是复制上游计数位置。
++
++## 原有调用链与约束
++
++```text
++Scheduler._process_one_msg(UserMsg)
++  → PrefillManager.add_one_req → PendingReq（等待队列）
++Scheduler._schedule_next_batch
++  → PrefillManager.schedule_next_batch
++    → 本轮候选顺序
++    → PrefillAdder.try_add_one
++      → 新请求：_try_allocate_one → CacheManager.try_match_and_lock
++        → probe/refresh → KV 容量检查 → commit_match → lock → touch
++        → TableManager.allocate → 复制缓存索引与 prompt
++      → 已准入 ChunkedReq：沿用 table_idx/cache_handle/cached_len
++    → Batch(phase="prefill")
++  → Prefill 没有 Batch 时才尝试 DecodeManager.schedule_next_batch
++  → _prepare_batch → allocate_paged → 原有 Engine.forward
++  → 请求完成/Abort：原有 cache_req + TableManager.free
++```
++
++工作区在开始时已有 PrefixCache 只读探测、延迟分裂和两种 FCFS 退化实现，
++并有其他用户修改；这些文件已先备份和记录哈希。默认 FCFS 不进行排序探测。
++新请求只追加到基础队列，LPM 生成单独的候选列表，基础新请求顺序仍按到达顺序维护。
++候选重排后按对象身份移除成功准入项，不能再用 `pending_list[len(reqs):]`。
++原有“一个候选不能接纳就 break”、Prefill/Decode 优先关系和预算算法保持不变。
++
++## 配置与策略
++
++| 配置 | 默认值 | 语义 |
++|---|---|---|
++| `schedule_policy` | `fcfs` | `fcfs`、`lpm`、`lpm-aging` |
++| `lpm_aging_tokens_per_pass` | `0` | 非负整数；仅 `lpm-aging` 使用，0 关闭 Aging |
++| `lpm_queue_threshold` | `128` | 待首次准入请求超过阈值时按到达顺序退回 FCFS |
++| `fairness_max_wait_steps` | `0` | 保留先前的可选整轮 FCFS 等待阈值；0 关闭 |
++
++本次将先前等待阈值的默认 64 调整为 0，以便纯 LPM 和 Pass-based Aging 单独工作；
++显式传入 `--fairness-max-wait-steps 64` 仍可使用原来的兜底。
++这项调整不影响默认 FCFS。阈值为正，Aging 和可选等待阈值非负，未知策略报错。
++
++```bash
++# 添加到原有服务启动命令；默认不改变现有 FCFS 行为
++--schedule-policy lpm-aging --lpm-aging-tokens-per-pass 8 --lpm-queue-threshold 128
++```
++
++核心分数为 `cached_len_est + lpm_aging_tokens_per_pass * waiting_passes`，降序排序；
++同分时按 `arrival_order` 升序。纯 LPM 或 Aging=0 使用原始匹配长度排序。
++虚拟分数从不写入 `handle.cached_len`，也不参与实际页数或 Token Budget 计算。
++
++## 有效等待轮次
++
++新请求初始 `waiting_passes=0`。一次 `schedule_next_batch` 至少成功准入一个**新请求**，
++本轮仍未准入的新请求才在调用末尾统一加 1。接纳多个新请求也只计一轮。
++只调用排序函数不会增长计数。已准入请求（含新 ChunkedReq）不再增长。
++
++空队列、零 Prefill Budget、没有表槽且无新准入、KV 容量全部拒绝、只有 chunk 续跑，
++都不算有效等待轮次。计数保存在 PendingReq 中，Abort/移除无需维护额外状态表。
++TP 使用相同逻辑事件计数和到达顺序，不读取各 rank 的本机时间；CPU 测试验证一致输入
++会产生一致决策，未运行完整多 GPU 模型集成测试。
++
++这与 PR 的“每次看见等待队列就计数”有所区别，避免 mini-SGLang 的 Decode-only/空转
++尝试造成不合理增长。N>0、匹配上限有限时，冷请求可以超过后来的新 hot 请求；
++这是排序保证，仍可能因表槽/KV/预算不足而不能接纳，不是严格服务时延保证。
++
++## 只读前缀估算与安全复用
++
++`CacheManager.probe_req` 与实际匹配都排除 prompt 的最后一个 token。
++`RadixPrefixCache.probe_prefix` 按 page_size 对齐比较，只读取 children/key/ref_count，
++不调用 split、lock、touch；timestamp、节点结构、引用计数、容量和 free_slots 不变。
++部分命中只统计匹配段，已受保护的节点不重复计入新增保护量。
++
++本轮排序结果保存为局部匹配计划，随调用结束释放。结构版本在插入新节点、分裂和淘汰时增长。
++实际准入前 `refresh_probe` 执行：
++
++1. 结构版本变化：重新只读匹配，避免使用失效节点位置或已淘汰索引。
++2. 结构未变：复用 token 匹配，沿祖先路径重算新增保护量，处理先前请求 lock/unlock 的影响。
++3. 用 `available_size - newly_protected_size` 检查真实容量，通过后才分裂、锁定和 touch。
++
++即使 LPM 排序估算过时，也不会用旧分数或旧保护量分配 KV。
++无排序收益时跳过探测：FCFS、队列过长、单请求、没有新表槽、chunk 已占满本轮预算。
++结构稳定的共享前缀批次中，3 个请求只做 3 次边比较；分裂时保守地重新匹配。
++该复用仅适用于相同请求输入及当前串行调度，不支持任意并发树修改。
++
++## Chunked Prefill 与资源生命周期
++
++已准入 chunk 始终排在新请求前面，继续沿用已有表槽、cache_handle 和进度。
++它们不参与新请求 LPM 排序，也不累计等待轮次。
++模型计算、Attention、Sampling、CUDA Graph、Decode 及原有页分配/释放流程均未修改。
++CPU 生命周期测试真实执行 allocate_paged/cache_req，验证 chunk 完成和 Abort 后表槽归还、
++protected_size 归零及缓存页总量守恒。测试只替换 CPU pinning，不伪造缓存资源计数。
++
++## 验证与复现
++
++最终结果：106 项 CPU 测试通过，0 失败、0 错误、0 跳过；既有 40 项测试包含在内。
++另外以 Python 3.10 语法版本解析所有改动 Python 文件，通过；本次新增行无行尾空格。
++
++在项目根目录执行（已有虚拟环境及 native radix 的 Ninja/C++ 编译依赖）：
++
++```bash
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python -m pytest \
++  tests/core tests/misc -q -o addopts='' --tb=short \
++  --junitxml=artifacts/lpm_aging/tests.xml
++
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python \
++  benchmarks/bench_prefill_policy.py --seed 31723 --trials 200 --repeats 5 \
++  --output artifacts/lpm_aging/benchmark.json
++```
++
++最终单元测试结果见 JUnit XML；详细 Benchmark 数据和每次重复见
++[`benchmark.json`](../artifacts/lpm_aging/benchmark.json)，可读结果见
++[`benchmark.md`](../artifacts/lpm_aging/benchmark.md)。
++
++本次修改的实现文件为 `scheduler/{utils,prefill,cache,config,scheduler}.py`、
++`server/args.py` 和 `kvcache/{base,radix_cache}.py`；新增两个策略/Benchmark 测试文件、
++一个 Benchmark 脚本和本文档。任务开始时已有的其他代码/文档/锁文件保持原样。
++[`changes.diff`](../artifacts/lpm_aging/changes.diff) 对比的是任务开始时的本地快照，
++不是混入先前用户改动的整仓 Git diff；
++[`verification.json`](../artifacts/lpm_aging/verification.json) 记录哈希、语法和测试摘要。
++
++测试覆盖默认 FCFS 与原有切片算法逐轮对比、评分及同分、Aging=0、持续 hot 到达、
++有效轮次及空转、128/129 边界、Abort、ChunkedReq、页尺寸 1/4、部分/无/重复匹配、
++排序后插入/分裂/淘汰/lock/unlock 的变化、实际 KV 约束和 Benchmark 确定性。
++
++## Benchmark 方法与结果解释
++
++环境为 Ryzen 7 5800H、WSL2、Python 3.12、Torch 2.9.1+cu128，Torch CPU 线程为 1。
++检测到 RTX 3060 Laptop 6GB，但没有加载模型；没有测量 GPU TTFT、TPOT 或推理吞吐。
++排序微基准使用真实 CPU RadixCache，预热原生比较内核；队列 8/32/128/129/256，
++前缀 64/1024 token，各 200 次。请求流模拟使用真实 PrefillManager、共享前缀、表槽、
++页分配和缓存回收，仅把模型 forward 替换成确定的 KV 计算完成事件；输出长度均为 1。
++页分配和模拟完成不计入调度 CPU 计时。5 次随机顺序重复保留运行间时间范围。
++
++混合负载：初始一个 65-token 冷请求，持续 32 轮、每轮 4 个 hot 请求，
++hot 命中 64 token，本轮预算 4 token，Aging N=8。冷请求的首次准入轮：
++FCFS=1，LPM=33，LPM-Aging=9；完成轮分别 17/49/25。
++这验证了排序超越，未把实际秒数的服务上界包装成公平性保证。
++
++三种策略排空后均复用 8192 token，计算 193 个 Prefill token，命中率约 97.70%，
++排空轮均为 49。Aging 提前计算冷请求的 65 个 token，使 hot 等待 p95 从纯 LPM 的 0
++增长到 17 轮；同等总工作下没有推理吞吐提升证据。
++hot-only/cold-only 负载的总计算量和完成进度也未因 Aging 改善。
++
++1024-token 前缀、128 请求的候选排序中位数约为 LPM 1.06ms、LPM-Aging 1.08ms；
++129 请求触发 FCFS 后约 3.3µs，并跳过全队列探测。
++混合负载的整体调度 CPU 均值约 FCFS 157µs、LPM 159µs、LPM-Aging 374µs。
++这不是公式本身变慢 2 倍：Aging 提前执行长 cold chunk 后，hot 队列积压，
++续跑完成后的排序需要探测更大的队列。具体数字以 JSON/运行范围为准。
++
++## 限制与后续方向
++
++队列超过阈值只是 CPU 开销退化策略；Aging 只保证优先级增长，不保证资源受限时服务。
++原有 break 会发生队首阻塞，不可准入的大请求仍需既有入口/资源策略处理。
++没有增加模型级性能基准或实际多 GPU 测试；pinning 被替换的 CPU 模拟不能代表 GPU 拷贝成本。
++全局结构版本是保守失效机制，不相关分支分裂也会重探测，可后续按实测成本决定是否细化。
++排序和真实准入不会因为虚拟分数而放宽任何原有资源检查。
++
++后续可在真实模型与固定请求轨迹上调优 Aging N/队列阈值，测 hot/cold TTFT 分位数、
++调度 CPU 时间与缓存命中率，并研究 chunk 预算对公平性的影响；当前数据不支持宣称 GPU 加速。
++
++简历表述：为 mini-SGLang 实现可配置 LPM 与按有效调度轮次老化的 Prefill 策略，
++加入无副作用前缀探测、过长队列 FCFS 降级及缓存计划失效校验，完成 CPU 回归和可复现调度基准，
++验证混合负载下冷请求排序/准入改善及资源守恒，并量化调度开销与 hot 请求等待的取舍。

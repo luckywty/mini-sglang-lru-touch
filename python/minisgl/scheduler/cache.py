@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, List, Tuple
 import torch
 from minisgl.core import Req
 from minisgl.kvcache import BaseCacheHandle, MatchResult, create_prefix_cache
+from minisgl.kvcache.base import MatchProbe
 from minisgl.utils import div_ceil
 
 if TYPE_CHECKING:
@@ -30,13 +31,39 @@ class CacheManager:
         input_len = req.input_len
         assert input_len > 0, "Input length must be greater than 0."
         return self.prefix_cache.match_prefix(req.input_ids[: input_len - 1])
-    
-    def estimate_req(self, req: PendingReq) -> int:
+
+    def probe_req(self, req: PendingReq) -> MatchProbe:
         input_len = req.input_len
-        assert input_len > 0
-        return self.prefix_cache.estimate_match_len(
-            req.input_ids[: input_len - 1].tolist()   # 注意：estimate 收 List[int]
-        )
+        assert input_len > 0, "Input length must be greater than 0."
+        return self.prefix_cache.probe_prefix(req.input_ids[: input_len - 1])
+
+    def try_match_and_lock(
+        self, req: PendingReq, reserved_size: int, probe: MatchProbe | None = None
+    ) -> BaseCacheHandle | None:
+        """Admit using real matched KV length; an optional probe must be for this request's input.
+
+        Refresh its tree position/protection cost before checking capacity. The
+        current scheduler is serial between refresh, split and locking.
+        """
+        # 当前调度器串行执行；探测到提交之间没有其他缓存修改或淘汰。
+        if probe is None:
+            probe = self.probe_req(req)
+        else:
+            probe = self.prefix_cache.refresh_probe(probe, req.input_ids[: req.input_len - 1])
+        required_size = req.input_len - probe.cached_len + req.output_len + reserved_size
+        available_after_lock = self.available_size - probe.newly_protected_size
+        if required_size > available_after_lock:
+            return None
+
+        handle = self.prefix_cache.commit_match(probe)
+        self.lock(handle)
+        self.touch(handle)
+        return handle
+
+    def estimate_req(self, req: PendingReq) -> int:
+        # Sorting estimates are read-only and work for both radix and naive caches.
+        return self.probe_req(req).cached_len
+
     @property
     def available_size(self) -> int:
         return self.prefix_cache.size_info.evictable_size + len(self.free_slots) * self.page_size

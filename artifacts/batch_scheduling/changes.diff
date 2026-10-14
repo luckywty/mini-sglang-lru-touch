@@ -1,0 +1,1273 @@
+--- a/python/minisgl/scheduler/scheduler.py
++++ b/python/minisgl/scheduler/scheduler.py
+@@ -76,6 +76,10 @@
+         self.eos_token_id = self.tokenizer.eos_token_id
+         self.token_pool = self.table_manager.token_pool
+         self.prefill_budget = config.max_extend_tokens
++        self.batch_schedule_policy = config.batch_schedule_policy
++        self.max_consecutive_decodes = config.max_consecutive_decodes
++        self.protected_prefill_tokens = config.protected_prefill_tokens
++        self._consecutive_decode_batches = 0
+         # self.config = config
+ 
+         # Initialize the I/O mixin
+@@ -116,7 +120,7 @@
+         for msg in self.receive_msg(blocking=blocking):
+             self._process_one_msg(msg)
+ 
+-        #self._schedule_next_batch()的策略：Prefill 优先，Prefill 没有可调度 Batch 时才尝试 Decode
++        # 根据配置的阶段策略选择 Prefill 或 Decode Batch。
+         forward_input = self._schedule_next_batch()
+         ongoing_data = None
+         if forward_input is not None:
+@@ -255,6 +259,8 @@
+                 logger.warning_rank0(
+                     f"Adjust max_tokens to {max_output_len} for request {msg.uid}."
+                 )
++            if not self.prefill_manager.runnable:
++                self._consecutive_decode_batches = 0
+             self.prefill_manager.add_one_req(msg)
+         elif isinstance(msg, AbortBackendMsg):
+             logger.debug_rank0("Aborting request %d", msg.uid)
+@@ -262,6 +268,8 @@
+             req_to_free = req_to_free or self.decode_manager.abort_req(msg.uid)
+             if req_to_free is not None:
+                 self._free_req_resources(req_to_free)
++            if not self.prefill_manager.runnable:
++                self._consecutive_decode_batches = 0
+         else:
+             logger.error(f"Unknown message type: {type(msg)}")
+             raise NotImplementedError
+@@ -285,13 +293,47 @@
+             write_tuple=write_mapping,
+         )
+ 
++    def _select_next_batch(self) -> Batch | None:
++        """Construct one batch before allocating its physical KV pages."""
++        if self.batch_schedule_policy == "prefill-first":
++            return (
++                self.prefill_manager.schedule_next_batch(self.prefill_budget)
++                or self.decode_manager.schedule_next_batch()
++            )
++
++        if not self.prefill_manager.runnable:
++            self._consecutive_decode_batches = 0
++            return self.decode_manager.schedule_next_batch()
++        if not self.decode_manager.runnable:
++            return self.prefill_manager.schedule_next_batch(self.prefill_budget)
++
++        if self._consecutive_decode_batches >= self.max_consecutive_decodes:
++            budget = min(self.prefill_budget, self.protected_prefill_tokens)
++            return (
++                self.prefill_manager.schedule_next_batch(budget)
++                or self.decode_manager.schedule_next_batch()
++            )
++        return (
++            self.decode_manager.schedule_next_batch()
++            or self.prefill_manager.schedule_next_batch(self.prefill_budget)
++        )
++
+     def _schedule_next_batch(self) -> ForwardInput | None:
+-        # TODO: support other policies: e.g. DECODE first
+-        batch = (
+-            self.prefill_manager.schedule_next_batch(self.prefill_budget)
+-            or self.decode_manager.schedule_next_batch()
+-        )
++        batch = self._select_next_batch()
+         return self._prepare_batch(batch) if batch else None
++
++    def _record_batch_submission(self, batch: Batch) -> None:
++        """Count submissions, independent of overlap result-processing order.
++
++        K bounds the gap before a prefill attempt, not admission under resource
++        pressure. Failed protection attempts therefore never reset the streak.
++        """
++        if self.batch_schedule_policy != "decode-first-bounded":
++            return
++        if batch.is_prefill or not self.prefill_manager.runnable:
++            self._consecutive_decode_batches = 0
++        else:
++            self._consecutive_decode_batches += 1
+ 
+     def _forward(self, forward_input: ForwardInput) -> ForwardOutput:
+         batch, sample_args, input_mapping, output_mapping = forward_input
+@@ -299,6 +341,7 @@
+         forward_output = self.engine.forward_batch(batch, sample_args)
+         self.token_pool[output_mapping] = forward_output.next_tokens_gpu
+         self.decode_manager.filter_reqs(forward_input.batch.reqs)
++        self._record_batch_submission(batch)
+         return forward_output
+ 
+ 
+--- a/python/minisgl/scheduler/config.py
++++ b/python/minisgl/scheduler/config.py
+@@ -22,6 +22,9 @@
+     lpm_queue_threshold: int = 128
+     fairness_max_wait_steps: int = 0  # optional legacy FCFS timeout fallback
+     lpm_aging_tokens_per_pass: int = 0
++    batch_schedule_policy: str = "prefill-first"
++    max_consecutive_decodes: int = 16
++    protected_prefill_tokens: int = 256
+ 
+     # networking config
+     _unique_suffix: str = field(default_factory=_get_pid_suffix)
+@@ -33,6 +36,14 @@
+             self.fairness_max_wait_steps,
+             self.lpm_aging_tokens_per_pass,
+         )
++        if self.batch_schedule_policy not in ("prefill-first", "decode-first-bounded"):
++            raise ValueError(
++                "batch_schedule_policy must be 'prefill-first' or 'decode-first-bounded'"
++            )
++        for name in ("max_consecutive_decodes", "protected_prefill_tokens"):
++            value = getattr(self, name)
++            if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
++                raise ValueError(f"{name} must be a positive integer")
+ 
+     @property
+     def zmq_backend_addr(self) -> str:
+--- a/python/minisgl/server/args.py
++++ b/python/minisgl/server/args.py
+@@ -222,6 +222,27 @@
+         default=ServerArgs.cache_type,
+         choices=SUPPORTED_CACHE_MANAGER.supported_names(),
+         help="The KV cache management strategy.",
++    )
++
++    parser.add_argument(
++        "--batch-schedule-policy",
++        choices=["prefill-first", "decode-first-bounded"],
++        default=ServerArgs.batch_schedule_policy,
++        help="Prefill/decode batch selection; the default preserves prefill-first behavior.",
++    )
++
++    parser.add_argument(
++        "--max-consecutive-decodes",
++        type=_positive_int,
++        default=ServerArgs.max_consecutive_decodes,
++        help="Decode batch submissions while prefill waits before prioritizing a prefill attempt.",
++    )
++
++    parser.add_argument(
++        "--protected-prefill-tokens",
++        type=_positive_int,
++        default=ServerArgs.protected_prefill_tokens,
++        help="Total new prefill tokens in a protection batch, capped by max-extend-tokens.",
+     )
+ 
+     parser.add_argument(
+--- /dev/null
++++ b/benchmarks/bench_batch_schedule_policy.py
+@@ -0,0 +1,428 @@
++"""CPU batch scheduling benchmark with real admission, KV pages and request completion.
++
++No model/attention/sampling/GPU runs. Batch gaps are not TTFT or GPU latency.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import math
++import os
++import platform
++import random
++import statistics
++import subprocess
++import time
++from contextlib import contextmanager, nullcontext
++from pathlib import Path
++from types import MethodType, SimpleNamespace
++from typing import NamedTuple
++from unittest.mock import patch
++
++import torch
++
++import minisgl.core as core
++from minisgl.core import SamplingParams
++from minisgl.distributed import DistributedInfo
++from minisgl.message import UserMsg
++from minisgl.scheduler.cache import CacheManager
++from minisgl.scheduler.decode import DecodeManager
++from minisgl.scheduler.prefill import ChunkedReq, PrefillManager
++from minisgl.scheduler.scheduler import Scheduler
++from minisgl.scheduler.table import TableManager
++
++
++WORKLOADS = (
++    "short", "long", "mixed", "memory-pressure", "table-pressure", "prefill-only", "decode-only"
++)
++
++
++@contextmanager
++def cpu_transfers():
++    empty = torch.empty
++    tensor = torch.tensor
++
++    def unpinned_empty(*args, **kwargs):
++        kwargs.pop("pin_memory", None)
++        return empty(*args, **kwargs)
++
++    def unpinned_tensor(*args, **kwargs):
++        kwargs.pop("pin_memory", None)
++        return tensor(*args, **kwargs)
++
++    with patch.object(torch.Tensor, "pin_memory", lambda tensor: tensor), patch.object(
++        torch, "empty", unpinned_empty
++    ), patch.object(torch, "tensor", unpinned_tensor), patch(
++        "minisgl.distributed.info._TP_INFO", DistributedInfo(0, 1)
++    ):
++        yield
++
++
++class CPUForwardOutput(NamedTuple):
++    next_tokens_gpu: torch.Tensor
++    next_tokens_cpu: torch.Tensor
++    copy_done_event: object
++
++
++def make_cpu_scheduler(
++    policy="decode-first-bounded", cap=16, protected=256, budget=8192,
++    page_size=1, num_pages=4096, table_slots=64, max_seq_len=4096,
++    prefill_policy="fcfs", aging=0,
++):
++    """Skip only GPU/model construction; execute actual scheduler lifecycle methods."""
++    core._GLOBAL_CTX = core.Context(page_size=page_size)
++    s = object.__new__(Scheduler)
++    page_table = torch.full((table_slots, max_seq_len), -1, dtype=torch.int32)
++    s.table_manager = TableManager(table_slots, page_table)
++    s.cache_manager = CacheManager(num_pages, page_size, page_table, type="radix")
++    s.decode_manager = DecodeManager(page_size)
++    s.prefill_manager = PrefillManager(
++        s.cache_manager, s.table_manager, s.decode_manager,
++        schedule_policy=prefill_policy, lpm_aging_tokens_per_pass=aging,
++    )
++    s.batch_schedule_policy = policy
++    s.max_consecutive_decodes = cap
++    s.protected_prefill_tokens = protected
++    s.prefill_budget = budget
++    s._consecutive_decode_batches = 0
++    s.token_pool = s.table_manager.token_pool
++    s.device = torch.device("cpu")
++    s.finished_reqs = set()
++    s.eos_token_id = -1
++    s.stream = None
++    s.engine_stream_ctx = nullcontext()
++    s.sent = []
++    s.send_result = s.sent.extend
++    s.receive_msg = lambda blocking: []
++
++    def forward(batch, sample_args):
++        tokens = torch.tensor([100000 + r.uid for r in batch.reqs], dtype=torch.int32)
++        for req in batch.reqs:
++            req.complete_one()
++        return CPUForwardOutput(tokens, tokens, SimpleNamespace(synchronize=lambda: None))
++
++    s.engine = SimpleNamespace(
++        max_seq_len=max_seq_len,
++        page_table=page_table,
++        graph_runner=SimpleNamespace(
++            pad_batch=lambda batch: setattr(batch, "padded_reqs", batch.reqs)
++        ),
++        attn_backend=SimpleNamespace(prepare_metadata=lambda batch: None),
++        sampler=SimpleNamespace(prepare=lambda batch: None),
++        forward_batch=forward,
++        stream=SimpleNamespace(wait_stream=lambda stream: None),
++    )
++    return s
++
++
++def enqueue(s, uid, ids, output_tokens=1):
++    s._process_one_msg(UserMsg(uid, ids, SamplingParams(max_tokens=output_tokens, ignore_eos=True)))
++    return s.prefill_manager.pending_list[-1]
++
++
++def submit_one(s):
++    forward_input = s._schedule_next_batch()
++    if forward_input is None:
++        return None
++    output = s._forward(forward_input)
++    s._process_last_data((forward_input, output))
++    return forward_input.batch
++
++
++def assert_resources(s, table_slots):
++    assert not s.prefill_manager.runnable and not s.decode_manager.runnable
++    assert s.table_manager.available_size == table_slots
++    assert len(set(s.table_manager._free_slots)) == table_slots
++    cache = s.cache_manager
++    assert cache.prefix_cache.size_info.protected_size == 0
++    cache.check_integrity()
++    pages = list(cache.free_slots.tolist())
++    stack = [cache.prefix_cache.root_node]
++    while stack:
++        node = stack.pop()
++        assert node.ref_count == (1 if node.is_root() else 0)
++        if not node.is_root():
++            pages.extend(node.value[::cache.page_size].tolist())
++        stack.extend(node.children.values())
++    assert len(pages) == len(set(pages)) == cache.num_pages
++
++
++def percentile(values, fraction):
++    values = sorted(values)
++    return values[max(0, math.ceil(len(values) * fraction) - 1)] if values else None
++
++
++def simulate(policy, workload, args, cap=16, protected=256):
++    rng = random.Random(args.seed)
++    arrivals_count = 0 if workload == "decode-only" else args.stream_steps * args.arrivals_per_pass
++    initial_decodes = 0 if workload == "prefill-only" else args.initial_decodes
++    slots = (
++        max(1, initial_decodes) if workload == "table-pressure"
++        else initial_decodes + arrivals_count + 1
++    )
++    if workload == "memory-pressure":
++        # Each request is feasible alone, but the initial decode reservations can
++        # temporarily prevent even the first cold request from being admitted.
++        capacity = max(
++            initial_decodes * (8 + args.decode_tokens + args.page_size),
++            args.long_prompt_tokens + args.output_tokens + args.prefix_length,
++        ) + 2 * args.page_size
++    else:
++        capacity = initial_decodes * (8 + args.decode_tokens + args.page_size) + args.prefix_length
++        capacity += (
++            arrivals_count * (args.long_prompt_tokens + args.output_tokens + args.page_size) + 32
++        )
++    s = make_cpu_scheduler(
++        policy="prefill-first" if policy == "decode-first-unbounded" else policy,
++        cap=cap, protected=protected, budget=args.prefill_budget, page_size=args.page_size,
++        num_pages=math.ceil(capacity / args.page_size), table_slots=slots,
++        max_seq_len=max(args.long_prompt_tokens + args.output_tokens, args.decode_tokens + 8,
++                        args.prefix_length + 1 + args.output_tokens) + 16,
++        prefill_policy=args.prefill_policy, aging=args.aging_tokens_per_pass,
++    )
++    for uid in range(initial_decodes):
++        enqueue(
++            s, uid, torch.arange(1000 + uid * 100, 1008 + uid * 100, dtype=torch.int32),
++            args.decode_tokens,
++        )
++    if initial_decodes:
++        # Bootstrap all decode sessions identically, outside timed/observed workload.
++        batch = s.prefill_manager.schedule_next_batch(initial_decodes * 8)
++        forward_input = s._prepare_batch(batch)
++        s._process_last_data((forward_input, s._forward(forward_input)))
++    bootstrap_finished = {m.uid for m in s.sent if m.finished}
++    s.sent.clear()
++    prefix = torch.arange(50000, 50000 + args.prefix_length, dtype=torch.int32)
++    indices = s.cache_manager._page_to_token(
++        s.cache_manager._allocate(args.prefix_length // args.page_size)
++    )
++    s.cache_manager.prefix_cache.insert_prefix(prefix, indices)
++    s.cache_manager.prefix_cache.probe_prefix(prefix)  # Warm native matching before timing.
++    if policy == "decode-first-unbounded":
++        # Benchmark-only baseline; not a third production policy.
++        def unbounded(self):
++            return (self.decode_manager.schedule_next_batch()
++                    or self.prefill_manager.schedule_next_batch(self.prefill_budget))
++        s._select_next_batch = MethodType(unbounded, s)
++
++    counters = {"prefill_attempts": 0, "rejected_prefill_attempts": 0,
++                "protection_attempts": 0, "successful_protection_batches": 0}
++    original_prefill = s.prefill_manager.schedule_next_batch
++
++    def tracked_prefill(budget):
++        pending = s.prefill_manager.runnable
++        protection = (policy == "decode-first-bounded" and pending and s.decode_manager.runnable
++                      and s._consecutive_decode_batches >= cap)
++        counters["prefill_attempts"] += int(pending)
++        counters["protection_attempts"] += int(protection)
++        batch = original_prefill(budget)
++        counters["rejected_prefill_attempts"] += int(pending and batch is None)
++        counters["successful_protection_batches"] += int(protection and batch is not None)
++        return batch
++
++    s.prefill_manager.schedule_next_batch = tracked_prefill
++    arrivals, first, prefill_done = {}, {}, {}
++    completion = {uid: 0 for uid in bootstrap_finished}
++    # Include the bootstrap output at batch 0, so prefill-first's initial
++    # consecutive prefill burst is visible in the decode output gap metric.
++    output_steps = {uid: [0] for uid in range(initial_decodes)}
++    cached, prompt_lengths, durations, phases = {}, {}, [], []
++    computed = 0
++    streak = max_streak = 0
++    max_queue = 0
++    # Finite workload: every feasible request must finish; detect stalled/infeasible setup.
++    bound = (args.stream_steps + args.decode_tokens + arrivals_count *
++             (args.long_prompt_tokens + args.output_tokens)) * (cap + 2) + 32
++    for step in range(1, bound + 1):
++        if step <= args.stream_steps and workload != "decode-only":
++            for offset in range(args.arrivals_per_pass):
++                uid = initial_decodes + (step - 1) * args.arrivals_per_pass + offset
++                cold = workload in ("long", "memory-pressure") or (
++                    workload in ("mixed", "prefill-only") and rng.random() < 0.25
++                )
++                if cold:
++                    start = 1000000 + uid * (args.long_prompt_tokens + 128)
++                    ids = torch.arange(start, start + args.long_prompt_tokens, dtype=torch.int32)
++                else:
++                    ids = torch.cat([prefix, torch.tensor([2000000 + uid], dtype=torch.int32)])
++                enqueue(s, uid, ids, 1 if workload == "prefill-only" else args.output_tokens)
++                arrivals[uid], prompt_lengths[uid] = step, len(ids)
++        had_prefill = s.prefill_manager.runnable
++        max_queue = max(max_queue, len(s.prefill_manager.pending_list))
++        start_time = time.perf_counter_ns()
++        batch = s._select_next_batch()
++        durations.append((time.perf_counter_ns() - start_time) / 1000)
++        if batch is None:
++            if s.prefill_manager.runnable or s.decode_manager.runnable:
++                raise RuntimeError("Feasible workload stalled without a batch")
++            if step >= args.stream_steps or workload == "decode-only":
++                break
++            continue
++        phases.append(batch.phase)
++        if batch.is_prefill:
++            streak = 0
++            computed += sum(r.extend_len for r in batch.reqs)
++            for req in batch.reqs:
++                if req.uid not in first:
++                    first[req.uid], cached[req.uid] = step, req.cache_handle.cached_len
++                if not isinstance(req, ChunkedReq):
++                    prefill_done[req.uid] = step
++        elif had_prefill:
++            streak += 1
++            max_streak = max(max_streak, streak)
++        else:
++            streak = 0
++        forward_input = s._prepare_batch(batch)
++        output = s._forward(forward_input)
++        before_messages = len(s.sent)
++        s._process_last_data((forward_input, output))
++        for msg in s.sent[before_messages:]:
++            output_steps.setdefault(msg.uid, []).append(step)
++            if msg.finished:
++                completion[msg.uid] = step
++        if (step >= args.stream_steps or workload == "decode-only") and not (
++            s.prefill_manager.runnable or s.decode_manager.runnable
++        ):
++            break
++    else:
++        raise RuntimeError("Workload did not drain within finite batch bound")
++    assert set(first) == set(prefill_done) == set(arrivals)
++    assert len(completion) == arrivals_count + initial_decodes
++    assert_resources(s, slots)
++    waits = [first[u] - arrivals[u] for u in arrivals]
++    done_waits = [prefill_done[u] - arrivals[u] for u in arrivals]
++    decode_gaps = [b - a for uid, times in output_steps.items() if uid < initial_decodes
++                   for a, b in zip(times, times[1:])]
++    return {
++        "policy": policy, "workload": workload,
++        "cap": cap if policy == "decode-first-bounded" else None,
++        "protected_tokens": protected if policy == "decode-first-bounded" else None,
++        "prefill_policy": args.prefill_policy, "requests": arrivals_count + initial_decodes,
++        "prefill_first_wait_p95_batches": percentile(waits, 0.95),
++        "prefill_first_wait_max_batches": max(waits, default=0),
++        "prefill_completion_wait_p95_batches": percentile(done_waits, 0.95),
++        "initial_decode_output_gap_p95_batches": percentile(decode_gaps, 0.95),
++        "initial_decode_output_gap_max_batches": max(decode_gaps, default=0),
++        "max_decode_streak_while_prefill_waits": max_streak,
++        "prefill_batches": phases.count("prefill"), "decode_batches": phases.count("decode"),
++        "computed_prefill_tokens": computed, "cached_tokens_at_admission": sum(cached.values()),
++        "cache_hit_ratio": (
++            sum(cached.values()) / sum(prompt_lengths.values()) if prompt_lengths else None
++        ),
++        "drain_batch": max(completion.values(), default=0), "max_queue": max_queue,
++        "scheduling_median_us": statistics.median(durations),
++        "scheduling_p95_us": percentile(durations, 0.95),
++        "resource_integrity": "passed", **counters,
++    }
++
++
++def positive(value):
++    number = int(value)
++    if number <= 0:
++        raise argparse.ArgumentTypeError("must be positive")
++    return number
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--seed", type=int, default=31723)
++    parser.add_argument("--repeats", type=positive, default=5)
++    parser.add_argument("--decode-caps", type=positive, nargs="+", default=[1, 4, 8, 16, 32])
++    parser.add_argument(
++        "--protected-budgets", type=positive, nargs="+", default=[64, 128, 256, 512]
++    )
++    parser.add_argument("--workloads", choices=WORKLOADS, nargs="+", default=list(WORKLOADS))
++    parser.add_argument("--prefill-policy", choices=["fcfs", "lpm", "lpm-aging"], default="fcfs")
++    parser.add_argument("--aging-tokens-per-pass", type=int, default=8)
++    parser.add_argument("--prefill-budget", type=positive, default=8192)
++    parser.add_argument("--page-size", type=positive, default=1)
++    parser.add_argument("--prefix-length", type=positive, default=64)
++    parser.add_argument("--long-prompt-tokens", type=positive, default=1024)
++    parser.add_argument("--decode-tokens", type=positive, default=128)
++    parser.add_argument("--output-tokens", type=positive, default=8)
++    parser.add_argument("--initial-decodes", type=positive, default=4)
++    parser.add_argument("--stream-steps", type=positive, default=16)
++    parser.add_argument("--arrivals-per-pass", type=positive, default=2)
++    parser.add_argument(
++        "--output", type=Path, default=Path("artifacts/batch_scheduling/benchmark.json")
++    )
++    args = parser.parse_args()
++    if args.prefix_length % args.page_size:
++        parser.error("prefix-length must be page aligned")
++    if args.aging_tokens_per_pass < 0:
++        parser.error("aging-tokens-per-pass must be nonnegative")
++    torch.set_num_threads(1)
++    metadata = {
++        "platform": platform.platform(), "python": platform.python_version(),
++        "torch": torch.__version__,
++        "cpu": next(
++            (line.split(":", 1)[1].strip()
++             for line in Path("/proc/cpuinfo").read_text().splitlines()
++             if line.startswith("model name")), platform.processor()
++        ),
++        "logical_cpus": os.cpu_count(), "torch_threads": 1,
++        "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
++        "scope": "CPU real scheduler/allocator with simulated engine; no GPU TTFT/ITL/throughput",
++        "parameters": {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
++    }
++    cases = [(workload, policy, 16, 256) for workload in args.workloads
++             for policy in ("prefill-first", "decode-first-unbounded")]
++    cases += [(workload, "decode-first-bounded", cap, protected) for workload in args.workloads
++              for cap in args.decode_caps for protected in args.protected_budgets]
++    runs = []
++    rng = random.Random(args.seed)
++    with cpu_transfers():
++        for repeat in range(args.repeats):
++            rng.shuffle(cases)
++            for workload, policy, cap, protected in cases:
++                row = simulate(policy, workload, args, cap, protected)
++                row["repeat"] = repeat
++                runs.append(row)
++            print(f"repeat={repeat + 1}: {len(cases)} cases drained, resources passed", flush=True)
++    summary = []
++    for workload, policy, cap, protected in sorted(cases):
++        group = [
++            r for r in runs if r["workload"] == workload and r["policy"] == policy and
++            (policy != "decode-first-bounded" or
++             (r["cap"] == cap and r["protected_tokens"] == protected))
++        ]
++        row = {k: v for k, v in group[0].items() if k != "repeat"}
++        deterministic = [k for k in row if not k.startswith("scheduling_")]
++        assert all(all(r[k] == row[k] for k in deterministic) for r in group)
++        for key in ("scheduling_median_us", "scheduling_p95_us"):
++            row[key] = statistics.median(r[key] for r in group)
++        row["min_run_median_us"] = min(r["scheduling_median_us"] for r in group)
++        row["max_run_median_us"] = max(r["scheduling_median_us"] for r in group)
++        summary.append(row)
++    args.output.parent.mkdir(parents=True, exist_ok=True)
++    args.output.write_text(
++        json.dumps({"metadata": metadata, "summary": summary, "runs": runs}, indent=2) + "\n"
++    )
++    lines = [
++        "# Batch 调度 CPU Benchmark", "",
++        f"环境：{metadata['cpu']}；Python {metadata['python']}；"
++        f"Torch {metadata['torch']}；1 个 Torch 线程。", "",
++        "真实阶段选择、准入、KV 分配及完成释放；Engine 仅模拟进度和输出。"
++        "Batch 间隔不是 GPU 延迟。", "",
++        "| 负载 | 策略 | K | 保护预算 | 首次 Prefill 等待 P95（批） | "
++        "Prefill 完成等待 P95（批） | 初始 Decode 输出最大间隔（批） | "
++        "等待时最长连续 Decode | 调度中位数 µs | 保护成功/尝试 |",
++        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
++    ]
++    for r in summary:
++        lines.append(
++            f"| {r['workload']} | {r['policy']} | {r['cap']} | {r['protected_tokens']} | "
++            f"{r['prefill_first_wait_p95_batches']} | {r['prefill_completion_wait_p95_batches']} | "
++            f"{r['initial_decode_output_gap_max_batches']} | "
++            f"{r['max_decode_streak_while_prefill_waits']} | "
++            f"{r['scheduling_median_us']:.2f} | "
++            f"{r['successful_protection_batches']}/{r['protection_attempts']} |"
++        )
++    lines += ["", f"{len(runs)} 次运行排空并通过表槽唯一性、缓存引用、物理页守恒和唯一性检查。",
++              "请求按固定 Batch 序号到达，各策略的到达序列一致；吞吐、TTFT、ITL 需要另做真实 GPU 实验。", ""]
++    args.output.with_suffix(".md").write_text("\n".join(lines))
++    print(f"Saved {args.output}")
++
++
++if __name__ == "__main__":
++    main()
+--- /dev/null
++++ b/tests/core/test_batch_schedule_policy.py
+@@ -0,0 +1,417 @@
++from __future__ import annotations
++
++import importlib.util
++from pathlib import Path
++from types import SimpleNamespace
++from unittest.mock import Mock
++
++import pytest
++import torch
++
++import minisgl.core as core
++from minisgl.core import Batch
++from minisgl.distributed import DistributedInfo
++from minisgl.message import AbortBackendMsg, BatchBackendMsg, UserMsg
++from minisgl.scheduler.config import SchedulerConfig
++from minisgl.scheduler.prefill import ChunkedReq
++from minisgl.scheduler.scheduler import Scheduler
++from minisgl.server.args import parse_args
++
++
++@pytest.fixture
++def harness(monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    path = Path(__file__).resolve().parents[2] / "benchmarks/bench_batch_schedule_policy.py"
++    spec = importlib.util.spec_from_file_location("batch_schedule_harness", path)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    with module.cpu_transfers():
++        yield module
++
++
++def fake_scheduler(policy="decode-first-bounded", count=0, pending=True, running=True):
++    s = object.__new__(Scheduler)
++    s.batch_schedule_policy = policy
++    s.max_consecutive_decodes = 3
++    s.protected_prefill_tokens = 2
++    s.prefill_budget = 8
++    s._consecutive_decode_batches = count
++    s.prefill_manager = SimpleNamespace(
++        runnable=pending,
++        schedule_next_batch=Mock(return_value=Batch([], "prefill") if pending else None),
++    )
++    s.decode_manager = SimpleNamespace(
++        runnable=running,
++        schedule_next_batch=Mock(return_value=Batch([], "decode") if running else None),
++    )
++    s._prepare_batch = Mock(side_effect=lambda batch: batch)
++    return s
++
++
++@pytest.mark.parametrize("policy", ["prefill-first", "decode-first-bounded"])
++@pytest.mark.parametrize(
++    "pending,running", [(False, False), (True, False), (False, True), (True, True)]
++)
++def test_phase_selection_and_default_call_order(policy, pending, running):
++    s = fake_scheduler(policy, pending=pending, running=running)
++    batch = s._schedule_next_batch()
++    phase = (
++        "prefill" if pending and (policy == "prefill-first" or not running)
++        else "decode" if running else None
++    )
++    assert (batch.phase if batch else None) == phase
++    if batch:
++        s._prepare_batch.assert_called_once_with(batch)
++    else:
++        s._prepare_batch.assert_not_called()
++    if phase == "prefill":
++        s.prefill_manager.schedule_next_batch.assert_called_once_with(8)
++        s.decode_manager.schedule_next_batch.assert_not_called()
++    elif policy == "decode-first-bounded":
++        s.prefill_manager.schedule_next_batch.assert_not_called()
++    else:
++        s.prefill_manager.schedule_next_batch.assert_called_once_with(8)
++
++
++@pytest.mark.parametrize("count,expected", [(2, "decode"), (3, "prefill"), (4, "prefill")])
++def test_cap_boundaries_do_not_count_selection(count, expected):
++    s = fake_scheduler(count=count)
++    assert s._schedule_next_batch().phase == expected
++    assert s._consecutive_decode_batches == count
++    if expected == "prefill":
++        s.prefill_manager.schedule_next_batch.assert_called_once_with(2)
++
++
++@pytest.mark.parametrize("normal,protected,expected", [(8, 2, 2), (2, 8, 2), (0, 2, 0)])
++def test_protected_budget_is_capped_by_normal_budget(normal, protected, expected):
++    s = fake_scheduler(count=3)
++    s.prefill_budget, s.protected_prefill_tokens = normal, protected
++    s._schedule_next_batch()
++    s.prefill_manager.schedule_next_batch.assert_called_once_with(expected)
++
++
++def test_failed_protection_keeps_counter_and_retries():
++    s = fake_scheduler(count=3)
++    s.prefill_manager.schedule_next_batch.return_value = None
++    for expected in (4, 5):
++        batch = s._schedule_next_batch()
++        assert batch.is_decode
++        s._record_batch_submission(batch)
++        assert s._consecutive_decode_batches == expected
++    assert s.prefill_manager.schedule_next_batch.call_count == 2
++    assert s._prepare_batch.call_count == 2
++
++
++def test_decode_unavailable_falls_back_without_preparing_a_discarded_batch():
++    s = fake_scheduler()
++    s.decode_manager.schedule_next_batch.return_value = None
++    batch = s._schedule_next_batch()
++    assert batch.is_prefill
++    s.prefill_manager.schedule_next_batch.assert_called_once_with(8)
++    s._prepare_batch.assert_called_once_with(batch)
++
++
++@pytest.mark.parametrize("phase,pending,count,expected", [
++    ("decode", True, 0, 1), ("decode", True, 3, 4),
++    ("decode", False, 3, 0), ("prefill", True, 3, 0),
++])
++def test_submission_counter_rules(phase, pending, count, expected):
++    s = fake_scheduler(count=count, pending=pending)
++    s._record_batch_submission(Batch([object()] * 100, phase))
++    assert s._consecutive_decode_batches == expected
++
++
++def test_empty_waiting_queue_resets_historical_streak():
++    s = fake_scheduler(count=99, pending=False)
++    assert s._schedule_next_batch().is_decode
++    assert s._consecutive_decode_batches == 0
++
++
++def test_config_and_cli_defaults_and_independent_prefill_policy():
++    config = SchedulerConfig("test-model", DistributedInfo(0, 1), torch.float32)
++    assert (
++        config.batch_schedule_policy, config.max_consecutive_decodes, config.protected_prefill_tokens
++    ) == ("prefill-first", 16, 256)
++    default, _ = parse_args(["--model-path", "test-model", "--dtype", "float32"])
++    assert default.batch_schedule_policy == "prefill-first"
++    configured, _ = parse_args([
++        "--model-path", "test-model", "--dtype", "float32",
++        "--batch-schedule-policy", "decode-first-bounded", "--max-consecutive-decodes", "4",
++        "--protected-prefill-tokens", "128", "--schedule-policy", "lpm-aging",
++        "--lpm-aging-tokens-per-pass", "8",
++    ])
++    assert (
++        configured.batch_schedule_policy, configured.max_consecutive_decodes,
++        configured.protected_prefill_tokens,
++    ) == ("decode-first-bounded", 4, 128)
++    assert configured.schedule_policy == "lpm-aging" and configured.lpm_aging_tokens_per_pass == 8
++
++
++@pytest.mark.parametrize("field", ["max_consecutive_decodes", "protected_prefill_tokens"])
++@pytest.mark.parametrize("value", [0, -1, 1.5, True, "2"])
++def test_invalid_positive_integer_config(field, value):
++    with pytest.raises(ValueError, match=field):
++        SchedulerConfig("test-model", DistributedInfo(0, 1), torch.float32, **{field: value})
++
++
++def test_unknown_batch_policy_is_rejected():
++    with pytest.raises(ValueError, match="batch_schedule_policy"):
++        SchedulerConfig(
++            "test-model", DistributedInfo(0, 1), torch.float32, batch_schedule_policy="unknown"
++        )
++
++
++@pytest.mark.parametrize("flag,value", [
++    ("--batch-schedule-policy", "unknown"), ("--max-consecutive-decodes", "0"),
++    ("--max-consecutive-decodes", "-1"), ("--protected-prefill-tokens", "0"),
++    ("--protected-prefill-tokens", "-1"),
++])
++def test_invalid_cli(flag, value):
++    with pytest.raises(SystemExit) as error:
++        parse_args(["--model-path", "test-model", "--dtype", "float32", flag, value])
++    assert error.value.code == 2
++
++
++def warm_decode(h, s, uid=0, output_tokens=16):
++    h.enqueue(
++        s, uid, torch.tensor([1000 + uid * 10, 1001 + uid * 10], dtype=torch.int32), output_tokens
++    )
++    assert h.submit_one(s).is_prefill
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++@pytest.mark.parametrize("prefill_policy", ["fcfs", "lpm", "lpm-aging"])
++def test_chunk_continuation_budget_and_release(harness, page_size, prefill_policy):
++    h = harness
++    s = h.make_cpu_scheduler(cap=2, protected=3, budget=32, page_size=page_size,
++                             prefill_policy=prefill_policy, aging=2)
++    warm_decode(h, s)
++    pending = h.enqueue(s, 1, torch.arange(100, 108, dtype=torch.int32), 2)
++    # Add a second candidate so LPM actually probes/sorts at admission opportunities.
++    other = h.enqueue(s, 2, torch.arange(200, 202, dtype=torch.int32), 1)
++    assert h.submit_one(s).is_decode
++    assert h.submit_one(s).is_decode
++    assert pending.waiting_passes == other.waiting_passes == 0
++    batch = h.submit_one(s)
++    assert batch.is_prefill and sum(r.cached_len for r in batch.reqs) == 3
++    assert isinstance(pending.chunked_req, ChunkedReq)
++    table_idx, handle = pending.chunked_req.table_idx, pending.chunked_req.cache_handle
++    assert s._consecutive_decode_batches == 0
++    assert other.waiting_passes == (1 if prefill_policy == "lpm-aging" else 0)
++    for _ in range(2):
++        assert h.submit_one(s).is_decode
++    next_chunk = h.submit_one(s)
++    assert next_chunk.is_prefill
++    assert pending.chunked_req.table_idx == table_idx
++    assert pending.chunked_req.cache_handle is handle
++    assert pending.chunked_req.cached_len == 6
++    assert other.waiting_passes == (1 if prefill_policy == "lpm-aging" else 0)
++    for _ in range(100):
++        if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++            break
++        h.submit_one(s)
++    h.assert_resources(s, 64)
++    assert len([m for m in s.sent if m.finished]) == 3
++
++
++@pytest.mark.parametrize("failure", ["kv", "table", "budget"])
++def test_protection_failure_preserves_resources_then_recovers(harness, failure):
++    h = harness
++    s = h.make_cpu_scheduler(cap=1, protected=2, budget=8,
++                             num_pages=12 if failure == "kv" else 64,
++                             table_slots=1 if failure == "table" else 4)
++    warm_decode(h, s, output_tokens=8)
++    pending = h.enqueue(s, 1, torch.arange(100, 106, dtype=torch.int32), 2)
++    assert h.submit_one(s).is_decode
++    if failure == "budget":
++        s.prefill_budget = 0
++    tree = s.cache_manager.prefix_cache
++    before = (tree._structure_version, tree.size_info, s.table_manager.available_size)
++    batch = s._select_next_batch()
++    assert batch.is_decode
++    assert (tree._structure_version, tree.size_info, s.table_manager.available_size) == before
++    assert pending.chunked_req is None and pending.waiting_passes == 0
++    assert s._consecutive_decode_batches == 1
++    forward_input = s._prepare_batch(batch)
++    s._process_last_data((forward_input, s._forward(forward_input)))
++    assert s._consecutive_decode_batches == 2
++    s.prefill_budget = 8
++    for _ in range(100):
++        if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++            break
++        h.submit_one(s)
++    assert any(m.uid == 1 and m.finished for m in s.sent)
++    h.assert_resources(s, 1 if failure == "table" else 4)
++
++
++@pytest.mark.parametrize("chunked", [False, True])
++def test_abort_and_new_arrival_do_not_inherit_streak(harness, chunked):
++    h = harness
++    s = h.make_cpu_scheduler(cap=1, protected=2)
++    warm_decode(h, s)
++    pending = h.enqueue(s, 1, torch.arange(100, 108, dtype=torch.int32), 2)
++    h.submit_one(s)
++    if chunked:
++        h.submit_one(s)
++        assert pending.chunked_req is not None
++        h.submit_one(s)
++    assert s._consecutive_decode_batches == 1
++    # Abort and new arrival in one receive batch must observe the empty-queue boundary.
++    new = UserMsg(2, torch.tensor([200, 201], dtype=torch.int32), core.SamplingParams(max_tokens=1))
++    s._process_one_msg(BatchBackendMsg([AbortBackendMsg(1), new]))
++    assert s._consecutive_decode_batches == 0
++    assert [p.uid for p in s.prefill_manager.pending_list] == [2]
++    for _ in range(100):
++        if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++            break
++        h.submit_one(s)
++    h.assert_resources(s, 64)
++
++
++def test_failed_forward_and_prepare_do_not_increment_counter(harness, monkeypatch):
++    h = harness
++    s = h.make_cpu_scheduler(cap=3)
++    warm_decode(h, s)
++    h.enqueue(s, 1, torch.tensor([10, 11], dtype=torch.int32), 1)
++    forward_input = s._schedule_next_batch()
++    assert s._consecutive_decode_batches == 0
++    with monkeypatch.context() as m:
++        m.setattr(s.engine, "forward_batch", Mock(side_effect=RuntimeError("submit failed")))
++        with pytest.raises(RuntimeError, match="submit failed"):
++            s._forward(forward_input)
++    assert s._consecutive_decode_batches == 0
++    with monkeypatch.context() as m:
++        m.setattr(s, "_prepare_batch", Mock(side_effect=RuntimeError("prepare failed")))
++        with pytest.raises(RuntimeError, match="prepare failed"):
++            s._schedule_next_batch()
++    assert s._consecutive_decode_batches == 0
++
++
++def test_decode_priority_does_not_probe_prefill_before_protection(harness, monkeypatch):
++    h = harness
++    s = h.make_cpu_scheduler(cap=2, protected=2)
++    warm_decode(h, s)
++    pending = h.enqueue(s, 1, torch.arange(100, 108, dtype=torch.int32), 1)
++    with monkeypatch.context() as m:
++        m.setattr(s.cache_manager, "probe_req", Mock(side_effect=AssertionError("unneeded probe")))
++        assert h.submit_one(s).is_decode
++        assert h.submit_one(s).is_decode
++    assert pending.waiting_passes == 0
++    assert h.submit_one(s).is_prefill
++    for _ in range(100):
++        if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++            break
++        h.submit_one(s)
++    h.assert_resources(s, 64)
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++def test_protection_budget_is_batch_total_and_excludes_cached_prefix(harness, page_size):
++    h = harness
++    s = h.make_cpu_scheduler(cap=1, protected=2, page_size=page_size)
++    warm_decode(h, s)
++    prefix = torch.arange(100, 108, dtype=torch.int32)
++    indices = s.cache_manager._page_to_token(s.cache_manager._allocate(8 // page_size))
++    s.cache_manager.prefix_cache.insert_prefix(prefix, indices)
++    for uid in (1, 2, 3):
++        h.enqueue(s, uid, torch.cat([prefix, torch.tensor([200 + uid], dtype=torch.int32)]), 1)
++    assert h.submit_one(s).is_decode
++    batch = s._select_next_batch()
++    assert batch.is_prefill
++    assert [r.uid for r in batch.reqs] == [1, 2]
++    assert [r.cache_handle.cached_len for r in batch.reqs] == [8, 8]
++    assert sum(r.extend_len for r in batch.reqs) == 2
++    assert [p.uid for p in s.prefill_manager.pending_list] == [3]
++    forward_input = s._prepare_batch(batch)
++    s._process_last_data((forward_input, s._forward(forward_input)))
++    for _ in range(100):
++        if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++            break
++        h.submit_one(s)
++    h.assert_resources(s, 64)
++
++
++@pytest.mark.parametrize("overlap", [False, True])
++def test_actual_loops_count_submissions_before_previous_results(harness, overlap):
++    h = harness
++    s = h.make_cpu_scheduler(cap=2, protected=2)
++    warm_decode(h, s)
++    h.enqueue(s, 1, torch.arange(100, 108, dtype=torch.int32), 1)
++    phases = []
++    original_forward = s._forward
++
++    def track_forward(forward_input):
++        phases.append(forward_input.batch.phase)
++        return original_forward(forward_input)
++
++    s._forward = track_forward
++    last = None
++    counts = []
++    for _ in range(4):
++        if overlap:
++            last = s.overlap_loop(last)
++        else:
++            s.normal_loop()
++        counts.append(s._consecutive_decode_batches)
++    assert phases == ["decode", "decode", "prefill", "decode"]
++    assert counts == [1, 2, 0, 1]
++    if overlap:
++        s._process_last_data(last)
++    for _ in range(100):
++        if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++            break
++        h.submit_one(s)
++    h.assert_resources(s, 64)
++
++
++@pytest.mark.parametrize("prefill_policy", ["fcfs", "lpm-aging"])
++def test_default_selection_matches_original_expression_over_lifecycle(harness, prefill_policy):
++    h = harness
++
++    def run(original):
++        s = h.make_cpu_scheduler(
++            policy="prefill-first", budget=3, prefill_policy=prefill_policy, aging=2
++        )
++        for uid, length in [(90, 8), (10, 2), (50, 5)]:
++            h.enqueue(s, uid, torch.arange(uid * 100, uid * 100 + length, dtype=torch.int32), 3)
++        trace = []
++        for _ in range(100):
++            if original:
++                batch = (s.prefill_manager.schedule_next_batch(s.prefill_budget)
++                         or s.decode_manager.schedule_next_batch())
++            else:
++                batch = s._select_next_batch()
++            if batch is None:
++                break
++            trace.append((
++                batch.phase, [(r.uid, r.cached_len, r.device_len, r.table_idx) for r in batch.reqs]
++            ))
++            forward_input = s._prepare_batch(batch)
++            s._process_last_data((forward_input, s._forward(forward_input)))
++        h.assert_resources(s, 64)
++        return trace, [(m.uid, m.next_token, m.finished) for m in s.sent]
++
++    assert run(True) == run(False)
++
++
++def test_large_queue_and_equal_rank_inputs_have_deterministic_phase_choices(harness):
++    h = harness
++    traces = []
++    for _ in range(2):
++        s = h.make_cpu_scheduler(cap=2, protected=2, table_slots=140,
++                                 prefill_policy="lpm-aging", aging=2)
++        warm_decode(h, s)
++        for uid in range(1, 130):
++            h.enqueue(s, uid, torch.tensor([uid * 100, uid * 100 + 1], dtype=torch.int32), 1)
++        trace = []
++        for _ in range(3):
++            batch = h.submit_one(s)
++            trace.append((batch.phase, [r.uid for r in batch.reqs]))
++        assert trace == [("decode", [0]), ("decode", [0]), ("prefill", [1])]
++        traces.append(trace)
++        for _ in range(1000):
++            if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++                break
++            h.submit_one(s)
++        h.assert_resources(s, 140)
++    assert traces[0] == traces[1]
+--- /dev/null
++++ b/tests/core/test_batch_schedule_benchmark.py
+@@ -0,0 +1,60 @@
++from __future__ import annotations
++
++import importlib.util
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++import minisgl.core as core
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++@pytest.mark.parametrize(
++    "workload", ["mixed", "memory-pressure", "table-pressure", "prefill-only", "decode-only"]
++)
++def test_benchmark_is_reproducible_and_drains(workload, page_size, monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    path = Path(__file__).resolve().parents[2] / "benchmarks/bench_batch_schedule_policy.py"
++    spec = importlib.util.spec_from_file_location("batch_schedule_benchmark", path)
++    benchmark = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(benchmark)
++    args = SimpleNamespace(
++        seed=31723, stream_steps=4, arrivals_per_pass=1, initial_decodes=2,
++        decode_tokens=16, output_tokens=2, prefix_length=8, long_prompt_tokens=17,
++        prefill_budget=32, page_size=page_size, prefill_policy="fcfs", aging_tokens_per_pass=2,
++    )
++    with benchmark.cpu_transfers():
++        first = benchmark.simulate("decode-first-bounded", workload, args, cap=2, protected=4)
++        second = benchmark.simulate("decode-first-bounded", workload, args, cap=2, protected=4)
++        unbounded = benchmark.simulate("decode-first-unbounded", workload, args)
++    deterministic = [k for k in first if not k.startswith("scheduling_")]
++    assert all(first[k] == second[k] for k in deterministic)
++    assert first["resource_integrity"] == unbounded["resource_integrity"] == "passed"
++    if workload == "mixed":
++        assert first["prefill_first_wait_p95_batches"] < unbounded["prefill_first_wait_p95_batches"]
++        assert first["max_decode_streak_while_prefill_waits"] <= 2
++    if workload == "table-pressure":
++        assert first["rejected_prefill_attempts"] > 0
++        assert first["max_decode_streak_while_prefill_waits"] > 2
++    if workload == "memory-pressure":
++        assert first["rejected_prefill_attempts"] > 0
++        assert first["max_decode_streak_while_prefill_waits"] > 2
++
++
++def test_decode_gap_includes_initial_prefill_burst(monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    path = Path(__file__).resolve().parents[2] / "benchmarks/bench_batch_schedule_policy.py"
++    spec = importlib.util.spec_from_file_location("batch_schedule_gap_benchmark", path)
++    benchmark = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(benchmark)
++    args = SimpleNamespace(
++        seed=31723, stream_steps=4, arrivals_per_pass=1, initial_decodes=2,
++        decode_tokens=16, output_tokens=2, prefix_length=8, long_prompt_tokens=17,
++        prefill_budget=32, page_size=1, prefill_policy="fcfs", aging_tokens_per_pass=2,
++    )
++    with benchmark.cpu_transfers():
++        prefill = benchmark.simulate("prefill-first", "short", args)
++        bounded = benchmark.simulate("decode-first-bounded", "short", args, cap=2, protected=4)
++    assert prefill["initial_decode_output_gap_max_batches"] == 5
++    assert bounded["initial_decode_output_gap_max_batches"] == 2
+--- /dev/null
++++ b/docs/batch_scheduling.md
+@@ -0,0 +1,110 @@
++# 有次数限制的 Decode 优先与小预算 Prefill 保护
++
++默认阶段策略仍为 `prefill-first`。新增 `decode-first-bounded` 在存在活跃 Decode 时优先推进生成；有 Prefill 等待且连续提交 K 个 Decode Batch 后，下一次阶段选择优先尝试小预算 Prefill。
++
++## 两层配置
++
++| 配置 | 默认值 | 作用 |
++|---|---|---|
++| `batch_schedule_policy` | `prefill-first` | Prefill/Decode 阶段选择，另一个选项为 `decode-first-bounded` |
++| `max_consecutive_decodes` | 16 | 等待期间连续 Decode Batch 提交数，达到后优先尝试 Prefill |
++| `protected_prefill_tokens` | 256 | 保护轮次整个 Prefill Batch 的新增计算 Token 总预算 |
++| `schedule_policy` | `fcfs` | Prefill 内部的 FCFS / LPM / LPM-Aging 排序，语义保持原样 |
++
++示例服务参数：
++
++```bash
++--batch-schedule-policy decode-first-bounded \
++--max-consecutive-decodes 16 \
++--protected-prefill-tokens 256 \
++--schedule-policy lpm-aging \
++--lpm-aging-tokens-per-pass 8
++```
++
++两个整数参数必须为正整数。配置对象与 CLI 均拒绝非法参数；未知阶段策略报错。16 和 256 是实验起点，不代表适用于所有模型和硬件的最佳值。
++
++## 实际调用链
++
++```text
++normal_loop / overlap_loop
++  → _schedule_next_batch
++      → _select_next_batch：选择并构造一个 Batch
++      → _prepare_batch：仅准备这个最终 Batch 的 KV 页和元数据
++  → _forward：提交计算、写入 Token Pool、更新 Decode 集合
++      → _record_batch_submission：更新连续 Decode 计数
++  → _process_last_data：处理采样结果、缓存前缀、释放完成请求资源
++```
++
++默认分支保留原表达式：先调用正常预算 Prefill，再在返回 `None` 时调用 Decode。
++
++启用新策略后的行为：
++
++| 状态 | 下一批 |
++|---|---|
++| 没有等待 Prefill | Decode 或 `None`，计数清零 |
++| 有 Prefill、没有活跃 Decode | 正常预算 Prefill |
++| 两阶段都有且计数 < K | Decode 优先，无法构造 Decode 时回退正常预算 Prefill |
++| 两阶段都有且计数 >= K | 优先尝试预算 `min(max_extend_tokens, protected_prefill_tokens)` 的 Prefill |
++| 保护尝试无法构造 Prefill Batch | 回退 Decode；计数不清零，下一次继续保护尝试 |
++
++一个 Decode Batch 包含多少会话都只计一次。计数只在 `_forward` 成功路径中更新；选择 Batch、准备 Batch、空转和失败提交不会增加计数。成功提交任意 Prefill Batch（包括 ChunkedReq 续算）后清零。等待队列清空后清零；Abort 清空后紧接新到达也不会继承旧计数。
++
++计数使用提交顺序，不使用 GPU 完成时间，不增加 CUDA 同步。在 overlap 循环中，当前 Batch 先提交，上一批结果随后处理，所以计数不能放到结果处理位置。相同输入状态使用确定的整数决策；CPU 测试验证相同状态下的决策一致性，未执行多 GPU TP 实验。
++
++## 预算、缓存与生命周期
++
++保护预算限制整个 Batch 的 `sum(req.extend_len)`，已命中的前缀不占预算。例如 256 个 Token 可以用于多个短请求，也可以用于一个长请求的部分 Prompt。没有活跃 Decode 时恢复正常预算。
++
++PrefillManager、PrefillAdder、DecodeManager 和缓存实现无需为该策略改动：
++
++- 已准入 ChunkedReq 仍然优先续算，复用 Table 槽位、缓存 Handle 和真实计算进度。
++- 新请求沿用完整剩余 Prompt、预期输出和 `decode_manager.inflight_tokens` 的资源检查。缩小计算预算不能绕过 KV 准入限制。
++- Prefix Cache 的只读探测、计划刷新、准入后提交、引用计数与 LRU 更新均沿用现有代码。
++- 实际选定 Batch 才进入 `_prepare_batch`，不准备并丢弃另一个阶段的 Batch。
++- 完成和 Abort 沿用现有资源回收，测试检查物理页总量、唯一性、表槽唯一性和缓存引用归还。
++- Decode-only 轮次不增加 Prefill 内部的 `waiting_passes`；LPM-Aging 和可选 FCFS 等待退化仍按原有 Prefill 调度语义工作。
++
++## 保证的边界
++
++K 限制到下一次优先尝试 Prefill 的间隔。KV/Table 等资源不足时，可以连续 Decode 超过 K；后续持续尝试保护，直到可准入。保护机会也可能被已有 ChunkedReq 消耗，不能把阶段保护视为每个新请求的准入保证。
++
++Token 预算不等于 GPU 时间预算；长上下文与 Attention 后端可能改变耗时。小块续算会增加 Batch 数和元数据处理开销，需要结合模型实验调参。本实现不包含运行中 Kernel 抢占、KV 抢占/重算、混合 Prefill/Decode Batch、墙钟超时或自适应参数。
++
++提交失败与模型异常沿用现有异常处理；新增计数不会将异常视为服务，不增加新的计算或分配事务回滚机制。
++
++## CPU 测试与 Benchmark
++
++在项目根目录执行：
++
++```bash
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python -m pytest \
++  tests/core tests/misc -q -o addopts='' --tb=short \
++  --junitxml=artifacts/batch_scheduling/tests.xml
++
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python \
++  benchmarks/bench_batch_schedule_policy.py \
++  --seed 31723 --repeats 5 \
++  --output artifacts/batch_scheduling/benchmark.json
++```
++
++Benchmark 比较 Prefill-first、仅在 Benchmark 内实现的无次数限制 Decode-first，以及新策略。K 扫描 1/4/8/16/32，保护预算扫描 64/128/256/512。覆盖短 Prompt、长 Prompt、混合缓存冷热、KV 紧张、Table 紧张、Prefill-only 和 Decode-only。新策略结合 LPM-Aging 及 page_size=4 的补充实验命令：
++
++```bash
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python \
++  benchmarks/bench_batch_schedule_policy.py \
++  --seed 31723 --repeats 5 --decode-caps 16 --protected-budgets 256 \
++  --prefill-policy lpm-aging --aging-tokens-per-pass 8 --page-size 4 \
++  --output artifacts/batch_scheduling/benchmark_lpm_aging_page4.json
++```
++
++使用真实 Scheduler 阶段选择、准入、物理页分配、`Req.complete_one`、结果处理和缓存释放。CPU Engine 模拟输出和进度，移除 pinning 并提供单 rank CPU 上下文；不加载模型，不运行 Attention、Sampler 或 CUDA Graph。每组原生 Radix 比较器预热后测量阶段选择耗时，KV 页分配和模型进度模拟不在该计时区间内。
++
++请求按固定 Batch 序号到达，种子和到达序列固定，各策略运行顺序打乱；重复运行的调度语义和资源统计必须一致。统计 Prefill 首次执行/完成等待批数、初始 Decode 输出间隔批数、保护成功/拒绝、计算量、缓存复用和 CPU 耗时。Batch 数不是秒数；结果不能证明真实 TTFT、ITL 或吞吐提升。
++
++Decode 输出间隔从启动阶段 Batch 0 的输出开始记录，包含其后第一段等待。KV 紧张负载保证每个请求单独可行，同时让初始 Decode 预留阻止冷请求立即准入，用于验证保护失败后的行为。
++
++真实 GPU 验证需固定本地模型、采样配置、到达时间序列及负载，测量 TTFT、ITL 的 P50/P95/P99、吞吐和显存峰值，并分别测试 normal/overlap。当前交付的 GPU 指标标记为未执行。
++
++结果保存于 `artifacts/batch_scheduling/`；本次修改相对于执行前已有本地改动的差异保存在 `changes.diff`，审计摘要保存在 `verification.json`。
++
++本次执行结果：175 项相关 CPU 测试通过，770 次主实验和 105 次补充实验全部排空并通过资源检查。取舍与限制见 `artifacts/batch_scheduling/analysis.md`。
+--- /dev/null
++++ b/artifacts/batch_scheduling/analysis.md
+@@ -0,0 +1,85 @@
++# 实施和结果分析
++
++本次生产改动限于 `scheduler/scheduler.py`、`scheduler/config.py`、`server/args.py`。执行前保存了三个文件快照和全部 25 个已有本地改动文件的 SHA-256；任务范围外的已有文件内容保持一致。修改相对于执行前工作区的差异见 `changes.diff`，不是相对于 Git HEAD 的全部历史改动。
++
++## 实现
++
++- 默认 `prefill-first` 保留原来的 Prefill 调度表达式和预算。
++- 新增 `decode-first-bounded`：等待队列存在时连续成功提交 K 个 Decode Batch 后，优先尝试一次小预算 Prefill。
++- 保护预算为 `min(max_extend_tokens, protected_prefill_tokens)`，是整个 Batch 的新增计算 Token 总预算；命中前缀不占该预算。
++- 计数在 `_forward` 成功路径更新，成功 Prefill 清零，等待队列清空清零。Abort 清空后同批新到达不会继承历史计数。保护失败不会清零或停止 Decode。
++- 选择一个最终 Batch 后才准备 KV 页和计算元数据。ChunkedReq、Table 槽位、缓存 Handle、Decode 资源预留、实际准入和缓存锁定流程均复用已有实现。
++- Prefill 内部 LPM-Aging 仍按原有效等待轮次累计，Decode 轮次不增加 `waiting_passes`。
++
++## 验证
++
++相关 CPU 测试最终结果：**175 passed，0 failed，0 error，0 skipped**，耗时 10.46 秒。包含原有 106 项和新增 69 项。命令及策略语义见 `docs/batch_scheduling.md`；JUnit 结果在 `tests.xml`。
++
++新增测试覆盖策略默认值和非法参数、K-1/K/K+1、每个 Batch 只加一次、选择或失败提交不计数、保护失败重试、预算上限、缓存前缀不占计算预算、多个请求共享预算、无竞争恢复正常预算、KV/Table/预算不足、ChunkedReq 跨 Decode 续算、Abort 清空后新请求、normal/overlap 提交顺序、超过 128 个候选和确定性阶段选择。默认策略与原表达式执行完整请求生命周期的 Batch/输出轨迹一致。
++
++首次 CPU 测试调试中发现模拟环境缺少 TP 上下文、`torch.tensor` 的 pinning 替换和 Engine 的 page_table 字段，均在测试/Benchmark 支架中修复。沙箱限制阻止原生 Radix 缓存锁写入时，停止该次运行并获准在可写编译缓存的环境重新执行。最终测试无失败项。
++
++新增 Python 文件和生产修改使用 Python 3.10 语法解析验证；格式整理前后 AST 完全一致。GPU Kernel 测试及 `test_scheduler.py` 中需模型的手动集成脚本未执行。
++
++`git diff --check` 对整个已修改的 Scheduler 文件报告 3 处执行前已存在的行尾空白，保持原有内容；相对于本次执行前快照的新增差异和全部新文件无行尾空白。
++
++## Benchmark 方法
++
++环境：AMD Ryzen 7 5800H，WSL2，4 个可见逻辑 CPU，Python 3.12.14，Torch 2.9.1+cu128，1 个 Torch 线程。
++
++实际使用 Scheduler、PrefillManager、DecodeManager、RadixCache、TableManager、KV 分配和请求完成释放。CPU Engine 仅模拟进度与输出；无模型、Attention、真实采样或 GPU 推理。统计的 CPU 时间只覆盖阶段选择和准入，不含 `_prepare_batch` 与模拟 Forward。
++
++请求按固定 Batch 序号到达，所有策略使用相同的种子和输入序列。默认实验初始 4 个 Decode 请求，各生成 128 个 Token；16 个到达批次，每批到达 2 个新请求；新请求输出 8 Token，冷热 Prompt 分别为 65/1024 Token。热前缀预热 64 Token。正常 Prefill 预算 8192。Decode 输出间隔从启动时 Batch 0 的第一个输出开始计算，包含 Prefill-first 初期连续 Prefill 导致的等待。
++
++主实验：7 个负载 ×（2 个基线 + 5 个 K × 4 个保护预算）× 5 次重复 = **770 次运行**。补充实验使用 LPM-Aging、N=8、page_size=4、K=16、保护预算 256：7 个负载 × 3 个策略 × 5 次重复 = **105 次运行**。
++
++**875 次运行全部排空**，通过 Table 槽位归还及唯一性、非根缓存节点引用为零、protected_size=0、物理页总量和唯一性检查。重复实验的非计时指标一致。原始数据分别在 `benchmark.json` 和 `benchmark_lpm_aging_page4.json`。
++
++## 主要结果
++
++以下为主实验，Prefill 内部为 FCFS；新策略固定 K=16、保护预算 256。所有等待和输出间隔均以 Batch 计数，不能解释为真实毫秒或 TTFT。
++
++| 负载 | 策略 | 首次 Prefill 等待 P95（批） | Prefill 完成等待 P95（批） | 初始 Decode 输出最大间隔（批） | 等待期间最大连续 Decode | CPU 调度中位数（µs） |
++|---|---|---:|---:|---:|---:|---:|
++| 短 Prompt | Prefill-first | 0 | 0 | 17 | 0 | 4.19 |
++| 短 Prompt | 无限 Decode-first | 127 | 127 | 1 | 127 | 2.80 |
++| 短 Prompt | 有限 Decode-first | 16 | 16 | 2 | 16 | 2.76 |
++| 长 Prompt | Prefill-first | 0 | 0 | 17 | 0 | 4.23 |
++| 长 Prompt | 无限 Decode-first | 139 | 139 | 1 | 127 | 2.85 |
++| 长 Prompt | 有限 Decode-first | 145 | 145 | 2 | 16 | 3.16 |
++| 混合冷热 | Prefill-first | 0 | 0 | 17 | 0 | 4.23 |
++| 混合冷热 | 无限 Decode-first | 127 | 127 | 1 | 127 | 2.75 |
++| 混合冷热 | 有限 Decode-first | 131 | 132 | 2 | 16 | 3.16 |
++
++短请求实验中，阶段保护减少相对于无限 Decode-first 的 Prefill 等待，并降低相对于 Prefill-first 的最大 Decode 输出批间隔。该结果证明阶段调度的取舍，不能证明 GPU 延迟或吞吐改善。
++
++长 Prompt 和 FCFS 混合负载中，已有长请求的 ChunkedReq 先续算，保护轮次可能仅推进其一部分 Prompt；后续请求仍然排队。K=16/256 虽然限制了阶段之间的 Decode 连续批数，首次 Prefill 等待 P95 却可以高于无限 Decode-first。全部请求排空后的 Prefill 计算量相同：长 Prompt 32768 Token；混合负载 9239 Token，实际复用缓存 1472 Token。额外分块改变阶段交错与 Batch 数，不减少模型所需计算量。
++
++混合负载参数扫描的两个例子：K=1/预算512 的首次等待 P95 为 19 批；K=1/预算64 为 238 批。参数对阶段机会和续算速度的作用不同，不能简单认为 K 越小或块越小越公平，也不能把 16/256 当作通用最优值。
++
++LPM-Aging/page_size=4 补充实验中，短 Prompt 的首次等待 P95 为 16 批，混合负载为 130 批，阶段最大连续 Decode 均为 16。该补充实验用于验证组合运行和页大小兼容性；由于同时改变了页大小和内部策略，不据此归因某一项性能收益。
++
++## 资源受限及开销
++
++| 负载 | 策略 | 首次 Prefill 等待 P95（批） | 最大连续 Decode | 整批 Prefill 尝试失败次数 | CPU 调度中位数（µs） |
++|---|---|---:|---:|---:|---:|
++| KV 紧张 | 无限 Decode-first | 352 | 127 | 0 | 2.58 |
++| KV 紧张 | 有限 Decode-first | 352 | 127 | 111 | 3.02 |
++| Table 紧张 | 无限 Decode-first | 169 | 127 | 0 | 2.80 |
++| Table 紧张 | 有限 Decode-first | 169 | 127 | 111 | 10.58 |
++
++资源不足时，K=16 后的 111 次保护尝试均失败；直到已有 Decode 释放必要资源后请求才获得服务。排序和小预算无法产生额外 KV 或 Table 槽位。这些结果直接验证 K 只提供优先尝试的机会，不能构成资源受限情况下的服务上界。
++
++失败后的逐批重试有 CPU 开销，Table 紧张场景相对于无限 Decode-first 的调度中位数从约 2.80 µs 增至 10.58 µs。当前保持简单、确定的重试语义；后续可以在明确资源变化事件后重试，需同时处理缓存可用量、表槽释放和多 rank 一致性。
++
++Prefill-only 负载使用正常预算，32 个请求在 16 个 Prefill Batch 中完成；Decode-only 负载为 127 个 Decode Batch，所有阶段策略轨迹一致。默认兼容性另由完整生命周期测试验证。
++
++## 限制和后续工作
++
++- 没有可用本地模型权重，本次未执行真实 GPU TTFT/ITL/吞吐实验；CPU Batch 间隔不能替代这些指标。
++- 未执行多 GPU TP 运行；决策只使用确定的整数状态，CPU 测试验证相同输入状态下的结果一致。
++- 保护成功可能只是 Chunk 续算，不能保证某个新请求获得准入。原有队首资源阻塞语义保留。
++- Token 预算不是 GPU 时间预算。后续应结合模型、上下文长度、真实请求到达时间、normal/overlap 模式调参。
++- 失败重试节流、墙钟等待超时、混合阶段 Batch、实际 KV 抢占和自适应预算尚未实现。
++
++可用于项目记录：在 mini-SGLang 中实现可配置的有限 Decode 优先与小预算 Prefill 保护，保留原有默认调度和缓存准入语义；新增 69 项 CPU 测试并完成 875 次可复现实验，量化阶段公平性、分块续算与资源受限重试的取舍。

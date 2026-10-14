@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import heapq
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Dict, List, Tuple, TypeAlias
 
 import torch
 from minisgl.core import get_global_ctx
 from minisgl.utils import align_down
 
-from .base import BaseCacheHandle, BasePrefixCache, InsertResult, MatchResult, SizeInfo
+from .base import BaseCacheHandle, BasePrefixCache, InsertResult, MatchProbe, MatchResult, SizeInfo
 
 KEY_FN: TypeAlias = Callable[[torch.Tensor], Any]
 
@@ -103,6 +103,13 @@ class RadixCacheHandle(BaseCacheHandle):
         return torch.cat(value_list)
 
 
+@dataclass(frozen=True)
+class RadixMatchProbe(MatchProbe):
+    node: RadixTreeNode
+    matched_in_node: int
+    structure_version: int
+
+
 class RadixPrefixCache(BasePrefixCache):
     def __init__(self, device: torch.device):
         super().__init__()
@@ -112,6 +119,7 @@ class RadixPrefixCache(BasePrefixCache):
         self.empty_tensor = torch.empty(0, dtype=torch.int32, device=device)
         self.evictable_size = 0
         self.protected_size = 0
+        self._structure_version = 0
         self.root_node = RadixTreeNode(self.key_fn)
         self.root_node.ref_count = 1  # root is always protected
 
@@ -138,16 +146,20 @@ class RadixPrefixCache(BasePrefixCache):
                 node.ref_count += 1
                 node = node.parent
 
-    def touch_handle(self, handle: BaseCacheHandle) -> None:
-        #刷新已匹配前缀整条路径（handle.node -> root）的 LRU 时间戳。
+    def _touch_path(self, node: RadixTreeNode) -> None:
+        #刷新 node -> root 整条路径的 LRU 时间戳。
         #必须整条路径都刷：evict() 先淘汰叶子，叶子删完后会把 parent 推入堆，
         #祖先节点时间戳过期会导致 LRU 判序错误。
-        assert isinstance(handle, RadixCacheHandle)
+        #node 为 root 时（cached_len == 0 / 完全未命中）是空操作。
         tic = time.monotonic_ns()
-        node = handle.node
         while not node.is_root():
             node.timestamp = tic
             node = node.parent
+
+    def touch_handle(self, handle: BaseCacheHandle) -> None:
+        #仅在前缀被真正采纳（准入容量检查通过）后由调度器调用。
+        assert isinstance(handle, RadixCacheHandle)
+        self._touch_path(handle.node)
 
     def match_prefix(self, input_ids: torch.Tensor) -> MatchResult:
         #内部调用 _tree_walk 从根节点开始自顶向下搜索
@@ -156,13 +168,15 @@ class RadixPrefixCache(BasePrefixCache):
         return MatchResult(RadixCacheHandle(prefix_len, node))
 
     def estimate_match_len(self, token_ids: List[int]) -> int:
-        # Read-only prefix match estimate for scheduling (e.g. LPM sort).
-        # Unlike _tree_walk: no split, no timestamp refresh, no ref_count change.
-        # Returns page-aligned matched token count.
-        if len(token_ids) == 0:
-            return 0
+        # Scheduling estimates use the same read-only traversal as admission.
         input_ids = torch.tensor(token_ids, dtype=torch.int32)
+        return self.probe_prefix(input_ids).cached_len
+
+    def probe_prefix(self, input_ids: torch.Tensor) -> RadixMatchProbe:
+        # 只读探测：不分裂、不刷新时间戳、不修改引用计数或容量。
         prefix_len = 0
+        newly_protected_size = 0
+        matched_in_node = 0
         indice_len = len(input_ids)
         node = self.root_node
 
@@ -170,18 +184,50 @@ class RadixPrefixCache(BasePrefixCache):
             child_node = node.children.get(self.key_fn(input_ids[prefix_len:]))
             if child_node is None:
                 break
-            node = child_node
-            match_len = node.get_match_len(input_ids[prefix_len:])
+            match_len = child_node.get_match_len(input_ids[prefix_len:])
             match_len = align_down(match_len, self.page_size)
             if match_len == 0:
                 break
+            node = child_node
+            matched_in_node = match_len
             prefix_len += match_len
+            if node.ref_count == 0:
+                # 部分命中时只扣匹配部分，未命中的后缀仍可淘汰。
+                newly_protected_size += match_len
             if match_len != node.length:
                 # partial edge: count fully-matched pages only, do not split
                 break
-        return prefix_len
+        return RadixMatchProbe(
+            prefix_len, newly_protected_size, node, matched_in_node, self._structure_version
+        )
 
+    def refresh_probe(self, probe: MatchProbe, input_ids: torch.Tensor) -> RadixMatchProbe:
+        # 插入、分裂、淘汰会使节点位置失效；引用计数变化只需重算加锁成本。
+        if not isinstance(probe, RadixMatchProbe) or probe.structure_version != self._structure_version:
+            return self.probe_prefix(input_ids)
+        node = probe.node
+        matched_len = probe.matched_in_node
+        newly_protected_size = 0
+        while not node.is_root():
+            if node.ref_count == 0:
+                newly_protected_size += matched_len
+            node = node.parent
+            if not node.is_root():
+                matched_len = node.length
+        assert node is self.root_node, "Probe belongs to a different prefix cache"
+        if newly_protected_size == probe.newly_protected_size:
+            return probe
+        return replace(probe, newly_protected_size=newly_protected_size)
 
+    def commit_match(self, probe: MatchProbe) -> RadixCacheHandle:
+        assert isinstance(probe, RadixMatchProbe)
+        assert probe.structure_version == self._structure_version, "Refresh stale probe before commit"
+        node = probe.node
+        # 准入通过后直接使用探测记录的位置，不再从 root 遍历或比较 token。
+        if not node.is_root() and probe.matched_in_node != node.length:
+            node = node.split_at(probe.matched_in_node)
+            self._structure_version += 1
+        return RadixCacheHandle(probe.cached_len, node)
 
     def insert_prefix(self, input_ids: torch.Tensor, indices: torch.Tensor) -> InsertResult:
         insert_len = align_down(len(input_ids), self.page_size)
@@ -195,10 +241,17 @@ class RadixPrefixCache(BasePrefixCache):
         # 不能被当作公共前缀缓存，否则会导致跨请求的 KV 混淆
         input_ids, indices = input_ids[:insert_len], indices[:insert_len]
         node, prefix_len = self._tree_walk(input_ids)
+        #本请求刚刚读/写了这段前缀的 KV，它就是"最后一次使用"。
+        #必须在此就地刷新（而不是只靠准入时的 touch）：
+        #准入 -> cache_req 之间路径一直被 lock（ref_count > 0），evict 看不到；
+        #等 unlock 变回 evictable 时，若不刷新，时间戳会停在准入时刻，
+        #落后真实使用时间一个完整的 prefill + decode 时长，导致 LRU 判序颠倒。
+        self._touch_path(node)
         if prefix_len != insert_len:  # NOTE: prefix_len < insert_len
             new_node = RadixTreeNode(self.key_fn)
             new_node.set_key_value(input_ids[prefix_len:], indices[prefix_len:].clone())
             new_node.set_parent(node)
+            self._structure_version += 1
             self.evictable_size += new_node.length
             node = new_node
         return InsertResult(prefix_len, RadixCacheHandle(insert_len, node))
@@ -226,6 +279,7 @@ class RadixPrefixCache(BasePrefixCache):
             self.evictable_size -= node.length
             parent = node.parent
             del parent.children[self.key_fn(node._key)]
+            self._structure_version += 1
             # NOTE: root is always protected, so won't be evicted
             if parent.is_leaf() and parent.ref_count == 0:
                 heapq.heappush(leave_nodes, parent) #系统立即将其动态推入最小堆
@@ -264,8 +318,9 @@ class RadixPrefixCache(BasePrefixCache):
         return leave_nodes
 
     def _tree_walk(self, input_ids: torch.Tensor) -> Tuple[RadixTreeNode, int]:
-    #沿树向下搜索最长公共前缀并按需切分节点（只读，不刷新 LRU 时间戳；
-    #时间戳由调用方在真正采纳前缀时通过 touch_handle 刷新）
+        # 沿树匹配并按需切分节点，不刷新 LRU 时间戳。
+        # 调度准入使用 probe_prefix + commit_match，检查通过后直接提交分裂。
+        # insert_prefix 也使用此方法，并在 walk 后调用 _touch_path。
 
         prefix_len = 0
         indice_len = len(input_ids)
@@ -284,7 +339,8 @@ class RadixPrefixCache(BasePrefixCache):
 
             # need to split the node if not fully matched
             if match_len != node.length:
-                node = node.split_at(match_len)
+                node = node.split_at(match_len) #返回的是分裂点之前（前半段）的那个节点
+                self._structure_version += 1
                 return node, prefix_len
 
         return node, prefix_len

@@ -1,0 +1,99 @@
+{
+  "generated_utc": "2026-10-12T14:15:37.741349+00:00",
+  "baseline_snapshot": "/tmp/minisgl-batch-scheduling-baseline-20261012",
+  "git_head": "9a91cfafe754aa85daee49998176275667eb58f2",
+  "production_files_modified": [
+    "python/minisgl/scheduler/scheduler.py",
+    "python/minisgl/scheduler/config.py",
+    "python/minisgl/server/args.py"
+  ],
+  "new_source_test_document_files": [
+    "benchmarks/bench_batch_schedule_policy.py",
+    "tests/core/test_batch_schedule_policy.py",
+    "tests/core/test_batch_schedule_benchmark.py",
+    "docs/batch_scheduling.md",
+    "artifacts/batch_scheduling/analysis.md"
+  ],
+  "existing_local_files_audited": 25,
+  "existing_files_outside_scope_preserved": 22,
+  "outside_scope_changes": [],
+  "scoped_diff": {
+    "additions": 1181,
+    "deletions": 6,
+    "trailing_whitespace": []
+  },
+  "git_diff_check": {
+    "exit_code": 2,
+    "output": "python/minisgl/scheduler/scheduler.py:136: trailing whitespace.\n+                    forward_input, \npython/minisgl/scheduler/scheduler.py:208: trailing whitespace.\n+        \npython/minisgl/scheduler/scheduler.py:349: trailing whitespace.\n+    \"\"\"_make_positions 负责为当前批次中所有需要计算的 Token \n",
+    "explanation": "All three trailing-whitespace lines were present before this task; scoped additions are clean."
+  },
+  "tests": {
+    "tests": 175,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "new_cases": 69,
+    "existing_cases": 106,
+    "command": "PATH=\"$PWD/.venv/bin:$PATH\" PYTHONPATH=python .venv/bin/python -m pytest tests/core tests/misc -q -o addopts='' --tb=short --junitxml=artifacts/batch_scheduling/tests.xml"
+  },
+  "benchmarks": [
+    {
+      "file": "benchmark.json",
+      "runs": 770,
+      "cases": 154,
+      "page_size": 1,
+      "prefill_policy": "fcfs",
+      "all_resources_passed": true
+    },
+    {
+      "file": "benchmark_lpm_aging_page4.json",
+      "runs": 105,
+      "cases": 21,
+      "page_size": 4,
+      "prefill_policy": "lpm-aging",
+      "all_resources_passed": true
+    }
+  ],
+  "benchmark_runs_total": 875,
+  "python_3_10_syntax": "passed",
+  "formatting_ast_equivalence": "passed",
+  "gpu_inference": "not_run_no_local_model_weights",
+  "multi_gpu_tp": "not_run",
+  "initial_local_file_sha256": {
+    "artifacts/lpm_aging/benchmark.md": "55f3a93c3e5cb6fcc920e0a05febb3d50582f75cbad58aed74382fd7a026c474",
+    "artifacts/lpm_aging/changes.diff": "7bee910539a1637f3d3c44e1f26179bb05158dd19abc4959f820ad5574ce679b",
+    "artifacts/lpm_aging/tests.xml": "8a7a482fcbc3e57e60c1035298cad5974f7bbf3e1c3655dc971a2d399a19b2dd",
+    "benchmarks/bench_prefill_policy.py": "d0646fbc2c36a438dbf25ad80a7a139c3dc97fbe590c22279acd368f3c364703",
+    "docs/features_zh.md": "89f5cc0f30dfb2c00729cd60b111e8de888c33afcb918c988d73275c53950bf0",
+    "docs/lpm_aging.md": "9c95a84e10f145b98b93f20c9cf8814aab5994d63fbf92d711a005cbda1a25fb",
+    "docs/structures_zh.md": "2d6131b9d380eeda6e2e6c3b4109fae44b738d60031528631e2d389bfd1778bb",
+    "python/test/test1.py": "f199b4ecb49c5557c9c317b34152860cc92787b34d069d6197579a3f78ae3fef",
+    "tests/core/test_prefill_admission.py": "694c544a596c23370799e5f344e748bd64e4fca6b949d1ebda621b27acd7f0d8",
+    "tests/core/test_prefill_benchmark.py": "69b02dfcf94b9620f84ebce70284118b0d4ee8e08d56a41aa272eb9ccd0a6bab",
+    "tests/core/test_prefill_policy.py": "236a3fb069ec2f3be4b33b7b04627ca2e980610b46a8d63ad2a6300789abdf94",
+    "uv.lock": "83edd122f2ae7727b6278e33a80d8ac5fd25559fe03763a4b8dd5ee956ebc9c7",
+    "python/minisgl/core.py": "ebcf798399442ddeea2ff00644644e2dbaaee3273cca36081b99f2e8d67c98e4",
+    "python/minisgl/kvcache/base.py": "df4c7e943e0cc1cbd3f095905256650961b2904c8c1f3b9b49b23e41d2517c57",
+    "python/minisgl/kvcache/naive_cache.py": "b9fa8852d21293357db747612397149ac268ea7533d45efb4ba73d2187d1ae75",
+    "python/minisgl/kvcache/radix_cache.py": "bd73c772289890b1939303162bf6784bfa506cb43b05ad2b2a9aae07aea87590",
+    "python/minisgl/message/backend.py": "00e2b03f4b93d897653d1ce13e002465c13663b7a10e1f190b1839b9ed4f0eca",
+    "python/minisgl/message/frontend.py": "a44d7bd0ba45c2ae0df35a5fcfb322455dee4de7539edb5b2c6e5aff7656b2b3",
+    "python/minisgl/scheduler/cache.py": "737965b88affa1b62b5bede98be3a87a4452598eeeafc4dc2c5b7c9a50cf9e27",
+    "python/minisgl/scheduler/config.py": "292ed322779b6fb5389fe143d2f6a84c21739cfe475e5a3c83795ffcace946ca",
+    "python/minisgl/scheduler/prefill.py": "ce41b25ee28a7a62f22a724e5fe7cbc2f26fb2b3ab6ba7b07780d27562bbaa14",
+    "python/minisgl/scheduler/scheduler.py": "cbb700b6a1e7cdd6d05b9d73fd6b800f388af23dd4ef6ce30304eb3ec34e273f",
+    "python/minisgl/scheduler/utils.py": "a2a4e3064c0a35b0b50d2162a4f9b14c2caa6acb614cc4cc52c5cead114e0a3c",
+    "python/minisgl/server/args.py": "80b0500310c999c2fb4687dc2fb4c305ac88d9b27af1114f5fc0aadf3a647971",
+    "tests/core/test_cache_allocate.py": "29abe1e0d3947f2d23a937bd89f03ff6112d2afce8bf83727da433d117b79c42"
+  },
+  "final_task_file_sha256": {
+    "python/minisgl/scheduler/scheduler.py": "f1316b002f35c879fcbadec1a8178fe60ad793691248eb7923136a024c50b188",
+    "python/minisgl/scheduler/config.py": "45fb854b2fcf0df102adf7b21833725246ae65e5cd059d7642ba71d3f363c98d",
+    "python/minisgl/server/args.py": "6d89e6c73de9b5a95e444269f0af88e9bc7d97710509f79e9093fc4ea8364a67",
+    "benchmarks/bench_batch_schedule_policy.py": "c121da0a0bc9477eaafc7bd1d0152c2fcd0bf9ef2d27d94e3cc213ea260fd6bc",
+    "tests/core/test_batch_schedule_policy.py": "dcea86f80543dd922299dd94c3ee781d8b47737cb9a9827a73bf11709f782e49",
+    "tests/core/test_batch_schedule_benchmark.py": "ff16ea2bf465514456210f1bdbff6db1dd9e1b19020d3e12558b0d906afdcb2f",
+    "docs/batch_scheduling.md": "fcbc1bd44a12135b11f4e774865b076ca14220a43ee0abbca5a2e8c021ad6bb7",
+    "artifacts/batch_scheduling/analysis.md": "3736efa179ab0674c270067b5f2c0ae7fc9b38676d16006a30e8d8c3a6f9ec7a"
+  }
+}

@@ -51,6 +51,20 @@ class ServerArgs(SchedulerConfig):
         return f"tcp://127.0.0.1:{self.server_port + 1}"
 
 
+def _positive_int(value: str) -> int:
+    result = int(value)
+    if result <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return result
+
+
+def _nonnegative_int(value: str) -> int:
+    result = int(value)
+    if result < 0:
+        raise argparse.ArgumentTypeError("must be a nonnegative integer")
+    return result
+
+
 def parse_args(args: List[str], run_shell: bool = False) -> Tuple[ServerArgs, bool]:
     """
     Parse command line arguments and return an EngineConfig.
@@ -208,6 +222,76 @@ def parse_args(args: List[str], run_shell: bool = False) -> Tuple[ServerArgs, bo
         default=ServerArgs.cache_type,
         choices=SUPPORTED_CACHE_MANAGER.supported_names(),
         help="The KV cache management strategy.",
+    )
+
+    parser.add_argument(
+        "--batch-schedule-policy",
+        choices=["prefill-first", "decode-first-bounded"],
+        default=ServerArgs.batch_schedule_policy,
+        help="Prefill/decode batch selection; the default preserves prefill-first behavior.",
+    )
+
+    parser.add_argument(
+        "--max-consecutive-decodes",
+        type=_positive_int,
+        default=ServerArgs.max_consecutive_decodes,
+        help="Decode batch submissions while prefill waits before prioritizing a prefill attempt.",
+    )
+
+    parser.add_argument(
+        "--protected-prefill-tokens",
+        type=_positive_int,
+        default=ServerArgs.protected_prefill_tokens,
+        help="Total new prefill tokens in a protection batch, capped by max-extend-tokens.",
+    )
+
+    parser.add_argument(
+        "--adaptive-prefill-budget",
+        action="store_true",
+        default=ServerArgs.adaptive_prefill_budget,
+        help="Adapt protection budgets to live decode count; requires decode-first-bounded.",
+    )
+
+    parser.add_argument(
+        "--target-batch-tokens",
+        type=_positive_int,
+        default=ServerArgs.target_batch_tokens,
+        help="Target token allowance minus live decode count for adaptive protection batches.",
+    )
+
+    parser.add_argument(
+        "--min-chunk-tokens",
+        type=_positive_int,
+        default=ServerArgs.min_chunk_tokens,
+        help="Minimum total prefill budget for adaptive protection, not a per-request chunk size.",
+    )
+
+    parser.add_argument(
+        "--schedule-policy",
+        choices=["fcfs", "lpm", "lpm-aging"],
+        default=ServerArgs.schedule_policy,
+        help="Prefill admission order. LPM prioritizes cached prefixes with FCFS fallbacks.",
+    )
+
+    parser.add_argument(
+        "--lpm-queue-threshold",
+        type=_positive_int,
+        default=ServerArgs.lpm_queue_threshold,
+        help="Fall back to FCFS when the number of requests awaiting first admission exceeds this value.",
+    )
+
+    parser.add_argument(
+        "--lpm-aging-tokens-per-pass",
+        type=_nonnegative_int,
+        default=ServerArgs.lpm_aging_tokens_per_pass,
+        help="Virtual matched tokens per effective waiting pass in lpm-aging; 0 disables aging.",
+    )
+
+    parser.add_argument(
+        "--fairness-max-wait-steps",
+        type=_nonnegative_int,
+        default=ServerArgs.fairness_max_wait_steps,
+        help="Optional FCFS timeout in scheduling passes (not seconds); 0 disables this fallback.",
     )
 
     parser.add_argument(

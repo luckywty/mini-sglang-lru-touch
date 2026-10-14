@@ -1,0 +1,3998 @@
+{
+  "metadata": {
+    "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "torch": "2.9.1+cu128",
+    "cpu": "AMD Ryzen 7 5800H with Radeon Graphics",
+    "logical_cpus": 4,
+    "torch_threads": 1,
+    "git_head": "9a91cfafe754aa85daee49998176275667eb58f2",
+    "scope": "CPU real scheduler/allocator with simulated engine; no GPU TTFT/ITL/throughput",
+    "parameters": {
+      "seed": 31723,
+      "repeats": 5,
+      "decode_caps": [
+        16
+      ],
+      "protected_budgets": [
+        256
+      ],
+      "workloads": [
+        "long",
+        "mixed"
+      ],
+      "prefill_policy": "fcfs",
+      "aging_tokens_per_pass": 8,
+      "prefill_budget": 8192,
+      "page_size": 1,
+      "prefix_length": 64,
+      "long_prompt_tokens": 1024,
+      "decode_tokens": 128,
+      "stagger_decode_completions": true,
+      "output_tokens": 8,
+      "initial_decodes": 4,
+      "stream_steps": 16,
+      "arrivals_per_pass": 2,
+      "compare_adaptive": true,
+      "decode_loads": [
+        16,
+        192
+      ],
+      "target_budgets": [
+        256
+      ],
+      "min_chunks": [
+        64
+      ],
+      "output": "artifacts/adaptive_prefill_budget/benchmark_decode_churn.json"
+    }
+  },
+  "summary": [
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.1310000000000002,
+      "scheduling_p95_us": 61.346,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 3.101,
+      "max_run_median_us": 3.241
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 145,
+      "prefill_completion_wait_p95_batches": 145,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.85,
+      "scheduling_p95_us": 80.273,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 15.033999999999999,
+      "max_run_median_us": 19.1215
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.191,
+      "scheduling_p95_us": 57.78,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 3.186,
+      "max_run_median_us": 3.336
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 146,
+      "prefill_completion_wait_p95_batches": 146,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.489,
+      "scheduling_p95_us": 77.197,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 15.193999999999999,
+      "max_run_median_us": 16.305999999999997
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.2960000000000003,
+      "scheduling_p95_us": 49.534,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 3.191,
+      "max_run_median_us": 3.376
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 131,
+      "prefill_first_wait_max_batches": 132,
+      "prefill_completion_wait_p95_batches": 132,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 134,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 142,
+      "max_queue": 32,
+      "scheduling_median_us": 16.1205,
+      "scheduling_p95_us": 68.891,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 15.56,
+      "max_run_median_us": 18.6005
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.301,
+      "scheduling_p95_us": 52.039,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 3.266,
+      "max_run_median_us": 3.542
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 8,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 133,
+      "prefill_first_wait_max_batches": 133,
+      "prefill_completion_wait_p95_batches": 133,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 9,
+      "decode_batches": 141,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 150,
+      "max_queue": 32,
+      "scheduling_median_us": 16.336,
+      "scheduling_p95_us": 77.197,
+      "resource_integrity": "passed",
+      "prefill_attempts": 9,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "min_run_median_us": 15.0135,
+      "max_run_median_us": 17.5785
+    }
+  ],
+  "runs": [
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 8,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 133,
+      "prefill_first_wait_max_batches": 133,
+      "prefill_completion_wait_p95_batches": 133,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 9,
+      "decode_batches": 141,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 150,
+      "max_queue": 32,
+      "scheduling_median_us": 17.5785,
+      "scheduling_p95_us": 77.197,
+      "resource_integrity": "passed",
+      "prefill_attempts": 9,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.186,
+      "scheduling_p95_us": 60.946,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.1310000000000002,
+      "scheduling_p95_us": 61.346,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.2960000000000003,
+      "scheduling_p95_us": 49.534,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 146,
+      "prefill_completion_wait_p95_batches": 146,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 16.305999999999997,
+      "scheduling_p95_us": 77.197,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 145,
+      "prefill_completion_wait_p95_batches": 145,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 16.02,
+      "scheduling_p95_us": 87.346,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 131,
+      "prefill_first_wait_max_batches": 132,
+      "prefill_completion_wait_p95_batches": 132,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 134,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 142,
+      "max_queue": 32,
+      "scheduling_median_us": 16.1205,
+      "scheduling_p95_us": 68.891,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.542,
+      "scheduling_p95_us": 63.62,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 0
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 146,
+      "prefill_completion_wait_p95_batches": 146,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.489,
+      "scheduling_p95_us": 79.471,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 131,
+      "prefill_first_wait_max_batches": 132,
+      "prefill_completion_wait_p95_batches": 132,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 134,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 142,
+      "max_queue": 32,
+      "scheduling_median_us": 18.6005,
+      "scheduling_p95_us": 71.135,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.191,
+      "scheduling_p95_us": 62.108,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.301,
+      "scheduling_p95_us": 61.697,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.241,
+      "scheduling_p95_us": 72.668,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.2315,
+      "scheduling_p95_us": 49.955,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 8,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 133,
+      "prefill_first_wait_max_batches": 133,
+      "prefill_completion_wait_p95_batches": 133,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 9,
+      "decode_batches": 141,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 150,
+      "max_queue": 32,
+      "scheduling_median_us": 16.0705,
+      "scheduling_p95_us": 71.105,
+      "resource_integrity": "passed",
+      "prefill_attempts": 9,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 145,
+      "prefill_completion_wait_p95_batches": 145,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.189,
+      "scheduling_p95_us": 75.884,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 1
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 8,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 133,
+      "prefill_first_wait_max_batches": 133,
+      "prefill_completion_wait_p95_batches": 133,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 9,
+      "decode_batches": 141,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 150,
+      "max_queue": 32,
+      "scheduling_median_us": 16.336,
+      "scheduling_p95_us": 83.92,
+      "resource_integrity": "passed",
+      "prefill_attempts": 9,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.336,
+      "scheduling_p95_us": 53.992,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.376,
+      "scheduling_p95_us": 46.418,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 131,
+      "prefill_first_wait_max_batches": 132,
+      "prefill_completion_wait_p95_batches": 132,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 134,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 142,
+      "max_queue": 32,
+      "scheduling_median_us": 15.79,
+      "scheduling_p95_us": 63.531,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.106,
+      "scheduling_p95_us": 46.709,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.266,
+      "scheduling_p95_us": 46.117,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 146,
+      "prefill_completion_wait_p95_batches": 146,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.5845,
+      "scheduling_p95_us": 73.259,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 145,
+      "prefill_completion_wait_p95_batches": 145,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.85,
+      "scheduling_p95_us": 73.059,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 2
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.191,
+      "scheduling_p95_us": 57.78,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.302,
+      "scheduling_p95_us": 52.039,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.236,
+      "scheduling_p95_us": 62.108,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.191,
+      "scheduling_p95_us": 46.158,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 131,
+      "prefill_first_wait_max_batches": 132,
+      "prefill_completion_wait_p95_batches": 132,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 134,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 142,
+      "max_queue": 32,
+      "scheduling_median_us": 16.927500000000002,
+      "scheduling_p95_us": 73.46,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 145,
+      "prefill_completion_wait_p95_batches": 145,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.033999999999999,
+      "scheduling_p95_us": 80.273,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 8,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 133,
+      "prefill_first_wait_max_batches": 133,
+      "prefill_completion_wait_p95_batches": 133,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 9,
+      "decode_batches": 141,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 150,
+      "max_queue": 32,
+      "scheduling_median_us": 15.0135,
+      "scheduling_p95_us": 70.685,
+      "resource_integrity": "passed",
+      "prefill_attempts": 9,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 146,
+      "prefill_completion_wait_p95_batches": 146,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.4445,
+      "scheduling_p95_us": 76.185,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 3
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.216,
+      "scheduling_p95_us": 51.267,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 16,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 141,
+      "prefill_first_wait_max_batches": 141,
+      "prefill_completion_wait_p95_batches": 141,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 151,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 162,
+      "max_queue": 32,
+      "scheduling_median_us": 3.101,
+      "scheduling_p95_us": 50.306,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 9,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 145,
+      "prefill_completion_wait_p95_batches": 145,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 19.1215,
+      "scheduling_p95_us": 92.416,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 8,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 133,
+      "prefill_first_wait_max_batches": 133,
+      "prefill_completion_wait_p95_batches": 133,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 9,
+      "decode_batches": 141,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 150,
+      "max_queue": 32,
+      "scheduling_median_us": 16.737000000000002,
+      "scheduling_p95_us": 108.747,
+      "resource_integrity": "passed",
+      "prefill_attempts": 9,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "long",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 192,
+      "chunk_batches": 10,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 64,
+          "computed_tokens": 64,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 70,
+          "computed_tokens": 70,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 117,
+          "computed_tokens": 117,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 164,
+          "computed_tokens": 164,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 211,
+          "computed_tokens": 211,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 64,
+      "protection_budget_max": 211,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 145,
+      "prefill_first_wait_max_batches": 146,
+      "prefill_completion_wait_p95_batches": 146,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 11,
+      "decode_batches": 155,
+      "computed_prefill_tokens": 32768,
+      "cached_tokens_at_admission": 0,
+      "cache_hit_ratio": 0.0,
+      "drain_batch": 166,
+      "max_queue": 32,
+      "scheduling_median_us": 15.193999999999999,
+      "scheduling_p95_us": 79.531,
+      "resource_integrity": "passed",
+      "prefill_attempts": 11,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": true,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 240,
+          "computed_tokens": 240,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 241,
+          "computed_tokens": 241,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 245,
+          "computed_tokens": 245,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 248,
+          "computed_tokens": 248,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 252,
+          "computed_tokens": 252,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 240,
+      "protection_budget_max": 252,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.266,
+      "scheduling_p95_us": 44.615,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 224,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 192,
+      "max_active_decode_reqs": 193,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 192,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 186,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 139,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 92,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 45,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 131,
+      "prefill_first_wait_max_batches": 132,
+      "prefill_completion_wait_p95_batches": 132,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 134,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 142,
+      "max_queue": 32,
+      "scheduling_median_us": 15.56,
+      "scheduling_p95_us": 65.635,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    },
+    {
+      "policy": "decode-first-bounded",
+      "workload": "mixed",
+      "cap": 16,
+      "protected_tokens": 256,
+      "prefill_policy": "fcfs",
+      "requests": 48,
+      "adaptive_prefill_budget": false,
+      "target_batch_tokens": 256,
+      "min_chunk_tokens": 64,
+      "initial_decode_load": 16,
+      "max_active_decode_reqs": 28,
+      "chunk_batches": 7,
+      "protection_budget_samples": [
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 16,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 15,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 11,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 8,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        },
+        {
+          "decode_tokens": 4,
+          "budget": 256,
+          "computed_tokens": 256,
+          "accepted": true
+        }
+      ],
+      "protection_budget_min": 256,
+      "protection_budget_max": 256,
+      "protection_budget_utilization": 1.0,
+      "prefill_first_wait_p95_batches": 127,
+      "prefill_first_wait_max_batches": 128,
+      "prefill_completion_wait_p95_batches": 128,
+      "initial_decode_output_gap_p95_batches": 2,
+      "initial_decode_output_gap_max_batches": 2,
+      "max_decode_streak_while_prefill_waits": 16,
+      "prefill_batches": 8,
+      "decode_batches": 130,
+      "computed_prefill_tokens": 9239,
+      "cached_tokens_at_admission": 1472,
+      "cache_hit_ratio": 0.137428811502194,
+      "drain_batch": 138,
+      "max_queue": 32,
+      "scheduling_median_us": 3.306,
+      "scheduling_p95_us": 51.087,
+      "resource_integrity": "passed",
+      "prefill_attempts": 8,
+      "rejected_prefill_attempts": 0,
+      "protection_attempts": 7,
+      "successful_protection_batches": 7,
+      "repeat": 4
+    }
+  ]
+}

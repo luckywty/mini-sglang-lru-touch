@@ -1,0 +1,997 @@
+--- a/python/minisgl/scheduler/config.py
++++ b/python/minisgl/scheduler/config.py
+@@ -25,6 +25,9 @@
+     batch_schedule_policy: str = "prefill-first"
+     max_consecutive_decodes: int = 16
+     protected_prefill_tokens: int = 256
++    adaptive_prefill_budget: bool = False
++    target_batch_tokens: int = 256
++    min_chunk_tokens: int = 64
+ 
+     # networking config
+     _unique_suffix: str = field(default_factory=_get_pid_suffix)
+@@ -40,10 +43,30 @@
+             raise ValueError(
+                 "batch_schedule_policy must be 'prefill-first' or 'decode-first-bounded'"
+             )
+-        for name in ("max_consecutive_decodes", "protected_prefill_tokens"):
++        for name in (
++            "max_consecutive_decodes", "protected_prefill_tokens",
++            "target_batch_tokens", "min_chunk_tokens",
++        ):
+             value = getattr(self, name)
+             if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+                 raise ValueError(f"{name} must be a positive integer")
++        if not isinstance(self.adaptive_prefill_budget, bool):
++            raise ValueError("adaptive_prefill_budget must be a bool")
++        if self.adaptive_prefill_budget:
++            if self.batch_schedule_policy != "decode-first-bounded":
++                raise ValueError("adaptive_prefill_budget requires decode-first-bounded")
++            if (
++                not isinstance(self.max_extend_tokens, int)
++                or isinstance(self.max_extend_tokens, bool)
++                or self.max_extend_tokens <= 0
++            ):
++                raise ValueError("adaptive_prefill_budget requires positive integer max_extend_tokens")
++            if self.min_chunk_tokens > self.target_batch_tokens:
++                raise ValueError("min_chunk_tokens must not exceed target_batch_tokens")
++            if self.min_chunk_tokens > min(self.max_extend_tokens, self.protected_prefill_tokens):
++                raise ValueError(
++                    "min_chunk_tokens must not exceed max_extend_tokens or protected_prefill_tokens"
++                )
+ 
+     @property
+     def zmq_backend_addr(self) -> str:
+--- a/python/minisgl/scheduler/scheduler.py
++++ b/python/minisgl/scheduler/scheduler.py
+@@ -79,6 +79,9 @@
+         self.batch_schedule_policy = config.batch_schedule_policy
+         self.max_consecutive_decodes = config.max_consecutive_decodes
+         self.protected_prefill_tokens = config.protected_prefill_tokens
++        self.adaptive_prefill_budget = config.adaptive_prefill_budget
++        self.target_batch_tokens = config.target_batch_tokens
++        self.min_chunk_tokens = config.min_chunk_tokens
+         self._consecutive_decode_batches = 0
+         # self.config = config
+ 
+@@ -293,6 +296,18 @@
+             write_tuple=write_mapping,
+         )
+ 
++    def _get_protected_prefill_budget(self) -> int:
++        """Use live decode request count as a load signal for a prefill-only batch.
++
++        This is not a shared prefill/decode batch budget or a KV reservation.
++        No per-request state changes, probes or page alignment happen here.
++        """
++        upper = min(self.prefill_budget, self.protected_prefill_tokens)
++        if not self.adaptive_prefill_budget:
++            return upper
++        decode_tokens = len(self.decode_manager.running_reqs)
++        return min(upper, max(self.min_chunk_tokens, self.target_batch_tokens - decode_tokens))
++
+     def _select_next_batch(self) -> Batch | None:
+         """Construct one batch before allocating its physical KV pages."""
+         if self.batch_schedule_policy == "prefill-first":
+@@ -308,7 +323,7 @@
+             return self.prefill_manager.schedule_next_batch(self.prefill_budget)
+ 
+         if self._consecutive_decode_batches >= self.max_consecutive_decodes:
+-            budget = min(self.prefill_budget, self.protected_prefill_tokens)
++            budget = self._get_protected_prefill_budget()
+             return (
+                 self.prefill_manager.schedule_next_batch(budget)
+                 or self.decode_manager.schedule_next_batch()
+--- a/python/minisgl/server/args.py
++++ b/python/minisgl/server/args.py
+@@ -243,6 +243,27 @@
+         type=_positive_int,
+         default=ServerArgs.protected_prefill_tokens,
+         help="Total new prefill tokens in a protection batch, capped by max-extend-tokens.",
++    )
++
++    parser.add_argument(
++        "--adaptive-prefill-budget",
++        action="store_true",
++        default=ServerArgs.adaptive_prefill_budget,
++        help="Adapt protection budgets to live decode count; requires decode-first-bounded.",
++    )
++
++    parser.add_argument(
++        "--target-batch-tokens",
++        type=_positive_int,
++        default=ServerArgs.target_batch_tokens,
++        help="Target token allowance minus live decode count for adaptive protection batches.",
++    )
++
++    parser.add_argument(
++        "--min-chunk-tokens",
++        type=_positive_int,
++        default=ServerArgs.min_chunk_tokens,
++        help="Minimum total prefill budget for adaptive protection, not a per-request chunk size.",
+     )
+ 
+     parser.add_argument(
+--- a/benchmarks/bench_batch_schedule_policy.py
++++ b/benchmarks/bench_batch_schedule_policy.py
+@@ -26,6 +26,7 @@
+ from minisgl.distributed import DistributedInfo
+ from minisgl.message import UserMsg
+ from minisgl.scheduler.cache import CacheManager
++from minisgl.scheduler.config import SchedulerConfig
+ from minisgl.scheduler.decode import DecodeManager
+ from minisgl.scheduler.prefill import ChunkedReq, PrefillManager
+ from minisgl.scheduler.scheduler import Scheduler
+@@ -68,8 +69,16 @@
+     policy="decode-first-bounded", cap=16, protected=256, budget=8192,
+     page_size=1, num_pages=4096, table_slots=64, max_seq_len=4096,
+     prefill_policy="fcfs", aging=0,
++    adaptive=False, target=256, min_chunk=64,
+ ):
+     """Skip only GPU/model construction; execute actual scheduler lifecycle methods."""
++    config = SchedulerConfig(
++        "cpu-benchmark", DistributedInfo(0, 1), torch.float32,
++        batch_schedule_policy=policy, max_extend_tokens=budget,
++        max_consecutive_decodes=cap, protected_prefill_tokens=protected,
++        adaptive_prefill_budget=adaptive, target_batch_tokens=target, min_chunk_tokens=min_chunk,
++        schedule_policy=prefill_policy, lpm_aging_tokens_per_pass=aging,
++    )
+     core._GLOBAL_CTX = core.Context(page_size=page_size)
+     s = object.__new__(Scheduler)
+     page_table = torch.full((table_slots, max_seq_len), -1, dtype=torch.int32)
+@@ -84,6 +93,9 @@
+     s.max_consecutive_decodes = cap
+     s.protected_prefill_tokens = protected
+     s.prefill_budget = budget
++    s.adaptive_prefill_budget = config.adaptive_prefill_budget
++    s.target_batch_tokens = config.target_batch_tokens
++    s.min_chunk_tokens = config.min_chunk_tokens
+     s._consecutive_decode_batches = 0
+     s.token_pool = s.table_manager.token_pool
+     s.device = torch.device("cpu")
+@@ -152,7 +164,10 @@
+     return values[max(0, math.ceil(len(values) * fraction) - 1)] if values else None
+ 
+ 
+-def simulate(policy, workload, args, cap=16, protected=256):
++def simulate(
++    policy, workload, args, cap=16, protected=256,
++    adaptive=False, target=256, min_chunk=64,
++):
+     rng = random.Random(args.seed)
+     arrivals_count = 0 if workload == "decode-only" else args.stream_steps * args.arrivals_per_pass
+     initial_decodes = 0 if workload == "prefill-only" else args.initial_decodes
+@@ -179,11 +194,16 @@
+         max_seq_len=max(args.long_prompt_tokens + args.output_tokens, args.decode_tokens + 8,
+                         args.prefix_length + 1 + args.output_tokens) + 16,
+         prefill_policy=args.prefill_policy, aging=args.aging_tokens_per_pass,
++        adaptive=adaptive, target=target, min_chunk=min_chunk,
+     )
+     for uid in range(initial_decodes):
++        output_tokens = args.decode_tokens
++        if getattr(args, "stagger_decode_completions", False) and output_tokens > 1:
++            base = max(2, output_tokens // 2)
++            output_tokens = base + (uid * 17) % (output_tokens - base + 1)
+         enqueue(
+             s, uid, torch.arange(1000 + uid * 100, 1008 + uid * 100, dtype=torch.int32),
+-            args.decode_tokens,
++            output_tokens,
+         )
+     if initial_decodes:
+         # Bootstrap all decode sessions identically, outside timed/observed workload.
+@@ -208,6 +228,7 @@
+     counters = {"prefill_attempts": 0, "rejected_prefill_attempts": 0,
+                 "protection_attempts": 0, "successful_protection_batches": 0}
+     original_prefill = s.prefill_manager.schedule_next_batch
++    budget_samples = []
+ 
+     def tracked_prefill(budget):
+         pending = s.prefill_manager.runnable
+@@ -218,6 +239,13 @@
+         batch = original_prefill(budget)
+         counters["rejected_prefill_attempts"] += int(pending and batch is None)
+         counters["successful_protection_batches"] += int(protection and batch is not None)
++        if protection:
++            actual = sum(r.extend_len for r in batch.reqs) if batch is not None else 0
++            assert actual <= budget
++            budget_samples.append({
++                "decode_tokens": len(s.decode_manager.running_reqs),
++                "budget": budget, "computed_tokens": actual, "accepted": batch is not None,
++            })
+         return batch
+ 
+     s.prefill_manager.schedule_next_batch = tracked_prefill
+@@ -230,6 +258,8 @@
+     computed = 0
+     streak = max_streak = 0
+     max_queue = 0
++    max_active_decode = len(s.decode_manager.running_reqs)
++    chunk_batches = 0
+     # Finite workload: every feasible request must finish; detect stalled/infeasible setup.
+     bound = (args.stream_steps + args.decode_tokens + arrivals_count *
+              (args.long_prompt_tokens + args.output_tokens)) * (cap + 2) + 32
+@@ -248,6 +278,7 @@
+                 enqueue(s, uid, ids, 1 if workload == "prefill-only" else args.output_tokens)
+                 arrivals[uid], prompt_lengths[uid] = step, len(ids)
+         had_prefill = s.prefill_manager.runnable
++        max_active_decode = max(max_active_decode, len(s.decode_manager.running_reqs))
+         max_queue = max(max_queue, len(s.prefill_manager.pending_list))
+         start_time = time.perf_counter_ns()
+         batch = s._select_next_batch()
+@@ -261,6 +292,7 @@
+         phases.append(batch.phase)
+         if batch.is_prefill:
+             streak = 0
++            chunk_batches += int(any(isinstance(r, ChunkedReq) for r in batch.reqs))
+             computed += sum(r.extend_len for r in batch.reqs)
+             for req in batch.reqs:
+                 if req.uid not in first:
+@@ -298,6 +330,16 @@
+         "cap": cap if policy == "decode-first-bounded" else None,
+         "protected_tokens": protected if policy == "decode-first-bounded" else None,
+         "prefill_policy": args.prefill_policy, "requests": arrivals_count + initial_decodes,
++        "adaptive_prefill_budget": adaptive, "target_batch_tokens": target,
++        "min_chunk_tokens": min_chunk, "initial_decode_load": args.initial_decodes,
++        "max_active_decode_reqs": max_active_decode, "chunk_batches": chunk_batches,
++        "protection_budget_samples": budget_samples,
++        "protection_budget_min": min((r["budget"] for r in budget_samples), default=None),
++        "protection_budget_max": max((r["budget"] for r in budget_samples), default=None),
++        "protection_budget_utilization": (
++            sum(r["computed_tokens"] for r in budget_samples) /
++            sum(r["budget"] for r in budget_samples) if budget_samples else None
++        ),
+         "prefill_first_wait_p95_batches": percentile(waits, 0.95),
+         "prefill_first_wait_max_batches": max(waits, default=0),
+         "prefill_completion_wait_p95_batches": percentile(done_waits, 0.95),
+@@ -339,10 +381,19 @@
+     parser.add_argument("--prefix-length", type=positive, default=64)
+     parser.add_argument("--long-prompt-tokens", type=positive, default=1024)
+     parser.add_argument("--decode-tokens", type=positive, default=128)
++    parser.add_argument(
++        "--stagger-decode-completions", action="store_true",
++        help="Deterministically vary initial decode lengths to exercise live budget changes.",
++    )
+     parser.add_argument("--output-tokens", type=positive, default=8)
+     parser.add_argument("--initial-decodes", type=positive, default=4)
+     parser.add_argument("--stream-steps", type=positive, default=16)
+     parser.add_argument("--arrivals-per-pass", type=positive, default=2)
++    parser.add_argument("--compare-adaptive", action="store_true",
++                        help="Compare fixed/adaptive bounded decode-first at each decode load.")
++    parser.add_argument("--decode-loads", type=positive, nargs="+", default=[16, 64, 128, 192])
++    parser.add_argument("--target-budgets", type=positive, nargs="+", default=[128, 256, 512])
++    parser.add_argument("--min-chunks", type=positive, nargs="+", default=[32, 64, 128])
+     parser.add_argument(
+         "--output", type=Path, default=Path("artifacts/batch_scheduling/benchmark.json")
+     )
+@@ -369,22 +420,39 @@
+              for policy in ("prefill-first", "decode-first-unbounded")]
+     cases += [(workload, "decode-first-bounded", cap, protected) for workload in args.workloads
+               for cap in args.decode_caps for protected in args.protected_budgets]
++    cases = [(*case, False, 256, 64, args.initial_decodes) for case in cases]
++    if args.compare_adaptive:
++        cases = [
++            (workload, "decode-first-bounded", cap, protected, False, 256, 64, load)
++            for workload in args.workloads for cap in args.decode_caps
++            for protected in args.protected_budgets for load in args.decode_loads
++        ]
++        cases += [
++            (workload, "decode-first-bounded", cap, protected, True, target, floor, load)
++            for workload in args.workloads for cap in args.decode_caps
++            for protected in args.protected_budgets for load in args.decode_loads
++            for target in args.target_budgets for floor in args.min_chunks
++            if floor <= min(target, args.prefill_budget, protected)
++        ]
+     runs = []
+     rng = random.Random(args.seed)
+     with cpu_transfers():
+         for repeat in range(args.repeats):
+             rng.shuffle(cases)
+-            for workload, policy, cap, protected in cases:
+-                row = simulate(policy, workload, args, cap, protected)
++            for workload, policy, cap, protected, adaptive, target, floor, load in cases:
++                case_args = SimpleNamespace(**{**vars(args), "initial_decodes": load})
++                row = simulate(policy, workload, case_args, cap, protected, adaptive, target, floor)
+                 row["repeat"] = repeat
+                 runs.append(row)
+             print(f"repeat={repeat + 1}: {len(cases)} cases drained, resources passed", flush=True)
+     summary = []
+-    for workload, policy, cap, protected in sorted(cases):
++    for workload, policy, cap, protected, adaptive, target, floor, load in sorted(cases):
+         group = [
+             r for r in runs if r["workload"] == workload and r["policy"] == policy and
+             (policy != "decode-first-bounded" or
+-             (r["cap"] == cap and r["protected_tokens"] == protected))
++             (r["cap"] == cap and r["protected_tokens"] == protected)) and
++            r["adaptive_prefill_budget"] == adaptive and r["target_batch_tokens"] == target and
++            r["min_chunk_tokens"] == floor and r["initial_decode_load"] == load
+         ]
+         row = {k: v for k, v in group[0].items() if k != "repeat"}
+         deterministic = [k for k in row if not k.startswith("scheduling_")]
+@@ -404,14 +472,16 @@
+         f"Torch {metadata['torch']}；1 个 Torch 线程。", "",
+         "真实阶段选择、准入、KV 分配及完成释放；Engine 仅模拟进度和输出。"
+         "Batch 间隔不是 GPU 延迟。", "",
+-        "| 负载 | 策略 | K | 保护预算 | 首次 Prefill 等待 P95（批） | "
++        "| 负载 | 策略 | 初始 Decode | 自适应 | 目标/下限 | K | 保护预算 | 首次 Prefill 等待 P95（批） | "
+         "Prefill 完成等待 P95（批） | 初始 Decode 输出最大间隔（批） | "
+         "等待时最长连续 Decode | 调度中位数 µs | 保护成功/尝试 |",
+-        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
++        "|---|---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+     ]
+     for r in summary:
+         lines.append(
+-            f"| {r['workload']} | {r['policy']} | {r['cap']} | {r['protected_tokens']} | "
++            f"| {r['workload']} | {r['policy']} | {r['initial_decode_load']} | "
++            f"{r['adaptive_prefill_budget']} | {r['target_batch_tokens']}/{r['min_chunk_tokens']} | "
++            f"{r['cap']} | {r['protected_tokens']} | "
+             f"{r['prefill_first_wait_p95_batches']} | {r['prefill_completion_wait_p95_batches']} | "
+             f"{r['initial_decode_output_gap_max_batches']} | "
+             f"{r['max_decode_streak_while_prefill_waits']} | "
+--- a/tests/core/test_batch_schedule_policy.py
++++ b/tests/core/test_batch_schedule_policy.py
+@@ -35,6 +35,9 @@
+     s.max_consecutive_decodes = 3
+     s.protected_prefill_tokens = 2
+     s.prefill_budget = 8
++    s.adaptive_prefill_budget = False
++    s.target_batch_tokens = 256
++    s.min_chunk_tokens = 64
+     s._consecutive_decode_batches = count
+     s.prefill_manager = SimpleNamespace(
+         runnable=pending,
+--- /dev/null
++++ b/tests/core/test_adaptive_prefill_budget.py
+@@ -0,0 +1,343 @@
++from __future__ import annotations
++
++import importlib.util
++from pathlib import Path
++from types import SimpleNamespace
++from unittest.mock import Mock
++
++import pytest
++import torch
++
++import minisgl.core as core
++from minisgl.core import Batch
++from minisgl.distributed import DistributedInfo
++from minisgl.message import AbortBackendMsg
++from minisgl.scheduler.config import SchedulerConfig
++from minisgl.scheduler.scheduler import Scheduler
++from minisgl.server.args import parse_args
++
++
++def config(**kwargs):
++    return SchedulerConfig("test-model", DistributedInfo(0, 1), torch.float32, **kwargs)
++
++
++def fake_scheduler(n=64, count=16, pending=True, adaptive=True, **kwargs):
++    s = object.__new__(Scheduler)
++    s.batch_schedule_policy = "decode-first-bounded"
++    s.prefill_budget = 8192
++    s.protected_prefill_tokens = 256
++    s.adaptive_prefill_budget = adaptive
++    s.target_batch_tokens = 256
++    s.min_chunk_tokens = 64
++    s.max_consecutive_decodes = 16
++    s._consecutive_decode_batches = count
++    s.prefill_manager = SimpleNamespace(
++        runnable=pending,
++        schedule_next_batch=Mock(return_value=Batch([], "prefill") if pending else None),
++    )
++    s.decode_manager = SimpleNamespace(
++        runnable=bool(n), running_reqs=list(range(n)),
++        schedule_next_batch=Mock(return_value=Batch([], "decode") if n else None),
++    )
++    for key, value in kwargs.items():
++        setattr(s, key, value)
++    return s
++
++
++@pytest.fixture
++def harness(monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    path = Path(__file__).resolve().parents[2] / "benchmarks/bench_batch_schedule_policy.py"
++    spec = importlib.util.spec_from_file_location("adaptive_prefill_harness", path)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    with module.cpu_transfers():
++        yield module
++
++
++@pytest.mark.parametrize("n,expected", [(16, 240), (64, 192), (192, 64), (256, 64), (1000, 64)])
++def test_budget_uses_live_decode_count(n, expected):
++    s = fake_scheduler(n=n)
++    assert s._get_protected_prefill_budget() == expected
++    assert s._select_next_batch().is_prefill
++    s.prefill_manager.schedule_next_batch.assert_called_once_with(expected)
++    assert s._consecutive_decode_batches == 16
++
++
++@pytest.mark.parametrize("kwargs,expected", [
++    ({"target_batch_tokens": 512}, 256),
++    ({"prefill_budget": 128}, 128),
++    ({"protected_prefill_tokens": 128}, 128),
++    ({"target_batch_tokens": 128, "min_chunk_tokens": 128}, 128),
++])
++def test_budget_caps_and_floor(kwargs, expected):
++    assert fake_scheduler(**kwargs)._get_protected_prefill_budget() == expected
++
++
++def test_budget_is_monotone_and_uses_fresh_snapshot():
++    s = fake_scheduler(n=1)
++    budgets = []
++    for n in range(1, 257):
++        s.decode_manager.running_reqs = list(range(n))
++        budgets.append(s._get_protected_prefill_budget())
++    assert budgets == sorted(budgets, reverse=True)
++    assert min(budgets) == 64 and max(budgets) == 255
++    assert s._consecutive_decode_batches == 16
++
++
++def test_large_target_saturates_to_fixed_cap():
++    for n in (1, 64, 128, 256):
++        assert fake_scheduler(n=n, target_batch_tokens=1024)._get_protected_prefill_budget() == 256
++
++
++def test_decode_count_is_not_future_kv_reservation():
++    s = fake_scheduler(n=64)
++    s.decode_manager.inflight_tokens = 100000
++    s.decode_manager.padded_reqs = list(range(128))
++    assert s._get_protected_prefill_budget() == 192
++
++
++@pytest.mark.parametrize("count", [0, 15])
++def test_no_prefill_or_budget_computation_before_k(count):
++    s = fake_scheduler(count=count)
++    s._get_protected_prefill_budget = Mock(side_effect=AssertionError("premature budget"))
++    assert s._select_next_batch().is_decode
++    s.prefill_manager.schedule_next_batch.assert_not_called()
++
++
++@pytest.mark.parametrize("count", [0, 16, 99])
++def test_no_decode_restores_normal_budget(count):
++    s = fake_scheduler(n=0, count=count)
++    s._get_protected_prefill_budget = Mock(side_effect=AssertionError("unneeded budget"))
++    assert s._select_next_batch().is_prefill
++    s.prefill_manager.schedule_next_batch.assert_called_once_with(8192)
++
++
++def test_no_pending_prefill_stays_decode_only():
++    s = fake_scheduler(pending=False)
++    s._get_protected_prefill_budget = Mock(side_effect=AssertionError("unneeded budget"))
++    assert s._select_next_batch().is_decode
++    assert s._consecutive_decode_batches == 0
++
++
++def test_protection_failure_keeps_counter_and_recomputes_next_budget():
++    s = fake_scheduler(n=64)
++    s.prefill_manager.schedule_next_batch.return_value = None
++    batch = s._select_next_batch()
++    assert batch.is_decode
++    s.prefill_manager.schedule_next_batch.assert_called_once_with(192)
++    s._record_batch_submission(batch)
++    assert s._consecutive_decode_batches == 17
++    s.decode_manager.running_reqs = list(range(192))
++    assert s._select_next_batch().is_decode
++    assert s.prefill_manager.schedule_next_batch.call_args.args == (64,)
++
++
++@pytest.mark.parametrize("n", [1, 64, 192])
++def test_disabled_budget_preserves_old_upper_even_with_small_configuration(n):
++    s = fake_scheduler(n=n, adaptive=False, prefill_budget=8, protected_prefill_tokens=2)
++    assert s._get_protected_prefill_budget() == 2
++    assert s._select_next_batch().is_prefill
++    s.prefill_manager.schedule_next_batch.assert_called_once_with(2)
++
++
++def test_defaults_and_disabled_cross_constraints():
++    c = config()
++    assert (c.adaptive_prefill_budget, c.target_batch_tokens, c.min_chunk_tokens) == (False, 256, 64)
++    c = config(max_extend_tokens=0, protected_prefill_tokens=2)
++    assert not c.adaptive_prefill_budget
++    assert not config(target_batch_tokens=1, min_chunk_tokens=64).adaptive_prefill_budget
++
++
++@pytest.mark.parametrize("field", ["target_batch_tokens", "min_chunk_tokens"])
++@pytest.mark.parametrize("value", [0, -1, 1.5, True, "64"])
++def test_invalid_positive_config(field, value):
++    with pytest.raises(ValueError, match=field):
++        config(**{field: value})
++
++
++@pytest.mark.parametrize("value", [1, "false", None])
++def test_invalid_switch_type(value):
++    with pytest.raises(ValueError, match="adaptive_prefill_budget"):
++        config(adaptive_prefill_budget=value)
++
++
++@pytest.mark.parametrize("kwargs,message", [
++    ({"batch_schedule_policy": "prefill-first"}, "requires decode-first-bounded"),
++    ({"max_extend_tokens": 0}, "max_extend_tokens"),
++    ({"max_extend_tokens": -1}, "max_extend_tokens"),
++    ({"max_extend_tokens": True}, "max_extend_tokens"),
++    ({"max_extend_tokens": 32}, "max_extend_tokens or protected_prefill_tokens"),
++    ({"protected_prefill_tokens": 32}, "max_extend_tokens or protected_prefill_tokens"),
++    ({"target_batch_tokens": 32}, "target_batch_tokens"),
++])
++def test_enabled_cross_constraints(kwargs, message):
++    values = dict(batch_schedule_policy="decode-first-bounded", adaptive_prefill_budget=True)
++    values.update(kwargs)
++    with pytest.raises(ValueError, match=message):
++        config(**values)
++
++
++def test_cli_configuration_composes_with_lpm_aging():
++    common = ["--model-path", "test-model", "--dtype", "float32"]
++    default, _ = parse_args(common)
++    assert not default.adaptive_prefill_budget
++    enabled, _ = parse_args(common + [
++        "--batch-schedule-policy", "decode-first-bounded", "--adaptive-prefill-budget",
++        "--target-batch-tokens", "128", "--min-chunk-tokens", "32",
++        "--schedule-policy", "lpm-aging", "--lpm-aging-tokens-per-pass", "8",
++    ])
++    assert enabled.adaptive_prefill_budget and enabled.target_batch_tokens == 128
++    assert enabled.min_chunk_tokens == 32 and enabled.lpm_aging_tokens_per_pass == 8
++    with pytest.raises(ValueError, match="requires decode-first-bounded"):
++        parse_args(common + ["--adaptive-prefill-budget"])
++
++
++@pytest.mark.parametrize("flag", ["--target-batch-tokens", "--min-chunk-tokens"])
++@pytest.mark.parametrize("value", ["0", "-1", "1.5"])
++def test_invalid_cli_numbers(flag, value):
++    with pytest.raises(SystemExit) as error:
++        parse_args(["--model-path", "test-model", "--dtype", "float32", flag, value])
++    assert error.value.code == 2
++
++
++def advance(s):
++    fi = s._schedule_next_batch()
++    computed = sum(r.extend_len for r in fi.batch.reqs)
++    s._process_last_data((fi, s._forward(fi)))
++    return fi.batch, computed
++
++
++def drain(h, s, slots, limit=500):
++    for _ in range(limit):
++        if not (s.prefill_manager.runnable or s.decode_manager.runnable):
++            break
++        h.submit_one(s)
++    h.assert_resources(s, slots)
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++def test_budget_changes_continue_same_chunk_and_preserve_aging(harness, page_size):
++    h = harness
++    s = h.make_cpu_scheduler(
++        cap=2, protected=7, budget=32, page_size=page_size,
++        adaptive=True, target=8, min_chunk=2, prefill_policy="lpm-aging", aging=2,
++    )
++    for uid in range(4):
++        h.enqueue(
++            s, uid, torch.tensor([1000 + uid * 10, 1001 + uid * 10], dtype=torch.int32), 16
++        )
++    assert h.submit_one(s).is_prefill
++    pending = h.enqueue(s, 10, torch.arange(100, 125, dtype=torch.int32), 3)
++    other = h.enqueue(s, 11, torch.tensor([200, 201], dtype=torch.int32), 1)
++    for _ in range(2):
++        assert h.submit_one(s).is_decode
++    batch, used = advance(s)
++    assert batch.is_prefill and used == 4 and pending.chunked_req.cached_len == 4
++    table, handle = pending.chunked_req.table_idx, pending.chunked_req.cache_handle
++    assert other.waiting_passes == 1
++    for uid in (0, 1):
++        s._process_one_msg(AbortBackendMsg(uid))
++    for _ in range(2):
++        h.submit_one(s)
++    _, used = advance(s)
++    assert used == 6 and pending.chunked_req.cached_len == 10
++    assert pending.chunked_req.table_idx == table and pending.chunked_req.cache_handle is handle
++    s._process_one_msg(AbortBackendMsg(2))
++    for _ in range(2):
++        h.submit_one(s)
++    _, used = advance(s)
++    assert used == 7 and pending.chunked_req.cached_len == 17
++    assert other.waiting_passes == 1
++    s._process_one_msg(AbortBackendMsg(3))
++    batch, used = advance(s)
++    assert batch.is_prefill and used == 10  # Remaining prompt 8 + next request 2; normal budget.
++    assert pending.chunked_req is None
++    drain(h, s, 64)
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++def test_budget_is_read_only_and_cached_prefix_is_not_charged(harness, page_size, monkeypatch):
++    h = harness
++    s = h.make_cpu_scheduler(cap=1, protected=5, adaptive=True, target=3, min_chunk=1,
++                             page_size=page_size)
++    h.enqueue(s, 0, torch.tensor([1000, 1001], dtype=torch.int32), 8)
++    h.submit_one(s)
++    prefix = torch.arange(100, 108, dtype=torch.int32)
++    indices = s.cache_manager._page_to_token(s.cache_manager._allocate(8 // page_size))
++    s.cache_manager.prefix_cache.insert_prefix(prefix, indices)
++    for uid in (1, 2, 3):
++        h.enqueue(s, uid, torch.cat([prefix, torch.tensor([200 + uid], dtype=torch.int32)]), 1)
++    h.submit_one(s)
++    tree = s.cache_manager.prefix_cache
++    leaf = next(iter(tree.root_node.children.values()))
++    before = (leaf.timestamp, leaf.ref_count, tree._structure_version, tree.size_info,
++              s.cache_manager.free_slots.tolist(), s.table_manager.available_size)
++    with monkeypatch.context() as m:
++        m.setattr(s.cache_manager, "probe_req", Mock(side_effect=AssertionError("budget probes")))
++        assert s._get_protected_prefill_budget() == 2
++    assert before == (leaf.timestamp, leaf.ref_count, tree._structure_version, tree.size_info,
++                      s.cache_manager.free_slots.tolist(), s.table_manager.available_size)
++    fi = s._schedule_next_batch()
++    assert [r.uid for r in fi.batch.reqs] == [1, 2]
++    assert [r.cached_len for r in fi.batch.reqs] == [8, 8]
++    assert sum(r.extend_len for r in fi.batch.reqs) == 2
++    s._process_last_data((fi, s._forward(fi)))
++    drain(h, s, 64)
++
++
++@pytest.mark.parametrize("failure", ["kv", "table"])
++@pytest.mark.parametrize("page_size", [1, 4])
++def test_small_budget_cannot_bypass_admission(harness, failure, page_size):
++    h = harness
++    slots = 1 if failure == "table" else 4
++    s = h.make_cpu_scheduler(
++        cap=1, protected=3, budget=8, adaptive=True, target=4, min_chunk=1,
++        num_pages=12 // page_size if failure == "kv" else 64,
++        table_slots=slots, page_size=page_size,
++    )
++    h.enqueue(s, 0, torch.tensor([1000, 1001], dtype=torch.int32), 8)
++    h.submit_one(s)
++    pending = h.enqueue(s, 1, torch.arange(100, 106, dtype=torch.int32), 2)
++    h.submit_one(s)
++    tree = s.cache_manager.prefix_cache
++    before = (tree._structure_version, tree.size_info, s.table_manager.available_size)
++    batch = s._select_next_batch()
++    assert batch.is_decode and pending.chunked_req is None
++    assert before == (tree._structure_version, tree.size_info, s.table_manager.available_size)
++    assert s._consecutive_decode_batches == 1
++    fi = s._prepare_batch(batch)
++    s._process_last_data((fi, s._forward(fi)))
++    assert s._consecutive_decode_batches == 2
++    drain(h, s, slots)
++
++
++@pytest.mark.parametrize("overlap", [False, True])
++def test_adaptive_budget_preserves_loop_submission_order(harness, overlap):
++    h = harness
++    s = h.make_cpu_scheduler(cap=2, protected=7, adaptive=True, target=3, min_chunk=1)
++    h.enqueue(s, 0, torch.tensor([1000, 1001], dtype=torch.int32), 16)
++    h.submit_one(s)
++    h.enqueue(s, 1, torch.arange(100, 108, dtype=torch.int32), 1)
++    original = s._forward
++    phases, prefill_tokens, counts = [], [], []
++
++    def record(fi):
++        phases.append(fi.batch.phase)
++        if fi.batch.is_prefill:
++            prefill_tokens.append(sum(r.extend_len for r in fi.batch.reqs))
++        return original(fi)
++
++    s._forward = record
++    last = None
++    for _ in range(4):
++        if overlap:
++            last = s.overlap_loop(last)
++        else:
++            s.normal_loop()
++        counts.append(s._consecutive_decode_batches)
++    assert phases == ["decode", "decode", "prefill", "decode"]
++    assert prefill_tokens == [2] and counts == [1, 2, 0, 1]
++    if overlap:
++        s._process_last_data(last)
++    drain(h, s, 64)
+--- /dev/null
++++ b/tests/core/test_adaptive_prefill_benchmark.py
+@@ -0,0 +1,65 @@
++from __future__ import annotations
++
++import importlib.util
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++import minisgl.core as core
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++@pytest.mark.parametrize("workload", ["long", "mixed", "memory-pressure", "table-pressure",
++                                     "prefill-only", "decode-only"])
++def test_fixed_adaptive_comparison_drains_and_repeats(page_size, workload, monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    path = Path(__file__).resolve().parents[2] / "benchmarks/bench_batch_schedule_policy.py"
++    spec = importlib.util.spec_from_file_location("adaptive_prefill_benchmark", path)
++    bench = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(bench)
++    args = SimpleNamespace(
++        seed=31723, stream_steps=4, arrivals_per_pass=1, initial_decodes=4,
++        decode_tokens=16, output_tokens=2, prefix_length=8, long_prompt_tokens=17,
++        prefill_budget=32, page_size=page_size, prefill_policy="lpm-aging", aging_tokens_per_pass=2,
++    )
++    with bench.cpu_transfers():
++        fixed = bench.simulate("decode-first-bounded", workload, args, cap=2, protected=8)
++        first = bench.simulate("decode-first-bounded", workload, args, cap=2, protected=8,
++                               adaptive=True, target=8, min_chunk=2)
++        repeat = bench.simulate("decode-first-bounded", workload, args, cap=2, protected=8,
++                                adaptive=True, target=8, min_chunk=2)
++    assert all(first[k] == repeat[k] for k in first if not k.startswith("scheduling_"))
++    assert fixed["computed_prefill_tokens"] == first["computed_prefill_tokens"]
++    assert first["resource_integrity"] == fixed["resource_integrity"] == "passed"
++    samples = first["protection_budget_samples"]
++    assert all(2 <= r["budget"] <= 8 and r["computed_tokens"] <= r["budget"] for r in samples)
++    if workload in ("prefill-only", "decode-only"):
++        assert not samples
++        assert first["prefill_batches"] == fixed["prefill_batches"]
++        assert first["decode_batches"] == fixed["decode_batches"]
++    if workload == "long":
++        assert samples and samples[0]["budget"] == 4
++
++
++@pytest.mark.parametrize("page_size", [1, 4])
++def test_natural_decode_completions_change_protection_budget(page_size, monkeypatch):
++    monkeypatch.setattr(core, "_GLOBAL_CTX", None)
++    path = Path(__file__).resolve().parents[2] / "benchmarks/bench_batch_schedule_policy.py"
++    spec = importlib.util.spec_from_file_location("adaptive_completion_benchmark", path)
++    bench = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(bench)
++    args = SimpleNamespace(
++        seed=31723, stream_steps=4, arrivals_per_pass=1, initial_decodes=4,
++        decode_tokens=24, output_tokens=2, prefix_length=8, long_prompt_tokens=17,
++        prefill_budget=32, page_size=page_size, prefill_policy="fcfs", aging_tokens_per_pass=2,
++        stagger_decode_completions=True,
++    )
++    with bench.cpu_transfers():
++        result = bench.simulate("decode-first-bounded", "long", args, cap=2, protected=8,
++                                adaptive=True, target=8, min_chunk=2)
++    samples = result["protection_budget_samples"]
++    assert len({r["decode_tokens"] for r in samples}) > 1
++    assert len({r["budget"] for r in samples}) > 1
++    assert samples[0]["budget"] == 4 and max(r["budget"] for r in samples) > 4
++    assert result["resource_integrity"] == "passed"
+--- /dev/null
++++ b/docs/adaptive_prefill_budget.md
+@@ -0,0 +1,133 @@
++# 自适应 Chunk Budget
++
++该功能只调整 `decode-first-bounded` 的 Prefill 保护轮次预算，默认关闭。正常阶段选择、连续 Decode 提交计数、Prefill 内部排序、KV 准入和请求资源回收均沿用现有流程。
++
++## 配置
++
++| 字段 | 默认值 | 作用 |
++|---|---:|---|
++| `adaptive_prefill_budget` | `False` | 是否启用自适应保护预算 |
++| `target_batch_tokens` | 256 | 从中减去活跃 Decode 数量的目标 Token 额度 |
++| `min_chunk_tokens` | 64 | 本轮整个 Prefill Batch 的计算预算下限 |
++| `protected_prefill_tokens` | 256 | 保护轮次计算预算的上限，已有参数 |
++| `max_extend_tokens` | 8192 | 正常 Prefill 计算预算，也限制保护预算，已有参数 |
++| `max_consecutive_decodes` | 16 | 优先尝试 Prefill 前的连续 Decode Batch 提交数，已有参数 |
++
++启动时追加参数：
++
++```bash
++--batch-schedule-policy decode-first-bounded \
++--max-consecutive-decodes 16 \
++--protected-prefill-tokens 256 \
++--adaptive-prefill-budget \
++--target-batch-tokens 256 \
++--min-chunk-tokens 64
++```
++
++目标额度和最低预算必须为正整数，程序配置拒绝 bool、浮点或字符串冒充整数。开关必须为 bool。启用时必须使用 `decode-first-bounded`，`max_extend_tokens` 必须为正整数，并要求：
++
++```python
++min_chunk_tokens <= target_batch_tokens
++min_chunk_tokens <= min(max_extend_tokens, protected_prefill_tokens)
++```
++
++关闭时不新增这些跨参数限制，原有正常预算为零或保护预算小于64的配置仍按原逻辑处理。默认 `prefill-first` 不受影响。
++
++## 计算与调用位置
++
++每次需要保护 Prefill 时，Scheduler 调用 `_get_protected_prefill_budget()`：
++
++```python
++upper = min(self.prefill_budget, self.protected_prefill_tokens)
++if not self.adaptive_prefill_budget:
++    return upper
++
++decode_tokens = len(self.decode_manager.running_reqs)
++return min(
++    upper,
++    max(self.min_chunk_tokens, self.target_batch_tokens - decode_tokens),
++)
++```
++
++只有等待 Prefill 和活跃 Decode 同时存在且连续 Decode 提交数达到 K 时，调用该方法。预算计算一次后交给原有 `PrefillManager.schedule_next_batch(budget)`，同一 Batch 构造中固定使用这个预算。
++
++| 状态 | 行为 |
++|---|---|
++| 自适应关闭 | 原固定保护预算 |
++| 连续 Decode < K，两个阶段都有请求 | 优先 Decode，不计算 Prefill 预算 |
++| 连续 Decode >= K，两个阶段都有请求 | 优先尝试动态预算 Prefill |
++| 没有活跃 Decode | 使用正常 Prefill 预算 |
++| 没有等待 Prefill | Decode 或空闲，连续计数清零 |
++| 保护准入失败 | 回退 Decode，保留保护条件，下次重算当前预算 |
++| Prefill 成功提交 | 连续 Decode 计数清零 |
++
++当前标准 Decode 每个真实请求每批计算一个 Token，所以 `decode_tokens` 使用活跃 Decode 请求数量。等待 Prefill 和未完成的 ChunkedReq 不计入，CUDA Graph dummy 请求也不计入。`decode_manager.inflight_tokens` 是用于 KV 准入的未来资源预留，不能替代这里的计数。
++
++以目标256、下限64、保护上限256为例，16/64/192个活跃 Decode 分别产生240/192/64的保护预算。请求完成、Abort 或新请求进入 Decode 后，下一次保护轮次会根据新数量重新计算。
++
++## 正确性和性能边界
++
++- 预算是整个 Prefill Batch 的 `sum(req.extend_len)` 上限，缓存前缀不占预算。实际待计算量不足最低预算时无需填满；该下限不是每个请求的最小 Chunk 长度。
++- 计算方法只读取配置和 Decode 集合长度，不探测前缀、不修改 LRU、引用计数或树结构，不分配资源。
++- ChunkedReq 复用原 Table 槽位、缓存 Handle 和真实计算进度，允许下一次使用不同预算。
++- 不强制把 Token 预算按 page_size 取整，页对齐仍由 KV 分配器处理。
++- KV/Table 准入仍检查完整剩余 Prompt、输出预留和正在运行请求的需求。计算预算变小不能解决显存或 Table 不足。
++- LPM、有效等待轮次 Aging、超过128退化FCFS保持原定义。Chunk-only轮次不累计新请求等待计数；更多分块可能延迟新请求准入。
++- normal/overlap继续按成功提交更新连续 Decode 计数，无新增时间判断或 GPU 同步。相同输入状态使用确定的整数预算。
++
++当前 mini-SGLang 分别执行 Prefill 和 Decode Batch。此公式使用 Decode 数量作为 Prefill 计算量的负载信号，不表示同一 Batch 包含两阶段，也不能视为 GPU 时间预算。下限可使 `decode_tokens + budget` 超过目标额度。
++
++目标过大可能始终命中保护上限。例如真实 Decode 数量最多256、目标1024、保护上限256时，动态保护预算仍然为256。较小预算也可能增加 Chunk次数、重复 KV 读取和首次输出等待。当前只验证 CPU 调度语义和资源生命周期，真实 TPOT、TTFT、吞吐收益需要 GPU实验。
++
++## 测试与复现实验
++
++项目根目录运行测试：
++
++```bash
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python -m pytest \
++  tests/core tests/misc -q -o addopts='' --tb=short \
++  --junitxml=artifacts/adaptive_prefill_budget/tests.xml
++```
++
++扩展现有 Benchmark，使用 `--compare-adaptive` 对比相同 K、保护上限、请求输入及 Decode负载下的固定/动态预算：
++
++```bash
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python \
++  benchmarks/bench_batch_schedule_policy.py \
++  --compare-adaptive --seed 31723 --repeats 5 \
++  --decode-caps 16 --protected-budgets 256 \
++  --decode-loads 16 64 128 192 \
++  --target-budgets 128 256 512 --min-chunks 32 64 128 \
++  --output artifacts/adaptive_prefill_budget/benchmark.json
++```
++
++实验覆盖短/长/冷热混合Prompt、KV/Table紧张、Prefill-only、Decode-only；同组输入由相同随机种子生成，请求按固定 Batch序号到达，运行顺序打乱，每组重复5次。无模型推理：Engine只模拟进度和输出，使用真实阶段选择、准入、页分配、结果处理及资源释放。原生 Radix比较器预热后计时，测量阶段选择/准入CPU时间，不含页分配和模拟Forward。
++
++JSON保存每次保护的活跃 Decode 数、选定预算、实际计算Token和准入结果，以及Chunk批数、等待批数、Decode输出批间隔、缓存复用、CPU时间和资源守恒。预算利用率是实际Token/预算的逻辑比例，不是GPU利用率。固定Batch到达和批间隔不能替代真实请求到达时间与GPU延迟。
++
++LPM-Aging和page_size=4补充实验：
++
++```bash
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python \
++  benchmarks/bench_batch_schedule_policy.py \
++  --compare-adaptive --seed 31723 --repeats 5 \
++  --decode-caps 16 --protected-budgets 256 --decode-loads 16 192 \
++  --target-budgets 256 --min-chunks 64 \
++  --prefill-policy lpm-aging --aging-tokens-per-pass 8 --page-size 4 \
++  --output artifacts/adaptive_prefill_budget/benchmark_lpm_aging_page4.json
++```
++
++以前的阶段调度实验文件保留。当前结果、分析和本次相对于执行前工作区的差异记录保存于 `artifacts/adaptive_prefill_budget/`。
++
++为覆盖同一次运行中 Decode 数量自然减少的情况，增加了可选实验参数 `--stagger-decode-completions`，把初始请求的输出长度确定地分布在最大输出长度的一半到最大值之间，默认关闭。交错完成实验命令：
++
++```bash
++PATH="$PWD/.venv/bin:$PATH" PYTHONPATH=python .venv/bin/python \
++  benchmarks/bench_batch_schedule_policy.py \
++  --compare-adaptive --stagger-decode-completions --seed 31723 --repeats 5 \
++  --decode-caps 16 --protected-budgets 256 --decode-loads 16 192 \
++  --target-budgets 256 --min-chunks 64 --workloads long mixed \
++  --output artifacts/adaptive_prefill_budget/benchmark_decode_churn.json
++```
++
++最终测试249项通过（原有175项、新增74项），主实验1400次、页大小/LPM-Aging补充实验140次、交错完成实验40次，均排空并通过资源守恒检查。结果分析见 `artifacts/adaptive_prefill_budget/analysis.md`。
+--- /dev/null
++++ b/artifacts/adaptive_prefill_budget/analysis.md
+@@ -0,0 +1,103 @@
++# 自适应 Chunk Budget 实施与验证
++
++## 中断恢复
++
++恢复时已核对当前目录、Git状态和差异、源代码、执行前快照及测试XML。中断前已完成三个生产文件的修改、Benchmark/测试支架扩展，以及72项新增CPU测试；测试报告为247项通过、0失败。此前没有运行对照Benchmark或生成本功能文档。
++
++续接保留这些正确修改，完成1400次主实验、140次LPM-Aging/page_size=4补充实验、说明文档和最终审计。发现标准Benchmark的初始Decode请求长度相同，使保护轮次中的活跃数量通常不变，于是在Benchmark中增加默认关闭的交错完成选项、两个相关测试，并执行40次交错完成实验。该补充没有改变生产策略；因新增测试路径而重新运行相关测试，最终249项通过。
++
++## 实际变更
++
++| 文件 | 作用 |
++|---|---|
++| `python/minisgl/scheduler/config.py` | 新增默认关闭的开关、目标256、最低预算64；整数类型及启用时的跨参数校验 |
++| `python/minisgl/scheduler/scheduler.py` | 保存配置，增加只读预算计算方法，仅接入达到K的保护分支 |
++| `python/minisgl/server/args.py` | 三个CLI参数及含义说明 |
++| `tests/core/test_batch_schedule_policy.py` | 补齐现有CPU支架的新配置字段，原有断言保持 |
++| `benchmarks/bench_batch_schedule_policy.py` | 复用原模拟器进行固定/动态对照，记录预算与实际计算量，增加交错完成选项 |
++| `tests/core/test_adaptive_prefill_budget.py` | 配置、数学边界、作用条件、Chunk续算、缓存、准入和循环模式测试 |
++| `tests/core/test_adaptive_prefill_benchmark.py` | 实验可复现、资源归还及自然完成后的预算变化测试 |
++| `docs/adaptive_prefill_budget.md` | 配置、语义、限制和完整复现命令 |
++
++预算公式：
++
++```python
++min(
++    self.prefill_budget,
++    self.protected_prefill_tokens,
++    max(self.min_chunk_tokens,
++        self.target_batch_tokens - len(self.decode_manager.running_reqs)),
++)
++```
++
++关闭开关时返回原来的固定保护预算。两个阶段都有请求且连续Decode达到K时才计算动态预算；没有活跃Decode时仍使用正常预算。计算过程不做前缀探测、树修改、引用计数或资源分配。`inflight_tokens`继续承担原有KV预留职责。
++
++ChunkedReq复用已分配的Table槽位、缓存Handle与真实进度，下一次可以使用不同预算；KV完整需求检查、LPM排序、有效轮次Aging、FCFS退化、提交计数与完成/Abort释放流程均复用现有实现。小预算不跳过资源检查，也不强制按页大小取整。
++
++## 测试
++
++最终结果：**249 passed，0 failed，0 errors，0 skipped**，4.66秒。其中原有175项、新增74项。测试命令和JUnit结果见文档及`tests.xml`。
++
++新增覆盖目标减活跃Decode、最低/最高值、单调性和目标饱和、关闭兼容、非法类型/CLI/跨参数、K门控、无Decode正常预算、失败后保留计数重算、前缀不占计算预算、只读预算计算、动态预算下同一个Chunk续算、KV/Table不足、Abort改变负载、normal/overlap提交顺序、page_size=1/4及非页对齐预算、重复实验一致性、自然完成引起的预算变化。
++
++修改后的Python源码均通过Python3.10语法解析。测试后仅做格式整理的部分通过AST等价校验，未把未经测试的逻辑改动当作已验证。原有GPU手动集成脚本及GPU Kernel测试未执行。
++
++## Benchmark设置
++
++环境为AMD Ryzen 7 5800H、WSL2、Python3.12.14、Torch2.9.1+cu128，1个Torch线程。使用真实Scheduler、Prefill/DecodeManager、RadixCache、TableManager、物理页分配和结果回收；CPU Engine只模拟进度与输出，不执行模型、Attention、采样或CUDA Graph。
++
++计时覆盖阶段选择和准入，包含实验记录开销，不含物理页准备和模拟Forward。请求按固定Batch序号到达；随机种子31723，每组5次重复，打乱运行顺序，重复运行的非计时指标必须一致。记录的等待/输出间隔都是Batch数，不能换算成真实GPU延迟。
++
++主实验固定K=16、正常预算8192、保护上限256，初始Decode负载16/64/128/192，目标128/256/512，下限32/64/128。7种负载 × 4种Decode负载 ×（1组固定预算+9组自适应参数）×5重复 = **1400次运行**。
++
++补充实验使用LPM-Aging、N=8、page_size=4、初始Decode16/192、目标256、下限64，7种负载 ×2种负载 ×2种预算模式 ×5重复 = **140次运行**。
++
++交错完成实验使用初始Decode16/192、目标256、下限64、长/混合Prompt两种负载，2×2×2×5 = **40次运行**。
++
++**1580次运行全部排空**，通过表槽归还/唯一性、非根缓存引用归零、protected_size=0、物理页总量和唯一性检查。标准Prefill-only负载强制初始Decode为0，表中的`initial_decode_load`是实验参数；其实际最大活跃Decode数为0，无保护预算计算。
++
++## 主实验结果
++
++以下自适应参数为目标256、最低64，与固定预算256对照：
++
++| 负载 | 初始Decode | 固定/动态保护预算 | 固定/动态Chunk批数 | 首次Prefill等待P95（固定/动态，批） | Prefill完成等待P95（固定/动态，批） |
++|---|---:|---|---|---|---|
++| 短Prompt | 16 | 256 / 240 | 0 / 0 | 16 / 16 | 16 / 16 |
++| 短Prompt | 192 | 256 / 64 | 0 / 0 | 16 / 16 | 16 / 16 |
++| 长Prompt | 16 | 256 / 240 | 9 / 10 | 145 / 145 | 145 / 145 |
++| 长Prompt | 192 | 256 / 64 | 9 / 10 | 145 / 145 | 145 / 146 |
++| 混合冷热 | 16 | 256 / 240 | 7 / 7 | 131 / 131 | 132 / 132 |
++| 混合冷热 | 192 | 256 / 64 | 7 / 8 | 131 / 133 | 132 / 133 |
++
++已验证保护预算能随Decode负载缩小，但小预算增加了部分Chunk批次和等待。在这些负载中，初始Decode的最大输出批间隔均为2，未观察到批间隔改善；实际GPU中一次较小Prefill是否减少ITL仍需测量。
++
++混合高负载的CPU调度中位数，固定约16.54µs，自适应约18.09µs。该计时包含调度、准入、实验记录和不同Batch组成，不能把差额全部归因于预算公式。完整P95和运行间范围保存在JSON中。
++
++长Prompt全部排空后的计算量均为32768Token；混合负载均为9239Token并复用1472Token缓存。缩小预算改变分块和交错方式，不减少请求的总计算需求。短Prompt共32个新增计算Token，小于最低预算64，因此多个不同预算下的Batch轨迹相同；预算利用率是逻辑额度填充比例，不是GPU利用率。
++
++目标512在当前实验中始终命中保护上限256，行为指标与固定预算一致。目标128、下限128时始终使用128，说明下限和上限都可能使自适应退化为常量。
++
++LPM-Aging/page_size=4的高负载混合场景，固定/动态首次等待P95均为130批，完成等待为130/132批，Chunk批数为7/8。补充结果用于组合兼容验证，不把同时改变内部策略和页大小的结果归因于某一项独立性能提升。
++
++## 交错完成：同一次运行中的预算变化
++
++初始192个Decode请求、混合负载的自适应保护序列为：
++
++```text
++活跃Decode：192 → 192 → 192 → 186 → 139 → 92  → 45
++保护预算： 64  → 64  → 64  → 70  → 117 → 164 → 211
++```
++
++初始16个Decode的对应预算从240逐渐增加到252。结果直接验证预算并非初始化后固定，而是在每次保护时读取当前活跃数量重新计算。高负载混合请求的首次等待P95仍为固定131批、自适应133批，不能声称自动改善所有请求的排队公平性。
++
++## 资源不足与限制
++
++KV/Table紧张场景，固定与动态均发生111次整批保护尝试失败，继续Decode直到资源允许准入。更小的计算预算没有绕过完整需求检查或消除资源等待。连续Decode达到K只是优先尝试的条件，不能保证资源受限时获得服务。
++
++当前没有本地模型权重，因此未执行真实GPU TTFT、ITL/TPOT、吞吐或显存峰值实验，也未执行多GPU TP运行。活跃请求数只是负载代理；不同上下文长度、后端和GPU下相同请求数可能有不同耗时。本实现不包含混合Prefill/Decode Batch、按实际耗时反馈调整预算、KV抢占或重算。
++
++后续应固定真实请求到达时间和采样配置，分别测量normal/overlap下的TTFT、ITL尾延迟、吞吐和显存，选择适合模型的目标/下限。对长请求或新请求等待恶化的情况，应同时观察Chunk续算优先和有效Aging轮次，不能仅追求更小预算。
++
++本次差异与工作区保留审计见`changes.diff`和`verification.json`；原有阶段调度/LPM实验结果保持不变。
++
++`git diff --check`仍报告Scheduler文件中3处执行前已有的行尾空白，保留原内容；本次相对于执行前快照的新增差异和新文件没有行尾空白。
