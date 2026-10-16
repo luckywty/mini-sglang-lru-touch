@@ -1,0 +1,12 @@
+[
+  {
+    "interaction": "B_x_C_given_A",
+    "n": 0,
+    "status": "unsupported: fewer than five complete legal paired blocks"
+  },
+  {
+    "interaction": "B_x_D_given_A_C",
+    "n": 0,
+    "status": "unsupported: fewer than five complete legal paired blocks"
+  }
+]

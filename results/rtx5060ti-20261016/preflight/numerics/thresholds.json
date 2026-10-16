@@ -1,0 +1,9 @@
+{
+  "weight_dtype": "bfloat16",
+  "torch_reference": "HF sdpa BF16",
+  "per_context_max_absolute_logit_error": 0.5,
+  "per_context_p99_absolute_logit_error": 0.125,
+  "changed_argmax_candidate_within_reference_best_logit": 0.125,
+  "selection": "every first differing prefix from the frozen W0 audit",
+  "caveat": "Post-discrepancy registration; fixed inputs and thresholds before logit evaluation."
+}

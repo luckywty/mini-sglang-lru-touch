@@ -1,0 +1,6 @@
+{
+  "primary": "itl_server_ms_p99",
+  "extend_to_10": false,
+  "valid_paired_runs": 0,
+  "reason": "Fewer than five quality-valid pairs; preserve unsupported/failed configuration, do not manufacture a CI."
+}

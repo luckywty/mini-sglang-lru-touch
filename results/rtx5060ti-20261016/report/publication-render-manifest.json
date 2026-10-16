@@ -1,0 +1,15 @@
+{
+  "scope": "Presentation-only F4 rendering: fewer x ticks and wrapped y label; data unchanged.",
+  "before_sha256": {
+    "report/figures/F4-cache.png": "928674423b7c2b97f6817731992c5d5da793e5748126cd2a5aa64c6a93e3615d",
+    "report/figures/F4-cache.svg": "01ab57c1e02f3024d09c493ebd6a848926e30837f0c932dbe874f3fc6cf7ab86",
+    "report/figures/F4-cache-source.json": "6798123da8b7e466296d43d7588284a8fae20b600230f3b472e87e5868eee85c"
+  },
+  "after_sha256": {
+    "report/figures/F4-cache.png": "c91fcddc3d632b73ea772f066341421f248a7e8dba16ffe06e41076c1bd824a3",
+    "report/figures/F4-cache.svg": "d1550539dd8d0b695eef4ae913eaa4039e51490501aad4458e31af738ad1a142",
+    "report/figures/F4-cache-source.json": "6798123da8b7e466296d43d7588284a8fae20b600230f3b472e87e5868eee85c"
+  },
+  "renderer": "benchmarks/serving/make_report.py",
+  "renderer_sha256": "3e90c03e76b508d8ca7479d758c64419f70b87a265d9f6d5176aa2ae58dd8806"
+}

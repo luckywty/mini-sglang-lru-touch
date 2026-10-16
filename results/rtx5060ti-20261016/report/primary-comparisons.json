@@ -1,0 +1,95 @@
+[
+  {
+    "experiment": "E03",
+    "reference": "S1L00",
+    "variant": "S1100",
+    "metric": "cold_wait_ms_p95",
+    "scope": "exploratory: tail calibration failed",
+    "reference_median": 372.112981575,
+    "candidate_median": 373.0522178,
+    "n": 10,
+    "median_improvement_pct": -1.8929886914723526,
+    "ci95_low_pct": -5.937168479610766,
+    "ci95_high_pct": 2.0564190449612663,
+    "paired_improvements_pct": [
+      -2.619171186723035,
+      -5.937168479610766,
+      -1.1668061962216703,
+      1.7456034469675252,
+      -15.365708818588919,
+      1.8643952069162806,
+      4.104022623607251,
+      -6.810202543263544,
+      -3.678105337029236,
+      2.3672346429550073
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1000",
+    "variant": "S1L00",
+    "metric": "output_tok_s",
+    "scope": "conditional fixed-length timing",
+    "reference_median": 1652.8309139489381,
+    "candidate_median": 1678.4645849698163,
+    "n": 8,
+    "median_improvement_pct": 1.4644999917471146,
+    "ci95_low_pct": -0.07417633648223454,
+    "ci95_high_pct": 4.121712255965693,
+    "paired_improvements_pct": [
+      2.3448903804496712,
+      4.121712255965693,
+      0.36641364706349044,
+      0.5841096030445581,
+      4.151535430402298,
+      -0.07417633648223454,
+      -0.7679860234566682,
+      3.3323175566384755
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "fixed24",
+    "variant": "S1011",
+    "metric": "itl_server_ms_p99",
+    "scope": "exploratory: tail calibration failed",
+    "reference_median": 23.91119725,
+    "candidate_median": 24.0263825,
+    "n": 10,
+    "median_improvement_pct": 0.7572853977543925,
+    "ci95_low_pct": -1.452016405979606,
+    "ci95_high_pct": 1.0966104860508197,
+    "paired_improvements_pct": [
+      0.8678429134397647,
+      1.4541547058512405,
+      -1.6239681857373123,
+      1.3253780586618746,
+      0.7582802377685383,
+      0.937506109749564,
+      -1.9309842093648166,
+      -1.452016405979606,
+      0.7562905577402468,
+      -0.6738930496056561
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1111",
+    "metric": "output_tok_s",
+    "scope": "conditional fixed-length timing",
+    "reference_median": 2025.7686588181007,
+    "candidate_median": 402.08053600446857,
+    "n": 5,
+    "median_improvement_pct": -79.90163399490082,
+    "ci95_low_pct": -80.95458190525369,
+    "ci95_high_pct": -79.19527832530255,
+    "paired_improvements_pct": [
+      -80.75577455954965,
+      -80.95458190525369,
+      -79.19527832530255,
+      -79.90163399490082,
+      -79.52719397877496
+    ]
+  }
+]

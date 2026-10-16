@@ -1,0 +1,20 @@
+commit 7cd28c7bda8f6881558fe810694019d3e46994b5
+Author:     luckywty <luckywty@users.noreply.github.com>
+AuthorDate: Wed Oct 14 17:27:44 2026 +0800
+Commit:     luckywty <luckywty@users.noreply.github.com>
+CommitDate: Wed Oct 14 17:27:44 2026 +0800
+
+    Sync scheduling optimizations and reproducible benchmark plans
+    
+    Update two-stage Radix admission, LPM with effective-pass aging, bounded
+    decode-first scheduling, and adaptive protected-prefill budgets.
+    
+    Include CPU regression tests, benchmark harnesses, nine simulation JSON
+    artifacts, optimization reviews, and five RTX 5060 Ti 8GB benchmark plans.
+    Keep the original before/after patch and label its historical scope.
+    
+    Validation: 249 tests passed (tests/core and tests/misc).
+    GPU serving benchmarks were not run; existing simulation results remain
+    explicitly distinguished from GPU performance evidence.
+origin	https://github.com/luckywty/mini-sglang-lru-touch.git (fetch)
+origin	https://github.com/luckywty/mini-sglang-lru-touch.git (push)

@@ -1,0 +1,58 @@
+{
+  "status": "passed",
+  "runs": 12,
+  "strict_greedy_cross_shape_equal": false,
+  "numerical_scope": "Matched-shape equivalence to upstream; strict HF absolute tolerance failed and remains reported.",
+  "numerical_decision": "preflight/numerics/decision.json",
+  "minimum_free_mib": 2882.0,
+  "source_and_collector_hashes": [
+    [
+      "98eef75243db1a2d100ef2427a6ba3ac373aa823b209730f84c966df7653b3c1",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "98eef75243db1a2d100ef2427a6ba3ac373aa823b209730f84c966df7653b3c1",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "98eef75243db1a2d100ef2427a6ba3ac373aa823b209730f84c966df7653b3c1",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "98eef75243db1a2d100ef2427a6ba3ac373aa823b209730f84c966df7653b3c1",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "e51137a1c2ee82e7dec1c6c68b6d5582eb789c2f7d00eec965f6a98ca6af849c",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "e51137a1c2ee82e7dec1c6c68b6d5582eb789c2f7d00eec965f6a98ca6af849c",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "98eef75243db1a2d100ef2427a6ba3ac373aa823b209730f84c966df7653b3c1",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "e51137a1c2ee82e7dec1c6c68b6d5582eb789c2f7d00eec965f6a98ca6af849c",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "e51137a1c2ee82e7dec1c6c68b6d5582eb789c2f7d00eec965f6a98ca6af849c",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "98eef75243db1a2d100ef2427a6ba3ac373aa823b209730f84c966df7653b3c1",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "e51137a1c2ee82e7dec1c6c68b6d5582eb789c2f7d00eec965f6a98ca6af849c",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ],
+    [
+      "e51137a1c2ee82e7dec1c6c68b6d5582eb789c2f7d00eec965f6a98ca6af849c",
+      "3cc370232d32c03a527806024f20203acc17563950b45c9d53b170357f5efebc"
+    ]
+  ]
+}

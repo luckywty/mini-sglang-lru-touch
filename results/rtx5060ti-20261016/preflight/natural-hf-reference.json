@@ -1,0 +1,366 @@
+{
+  "model": "/home/wangwei/ai-infra/models/Qwen3-0.6B",
+  "dtype": "bfloat16",
+  "backend": "HF SDPA",
+  "role": "semantic diagnostic, not performance measurement",
+  "rows": [
+    {
+      "request_id": "natural-0",
+      "input_ids": [
+        151644,
+        872,
+        198,
+        3838,
+        374,
+        220,
+        17,
+        488,
+        220,
+        17,
+        30,
+        21806,
+        448,
+        1172,
+        279,
+        1372,
+        13,
+        151645,
+        198,
+        151644,
+        77091,
+        198,
+        151667,
+        271,
+        151668,
+        271
+      ],
+      "generated_ids": [
+        17,
+        151645
+      ],
+      "output_text": "2",
+      "first_token_top10": [
+        {
+          "id": 17,
+          "text": "2",
+          "logit": 33.0
+        },
+        {
+          "id": 785,
+          "text": "The",
+          "logit": 26.375
+        },
+        {
+          "id": 16141,
+          "text": "Answer",
+          "logit": 22.5
+        },
+        {
+          "id": 16,
+          "text": "1",
+          "logit": 20.75
+        },
+        {
+          "id": 3,
+          "text": "$",
+          "logit": 20.375
+        },
+        {
+          "id": 10061,
+          "text": "Let",
+          "logit": 19.5
+        },
+        {
+          "id": 15,
+          "text": "0",
+          "logit": 19.375
+        },
+        {
+          "id": 18,
+          "text": "3",
+          "logit": 19.125
+        },
+        {
+          "id": 23,
+          "text": "8",
+          "logit": 18.875
+        },
+        {
+          "id": 2132,
+          "text": "It",
+          "logit": 18.375
+        }
+      ]
+    },
+    {
+      "request_id": "natural-1",
+      "input_ids": [
+        151644,
+        872,
+        198,
+        3838,
+        374,
+        279,
+        6722,
+        315,
+        9625,
+        30,
+        21806,
+        448,
+        825,
+        3409,
+        13,
+        151645,
+        198,
+        151644,
+        77091,
+        198,
+        151667,
+        271,
+        151668,
+        271
+      ],
+      "generated_ids": [
+        59604,
+        151645
+      ],
+      "output_text": "Paris",
+      "first_token_top10": [
+        {
+          "id": 59604,
+          "text": "Paris",
+          "logit": 23.375
+        },
+        {
+          "id": 43,
+          "text": "L",
+          "logit": 20.5
+        },
+        {
+          "id": 49000,
+          "text": "France",
+          "logit": 20.0
+        },
+        {
+          "id": 65063,
+          "text": "capital",
+          "logit": 20.0
+        },
+        {
+          "id": 2304,
+          "text": "Le",
+          "logit": 19.875
+        },
+        {
+          "id": 33,
+          "text": "B",
+          "logit": 19.625
+        },
+        {
+          "id": 44,
+          "text": "M",
+          "logit": 19.5
+        },
+        {
+          "id": 51,
+          "text": "T",
+          "logit": 19.375
+        },
+        {
+          "id": 31400,
+          "text": "CAP",
+          "logit": 19.0
+        },
+        {
+          "id": 49,
+          "text": "R",
+          "logit": 18.875
+        }
+      ]
+    },
+    {
+      "request_id": "natural-2",
+      "input_ids": [
+        151644,
+        872,
+        198,
+        27473,
+        279,
+        6364,
+        3409,
+        8251,
+        1119,
+        15154,
+        13,
+        21806,
+        448,
+        825,
+        3409,
+        13,
+        151645,
+        198,
+        151644,
+        77091,
+        198,
+        151667,
+        271,
+        151668,
+        271
+      ],
+      "generated_ids": [
+        70,
+        4330,
+        151645
+      ],
+      "output_text": "gato",
+      "first_token_top10": [
+        {
+          "id": 70,
+          "text": "g",
+          "logit": 21.375
+        },
+        {
+          "id": 66,
+          "text": "c",
+          "logit": 20.0
+        },
+        {
+          "id": 712,
+          "text": "per",
+          "logit": 19.75
+        },
+        {
+          "id": 20199,
+          "text": "cu",
+          "logit": 18.25
+        },
+        {
+          "id": 4616,
+          "text": "cat",
+          "logit": 18.0
+        },
+        {
+          "id": 301,
+          "text": "el",
+          "logit": 17.375
+        },
+        {
+          "id": 4814,
+          "text": "can",
+          "logit": 17.0
+        },
+        {
+          "id": 273,
+          "text": "le",
+          "logit": 17.0
+        },
+        {
+          "id": 79,
+          "text": "p",
+          "logit": 16.5
+        },
+        {
+          "id": 75,
+          "text": "l",
+          "logit": 16.375
+        }
+      ]
+    },
+    {
+      "request_id": "natural-3",
+      "input_ids": [
+        151644,
+        872,
+        198,
+        23526,
+        25,
+        7014,
+        11,
+        7589,
+        11,
+        7920,
+        11,
+        151645,
+        198,
+        151644,
+        77091,
+        198,
+        151667,
+        271,
+        151668,
+        271
+      ],
+      "generated_ids": [
+        35239,
+        11,
+        7589,
+        11,
+        7920,
+        11,
+        7794,
+        11,
+        6602,
+        11,
+        7728,
+        11,
+        7270,
+        13,
+        151645
+      ],
+      "output_text": "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.",
+      "first_token_top10": [
+        {
+          "id": 35239,
+          "text": "Monday",
+          "logit": 25.75
+        },
+        {
+          "id": 11095,
+          "text": "Mon",
+          "logit": 20.875
+        },
+        {
+          "id": 7014,
+          "text": " Monday",
+          "logit": 18.875
+        },
+        {
+          "id": 37788,
+          "text": "Thursday",
+          "logit": 18.75
+        },
+        {
+          "id": 40519,
+          "text": "Wednesday",
+          "logit": 18.625
+        },
+        {
+          "id": 34620,
+          "text": "Friday",
+          "logit": 18.375
+        },
+        {
+          "id": 40199,
+          "text": "Tuesday",
+          "logit": 18.375
+        },
+        {
+          "id": 1645,
+          "text": "mon",
+          "logit": 18.0
+        },
+        {
+          "id": 12,
+          "text": "-",
+          "logit": 17.75
+        },
+        {
+          "id": 9454,
+          "text": "Yes",
+          "logit": 17.125
+        }
+      ]
+    }
+  ],
+  "peak_reserved_mib": 1166.0
+}

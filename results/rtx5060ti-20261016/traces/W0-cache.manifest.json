@@ -1,0 +1,17 @@
+{
+  "role": "correctness",
+  "cache": "partial and full prefix reuse",
+  "concurrency": 1,
+  "sha256": "fe4e866666cb054d85d4b53022334292b7fad268c59daa8671f1223bc2bca9fb",
+  "requests": 32,
+  "classes": {
+    "hot": 24,
+    "cold": 8
+  },
+  "input_lengths": [
+    576
+  ],
+  "output_lengths": [
+    8
+  ]
+}

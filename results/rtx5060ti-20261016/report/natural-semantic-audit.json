@@ -1,0 +1,98 @@
+[
+  {
+    "variant": "H0000",
+    "request_id": "natural-0",
+    "actual_output": "2",
+    "expected": "4",
+    "semantic_passed": false,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "H0000",
+    "request_id": "natural-1",
+    "actual_output": "Paris",
+    "expected": "Paris",
+    "semantic_passed": true,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "H0000",
+    "request_id": "natural-2",
+    "actual_output": "gato",
+    "expected": "gato",
+    "semantic_passed": true,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "H0000",
+    "request_id": "natural-3",
+    "actual_output": "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.",
+    "expected": null,
+    "semantic_passed": null,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1000",
+    "request_id": "natural-0",
+    "actual_output": "2",
+    "expected": "4",
+    "semantic_passed": false,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1000",
+    "request_id": "natural-1",
+    "actual_output": "Paris",
+    "expected": "Paris",
+    "semantic_passed": true,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1000",
+    "request_id": "natural-2",
+    "actual_output": "gato",
+    "expected": "gato",
+    "semantic_passed": true,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1000",
+    "request_id": "natural-3",
+    "actual_output": "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.",
+    "expected": null,
+    "semantic_passed": null,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1111",
+    "request_id": "natural-0",
+    "actual_output": "2",
+    "expected": "4",
+    "semantic_passed": false,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1111",
+    "request_id": "natural-1",
+    "actual_output": "Paris",
+    "expected": "Paris",
+    "semantic_passed": true,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1111",
+    "request_id": "natural-2",
+    "actual_output": "gato",
+    "expected": "gato",
+    "semantic_passed": true,
+    "matches_exact_input_hf_bf16_text": true
+  },
+  {
+    "variant": "S1111",
+    "request_id": "natural-3",
+    "actual_output": "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.",
+    "expected": null,
+    "semantic_passed": null,
+    "matches_exact_input_hf_bf16_text": true
+  }
+]

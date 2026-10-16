@@ -1,0 +1,20 @@
+{
+  "workload": "W0-abort",
+  "role": "resource correctness only, intentionally short client deadlines",
+  "seed": 91003,
+  "sha256": "06e7d3f9a19f6a3270b788d951174bcd831211a73fcd796f3dac120af6857b7a",
+  "requests": 56,
+  "classes": {
+    "abort_short": 24,
+    "abort_long": 24,
+    "post_abort_control": 8
+  },
+  "input_lengths": [
+    128,
+    2048
+  ],
+  "output_lengths": [
+    32,
+    256
+  ]
+}

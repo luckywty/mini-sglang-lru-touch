@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "profile": "G1",
+  "requests": 1000,
+  "seeds": [
+    31723,
+    31724,
+    31725,
+    31726,
+    31727
+  ],
+  "extension_seeds": [
+    31728,
+    31729,
+    31730,
+    31731,
+    31732
+  ],
+  "model": "/home/wangwei/ai-infra/models/Qwen3-0.6B",
+  "pilot_anchors": {
+    "W4": {
+      "capacity_req_s": 9.398226519118799,
+      "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W4-capacity-H",
+      "open_checks": [
+        {
+          "factor": 0.8,
+          "rate": 7.5186,
+          "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W4-open-0.8-H/attempt-20261014-225357",
+          "success": 128,
+          "duration_s": 19.801507757,
+          "send_lag_p99_ms": 0.12046024,
+          "loop_lag_p99_ms": 0.20932426000000012
+        },
+        {
+          "factor": 1.05,
+          "rate": 9.8681,
+          "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W4-open-1.05-H",
+          "success": 128,
+          "duration_s": 15.442023966,
+          "send_lag_p99_ms": 0.3232921700000001,
+          "loop_lag_p99_ms": 0.1417476799999996
+        }
+      ]
+    },
+    "W6": {
+      "capacity_req_s": 46.48766373254431,
+      "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W6-firstcold-capacity-H",
+      "validation": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W6-firstcold-open-H"
+    },
+    "W3": {
+      "capacity_req_s": 50.1852163037948,
+      "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W3-capacity-H",
+      "open_checks": [
+        {
+          "factor": 0.8,
+          "rate": 40.1482,
+          "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W3-open-0.8-H",
+          "success": 128,
+          "duration_s": 3.036865028,
+          "send_lag_p99_ms": 0.5155943500000001,
+          "loop_lag_p99_ms": 0.11846454999999952
+        },
+        {
+          "factor": 1.05,
+          "rate": 52.6945,
+          "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W3-open-1.05-H",
+          "success": 128,
+          "duration_s": 2.521850177,
+          "send_lag_p99_ms": 0.53171822,
+          "loop_lag_p99_ms": 0.23712764000000094
+        }
+      ]
+    },
+    "W4-X": {
+      "capacity_req_s": 9.378120567787267,
+      "raw": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W4-X-capacity-H"
+    }
+  },
+  "rates": {
+    "W4": 9.8681,
+    "W6": 48.812,
+    "W3": 52.6945,
+    "W4-X": 9.847
+  },
+  "additional_rate_W4": 7.5186,
+  "W5": {
+    "cycle_s": 12.0,
+    "background_output": 256,
+    "requests": 1008
+  },
+  "slo": {
+    "short_ttft_ms": 500,
+    "long_ttft_ms": 2000,
+    "e2e_extra_ms": 500,
+    "output_interval_allowance_ms": 50,
+    "server_tpot_ms": 50,
+    "server_request_itl_p95_ms": 100,
+    "starvation_ms": 5000
+  },
+  "extension_rule": "At n=5 append to n=10 if run-paired 95% CI for registered primary crosses zero, signs differ, or primary run CV>5%; preserve all first five.",
+  "primary": {
+    "E01": "output_tok_s",
+    "E02": "itl_server_ms_p99",
+    "E03": "cold_wait_ms_p95",
+    "E04": "output_tok_s",
+    "E05": "itl_server_ms_p99",
+    "E02-low": "itl_server_ms_p99",
+    "E06": "output_tok_s"
+  },
+  "thermal_rule": "Before measurement, 60-second sampled range <=2C; otherwise record pollution and extend up to five windows.",
+  "client_rule": "send and loop lag P99 <1ms and loop lag <5% server median ITL; compare affinity and dummy SSE before formal claims",
+  "frozen_wall": 1791989933.025979,
+  "finalized": true,
+  "finalized_wall": 1791990413.3133962,
+  "source_basis": "Pinned H/S plus common host-terminal, post-EOS and Abort-overlap correctness repairs; HTTP keepalive3600s",
+  "numerical_limitation": "Strict cross-shape greedy and HF absolute thresholds not met; matched-shape H/S logits bitwise equal and upstream itself reproduces BF16 shape sensitivity.",
+  "W5_stability_pilots": [
+    {
+      "variant": "H0000",
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W5-cycle12-H0000",
+      "duration_s": 33.977352996,
+      "long_ttft_p95": 133.63636724999998,
+      "n_decode": [],
+      "budget": []
+    },
+    {
+      "variant": "S1010",
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W5-cycle12-S1010",
+      "duration_s": 35.207988401,
+      "long_ttft_p95": 2590.8425415,
+      "n_decode": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "budget": [
+        64
+      ]
+    },
+    {
+      "variant": "fixed24",
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W5-cycle12-fixed24",
+      "duration_s": 36.495508982,
+      "long_ttft_p95": 3807.6884387500004,
+      "n_decode": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "budget": [
+        24
+      ]
+    },
+    {
+      "variant": "S1011",
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W5-cycle12-S1011",
+      "duration_s": 36.270408221,
+      "long_ttft_p95": 3795.276168,
+      "n_decode": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "budget": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ]
+    }
+  ],
+  "W5_stability_verified": true,
+  "measurement_frozen": true,
+  "measurement_frozen_wall": 1792042166.1911643,
+  "collector_mode": "light",
+  "tail_calibration_passed": false,
+  "calibration_sha256": "05d42319045518254d76f9ae8e4aa136b1d5b6f6559a73834bddb88acfda08e3",
+  "model_manifest_sha256": "c82bb801ff3960d98ca0d3e818d29e92d1dd6c1cef4b808e1f40111c406008d6",
+  "model_revision": "local-sha256:f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b",
+  "tokenizer_hash": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+  "runtime_H_manifest_sha256": "64a0e6707e52a63e9c43779671727e7dea661688f26799ce20eda36f5e230035",
+  "runtime_S_manifest_sha256": "bd98fba26746e5d8de7eda3e762b3d4bee592301ba17f2114c2ef7537cde01b6",
+  "tooling_sha256": "ea7acf3a5c87bc5f6612e7b482d6b14fa15ca03ada95f33bfba93e7e82e65c30",
+  "dtype": "bfloat16",
+  "attention_backend": "fi/fa2",
+  "page_size": 1,
+  "kv_tokens": 16384,
+  "context_limit": 2304,
+  "max_running_requests": 16,
+  "normal_prefill_tokens": 256,
+  "expected_cuda_graph_sizes": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "http_keepalive_seconds": 3600,
+  "quality_retries": 2,
+  "quality_retry_reasons": [
+    "client lag exceeds frozen limit",
+    "60s thermal range exceeds2C"
+  ],
+  "quality_rule": "Keep every attempt; select the first quality-valid restart per seed, up to2 replacements. Slow performance or timeouts alone are not exclusion grounds.",
+  "evidence_scope": "Tail calibration did not meet preregistered tolerance: ITL effects exploratory, excluded from resume gains. Retain absolute observations, paired CIs, throughput/failure/fairness evidence and every failed gate.",
+  "W6_trace_version": 2,
+  "W6_protocol_amendment": "Cold quota floor(end/5)-floor(start/5) is placed before hot requests in every B32 burst; changed before any E03 measurement. W4 byte-for-byte unchanged.",
+  "protocol_version": "abort-overlap-v2",
+  "protocol_amendment_wall": 1792041004.7077327,
+  "natural_semantic_limitation": "2+2 outputs2 identically in mini H/S and exact-input HF BF16 reference; not a quality-lossless claim",
+  "two_variant_order": "AB/BA alternating before first E01/E02-low measurement; other order permutations unchanged",
+  "quality_budget_across_resumes": "At most3 completed quality attempts per seed/configuration, counting preserved polluted attempts across restarts"
+}

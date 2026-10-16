@@ -1,0 +1,15 @@
+[
+  {
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E05/seed-31727/S1011",
+    "seed": 31727,
+    "variant": "S1011",
+    "workload": "W5",
+    "full_run_offered": 1008,
+    "full_run_server_interval_count": 181776,
+    "selection_metric": 24.097883,
+    "display_window_s": [
+      0,
+      24
+    ]
+  }
+]

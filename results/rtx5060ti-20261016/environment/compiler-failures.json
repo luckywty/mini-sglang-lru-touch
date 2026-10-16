@@ -1,0 +1,14 @@
+[
+  {
+    "run": "preflight/H-G0-C1",
+    "phase": "warmup_first_forward",
+    "cause": "CUDA12.9 rejects default GCC15",
+    "action": "pin GCC14"
+  },
+  {
+    "run": "preflight/H-G0-C1/attempt-20261014-223330",
+    "phase": "warmup_first_forward",
+    "cause": "CUDA12.9 math_functions.h rsqrt/rsqrtf exception specification conflicts with Ubuntu26.04 glibc2.43",
+    "action": "Toolkit13.2 + GCC14 passed standalone sm120 compilation; run next functional smoke"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "dtype": "bfloat16",
+  "backend": "sdpa",
+  "peak_allocated": 1221455360,
+  "peak_reserved": 1239416832
+}

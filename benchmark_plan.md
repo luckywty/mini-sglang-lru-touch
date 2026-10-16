@@ -6,7 +6,7 @@
 
 ## 1. 审计范围与基线身份
 
-项目根目录：`/home/wty238388/ai-infra/Serving_V1/Promotion/mini-sglang`。
+项目根目录：`/home/wangwei/ai-infra/Promotion/mini-sglang-lru-touch`。
 
 | 项目 | 本次核对结果 |
 |---|---|

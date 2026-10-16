@@ -1,0 +1,9 @@
+{
+  "reason": "Cold quota floor(end/5)-floor(start/5) is placed before hot requests in every B32 burst; changed before any E03 measurement. W4 byte-for-byte unchanged.",
+  "previous_rate": 50.6307,
+  "new_rate": 48.812,
+  "measured_W6_runs_before_fix": 0,
+  "unaffected_W4_trace_sha256": "b2406f51f66130dad913e2b93132dfd9c180a62649f626e73b43a5f88d662615",
+  "pilot_capacity": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W6-firstcold-capacity-H",
+  "pilot_validation": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W6-firstcold-open-H"
+}

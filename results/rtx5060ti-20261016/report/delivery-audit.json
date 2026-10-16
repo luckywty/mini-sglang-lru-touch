@@ -1,0 +1,15 @@
+{
+  "measurement_complete": true,
+  "all_cells_five_seeds_attempted": true,
+  "all_cells_five_seeds_eligible": false,
+  "all_completed_resource_configs_match": true,
+  "tail_calibration_passed": false,
+  "cross_shape_strict_numeric_acceptance": false,
+  "natural_semantic_acceptance": false,
+  "natural_reference_text_equivalence": true,
+  "formal_attempts": 260,
+  "eligible_runs": 157,
+  "global_ledger_entries": 125,
+  "created_wall": 1792115025.318787,
+  "deliverable_scope": "Actual fixed-length benchmark with explicit failed acceptance gates; not an unqualified optimization success."
+}

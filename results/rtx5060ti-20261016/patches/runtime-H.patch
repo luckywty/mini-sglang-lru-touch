@@ -1,0 +1,34 @@
+--- a/python/minisgl/scheduler/scheduler.py
++++ b/python/minisgl/scheduler/scheduler.py
+@@ -75,6 +75,9 @@
+         # Initialize the I/O mixin
+         super().__init__(config, self.engine.tp_cpu_group)
+ 
++        from minisgl.benchmark.collector import install
++        install(self, config)
++
+     def run_when_idle(self) -> None:
+         """Called when the scheduler is idle to perform background tasks."""
+         logger.info_rank0("Scheduler is idle, waiting for new reqs...")
+@@ -147,10 +150,12 @@
+             for i, req in enumerate(batch.reqs):
+                 if isinstance(req, ChunkedReq):
+                     continue
++                if req in self.finished_reqs:
++                    continue  # Discard already-released EOS/Abort results.
+                 next_token = next_tokens_cpu[i]
+                 req.append_host(next_token.unsqueeze(0))
+                 next_token = int(next_token.item())
+-                finished = not req.can_decode
++                finished = len(req.input_ids) >= req.max_device_len
+                 if not req.sampling_params.ignore_eos:
+                     finished |= next_token == self.eos_token_id
+                 reply.append(DetokenizeMsg(uid=req.uid, next_token=next_token, finished=finished))
+@@ -193,6 +198,7 @@
+             req_to_free = req_to_free or self.decode_manager.abort_req(msg.uid)
+             if req_to_free is not None:
+                 self._free_req_resources(req_to_free)
++                self.finished_reqs.add(req_to_free)  # In-flight host result still owns this object.
+         else:
+             logger.error(f"Unknown message type: {type(msg)}")
+             raise NotImplementedError

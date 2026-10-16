@@ -1,0 +1,10 @@
+{
+  "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/attempt-20261015-125741",
+  "client_success": 940,
+  "client_timeout": 60,
+  "worker_error": "RuntimeError: CacheManager integrity check failed: free_pages(2878) + cache_pages(15554) != num_pages(16384)",
+  "worker_snapshot_available": false,
+  "root_cause": "Abort frees final prefill before its delayed host result; stale result recaches and returns the same pages again. Exact CPU reproduction in H/S.",
+  "remedy": "Shared Abort adds released Req to existing finished_reqs guard; no normal hot-path additions.",
+  "previous_formal_data": "Preserved and superseded for uniform correctness-version pairing."
+}

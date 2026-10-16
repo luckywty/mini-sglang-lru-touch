@@ -1,0 +1,215 @@
+{
+  "passed": false,
+  "observations": [
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-0-off-cpu8_9",
+      "output_tok_s": 1559.3269106905727,
+      "itl_client_ack_ms_p99": 12.477340439999999,
+      "ttft_text_ms_p95": 380.11489575,
+      "loop_lag_p99_ms": 0.1269603700000011,
+      "block": 0,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-0-light-cpu8_9",
+      "output_tok_s": 1543.2894209111862,
+      "itl_client_ack_ms_p99": 13.241744509999986,
+      "ttft_text_ms_p95": 382.90748405,
+      "loop_lag_p99_ms": 0.19152801000000105,
+      "block": 0,
+      "mode": "light",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-0-light-cpu8",
+      "output_tok_s": 1511.6081308661055,
+      "itl_client_ack_ms_p99": 11.43145644999999,
+      "ttft_text_ms_p95": 384.69396294999996,
+      "loop_lag_p99_ms": 0.15554639999999917,
+      "block": 0,
+      "mode": "light",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-1-off-cpu8_9",
+      "output_tok_s": 1508.6394113981275,
+      "itl_client_ack_ms_p99": 11.386741099999997,
+      "ttft_text_ms_p95": 395.88539525,
+      "loop_lag_p99_ms": 0.13286441000000046,
+      "block": 1,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-1-light-cpu8",
+      "output_tok_s": 1507.0678717798799,
+      "itl_client_ack_ms_p99": 10.711698550000001,
+      "ttft_text_ms_p95": 394.7662233,
+      "loop_lag_p99_ms": 0.12565715000000044,
+      "block": 1,
+      "mode": "light",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-1-light-cpu8_9",
+      "output_tok_s": 1508.5935894713614,
+      "itl_client_ack_ms_p99": 12.316324989999977,
+      "ttft_text_ms_p95": 385.32468029999995,
+      "loop_lag_p99_ms": 0.1561208000000002,
+      "block": 1,
+      "mode": "light",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-2-light-cpu8",
+      "output_tok_s": 1508.7465137453346,
+      "itl_client_ack_ms_p99": 10.30881263999998,
+      "ttft_text_ms_p95": 389.58737959999996,
+      "loop_lag_p99_ms": 0.1377322000000005,
+      "block": 2,
+      "mode": "light",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-2-off-cpu8_9",
+      "output_tok_s": 1520.8835099647201,
+      "itl_client_ack_ms_p99": 11.371054509999894,
+      "ttft_text_ms_p95": 385.26375105,
+      "loop_lag_p99_ms": 0.17401049999999932,
+      "block": 2,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-2-light-cpu8_9",
+      "output_tok_s": 1523.5728950987154,
+      "itl_client_ack_ms_p99": 11.170517589999989,
+      "ttft_text_ms_p95": 381.8884378,
+      "loop_lag_p99_ms": 0.13506015999999982,
+      "block": 2,
+      "mode": "light",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-3-light-cpu8",
+      "output_tok_s": 1506.9500487962594,
+      "itl_client_ack_ms_p99": 11.485843689999983,
+      "ttft_text_ms_p95": 386.68463199999997,
+      "loop_lag_p99_ms": 0.18987604000000113,
+      "block": 3,
+      "mode": "light",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-3-light-cpu8_9",
+      "output_tok_s": 1513.8118361105096,
+      "itl_client_ack_ms_p99": 11.125624709999808,
+      "ttft_text_ms_p95": 383.7994639,
+      "loop_lag_p99_ms": 0.143321,
+      "block": 3,
+      "mode": "light",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-3-off-cpu8_9",
+      "output_tok_s": 1513.6625679321887,
+      "itl_client_ack_ms_p99": 11.276778009999996,
+      "ttft_text_ms_p95": 381.8891104,
+      "loop_lag_p99_ms": 0.163954,
+      "block": 3,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-4-light-cpu8_9",
+      "output_tok_s": 1545.2483653814895,
+      "itl_client_ack_ms_p99": 12.84078454,
+      "ttft_text_ms_p95": 378.7152386,
+      "loop_lag_p99_ms": 0.16344404000000037,
+      "block": 4,
+      "mode": "light",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-4-light-cpu8",
+      "output_tok_s": 1596.896296529835,
+      "itl_client_ack_ms_p99": 10.676614609999994,
+      "ttft_text_ms_p95": 368.6755799,
+      "loop_lag_p99_ms": 0.11109107999999973,
+      "block": 4,
+      "mode": "light",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-4-off-cpu8_9",
+      "output_tok_s": 1604.5075394266369,
+      "itl_client_ack_ms_p99": 9.23276656999994,
+      "ttft_text_ms_p95": 362.28808115,
+      "loop_lag_p99_ms": 0.13390684000000003,
+      "block": 4,
+      "mode": "off",
+      "affinity": "8,9"
+    }
+  ],
+  "collector": {
+    "output_tok_s": {
+      "n": 5,
+      "median_improvement_pct": -0.003037301453212571,
+      "ci95_low_pct": -3.693293586287749,
+      "ci95_high_pct": 0.17683044864216235,
+      "paired_improvements_pct": [
+        -1.0284879757692433,
+        -0.003037301453212571,
+        0.17683044864216235,
+        0.009861390608656428,
+        -3.693293586287749
+      ]
+    },
+    "itl_client_ack_ms_p99": {
+      "n": 5,
+      "median_improvement_pct": -6.126338170187706,
+      "ci95_low_pct": -39.07840561813405,
+      "ci95_high_pct": 1.7635736406289348,
+      "paired_improvements_pct": [
+        -6.126338170187706,
+        -8.16373957953589,
+        1.7635736406289348,
+        1.340394391608557,
+        -39.07840561813405
+      ]
+    }
+  },
+  "client_affinity": {
+    "output_tok_s": {
+      "n": 5,
+      "median_improvement_pct": -0.4532787464445076,
+      "ci95_low_pct": -2.0528417817038846,
+      "ci95_high_pct": 3.342370864478772,
+      "paired_improvements_pct": [
+        -2.0528417817038846,
+        -0.10113510372373735,
+        -0.9731323917009038,
+        -0.4532787464445076,
+        3.342370864478772
+      ]
+    },
+    "itl_client_ack_ms_p99": {
+      "n": 5,
+      "median_improvement_pct": 13.028451598206637,
+      "ci95_low_pct": -3.23774160453576,
+      "ci95_high_pct": 16.85387620404699,
+      "paired_improvements_pct": [
+        13.671069235876665,
+        13.028451598206637,
+        7.7141004707912515,
+        -3.23774160453576,
+        16.85387620404699
+      ]
+    }
+  },
+  "limitations": "Short calibration runs; use measured paired CIs and preserve all runs. Off mode still uses common begin/dump boundary control.",
+  "frozen_client_transport": "prewarmed raw HTTP1.1",
+  "server_cpus": "0-7",
+  "client_cpus": "8,9"
+}

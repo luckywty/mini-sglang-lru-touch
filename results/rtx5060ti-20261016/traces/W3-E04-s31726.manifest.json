@@ -1,0 +1,20 @@
+{
+  "workload": "W3",
+  "experiment": "E04",
+  "seed": 31726,
+  "rate": 52.6945,
+  "arrival": "burst",
+  "frozen_config_sha256": "a2e1754fafa44dc38a9f2efc1d9498be7ceb6daeaaf55f09635aa1e43046c13e",
+  "sha256": "04c711697f7b790612a559fbf9d68b8857b039eea6a8e919c12a80bcf6f96643",
+  "requests": 1000,
+  "classes": {
+    "cold": 200,
+    "hot": 800
+  },
+  "input_lengths": [
+    576
+  ],
+  "output_lengths": [
+    32
+  ]
+}

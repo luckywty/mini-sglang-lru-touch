@@ -1,0 +1,23 @@
+{
+  "workload": "W4-X",
+  "experiment": "E06",
+  "seed": 31724,
+  "rate": 9.847,
+  "arrival": "poisson",
+  "frozen_config_sha256": "a2e1754fafa44dc38a9f2efc1d9498be7ceb6daeaaf55f09635aa1e43046c13e",
+  "sha256": "fd2966d6f3531c5c57d9dc1e2f8f30a5edd07ce83bb8f5f5d4745f77eaeb3743",
+  "requests": 1000,
+  "classes": {
+    "long": 200,
+    "short_hot": 400,
+    "short": 400
+  },
+  "input_lengths": [
+    128,
+    2048
+  ],
+  "output_lengths": [
+    32,
+    256
+  ]
+}

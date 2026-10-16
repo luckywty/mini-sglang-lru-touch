@@ -1,0 +1,14 @@
+{
+  "role": "prime",
+  "sha256": "a1202e03531cdf6f2e2e096594e4d7279198b140e6bfa134fdd76d083d5f666d",
+  "requests": 4,
+  "classes": {
+    "prime": 4
+  },
+  "input_lengths": [
+    576
+  ],
+  "output_lengths": [
+    2
+  ]
+}

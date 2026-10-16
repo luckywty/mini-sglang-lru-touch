@@ -1,0 +1,18 @@
+{
+  "role": "correctness",
+  "cache": "mixed unique and repeated prompts",
+  "sha256": "bc07f325c3410083f8c88a4efd94115e3e7f2495856852db815714c9c6f8c4e5",
+  "requests": 48,
+  "classes": {
+    "correctness": 48
+  },
+  "input_lengths": [
+    128,
+    512,
+    2048
+  ],
+  "output_lengths": [
+    32,
+    128
+  ]
+}

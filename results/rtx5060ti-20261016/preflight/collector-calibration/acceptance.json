@@ -1,0 +1,215 @@
+{
+  "passed": false,
+  "observations": [
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-0-off",
+      "output_tok_s": 1563.2603021768807,
+      "itl_client_ack_ms_p99": 11.903742860000001,
+      "ttft_text_ms_p95": 365.4936722,
+      "loop_lag_p99_ms": 0.11315036999999999,
+      "block": 0,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-0-full",
+      "output_tok_s": 1565.6761658980138,
+      "itl_client_ack_ms_p99": 10.916764399999543,
+      "ttft_text_ms_p95": 370.15315044999994,
+      "loop_lag_p99_ms": 0.10603399999999981,
+      "block": 0,
+      "mode": "full",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-1-full",
+      "output_tok_s": 1561.1592243519917,
+      "itl_client_ack_ms_p99": 11.635102409999151,
+      "ttft_text_ms_p95": 384.0292346499999,
+      "loop_lag_p99_ms": 0.12304391999999997,
+      "block": 1,
+      "mode": "full",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-1-off",
+      "output_tok_s": 1583.3763390163058,
+      "itl_client_ack_ms_p99": 12.550965319999962,
+      "ttft_text_ms_p95": 363.15838924999997,
+      "loop_lag_p99_ms": 0.10701373000000007,
+      "block": 1,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-2-off",
+      "output_tok_s": 1501.6753755153627,
+      "itl_client_ack_ms_p99": 10.387497589999828,
+      "ttft_text_ms_p95": 390.83179534999994,
+      "loop_lag_p99_ms": 0.1569483000000011,
+      "block": 2,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-2-full",
+      "output_tok_s": 1501.800966336875,
+      "itl_client_ack_ms_p99": 11.87080536999877,
+      "ttft_text_ms_p95": 389.80055649999997,
+      "loop_lag_p99_ms": 0.1073497000000001,
+      "block": 2,
+      "mode": "full",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-3-full",
+      "output_tok_s": 1538.2151161957838,
+      "itl_client_ack_ms_p99": 10.951348309999998,
+      "ttft_text_ms_p95": 383.50456364999997,
+      "loop_lag_p99_ms": 0.15743083999999968,
+      "block": 3,
+      "mode": "full",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-3-off",
+      "output_tok_s": 1531.750266013729,
+      "itl_client_ack_ms_p99": 11.736528999998312,
+      "ttft_text_ms_p95": 390.9631326,
+      "loop_lag_p99_ms": 0.1699053300000006,
+      "block": 3,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-4-off",
+      "output_tok_s": 1503.0988095697426,
+      "itl_client_ack_ms_p99": 11.453109469999996,
+      "ttft_text_ms_p95": 393.0167459,
+      "loop_lag_p99_ms": 0.11196408000000024,
+      "block": 4,
+      "mode": "off",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-4-full",
+      "output_tok_s": 1588.514996757152,
+      "itl_client_ack_ms_p99": 9.773197899998989,
+      "ttft_text_ms_p95": 354.49081585,
+      "loop_lag_p99_ms": 0.15810634999999926,
+      "block": 4,
+      "mode": "full",
+      "affinity": "8,9"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-0-client-cpu8",
+      "output_tok_s": 1487.895910553804,
+      "itl_client_ack_ms_p99": 12.152437479999847,
+      "ttft_text_ms_p95": 387.4851564,
+      "loop_lag_p99_ms": 0.20855664999999987,
+      "block": 0,
+      "mode": "full",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-1-client-cpu8",
+      "output_tok_s": 1508.7438233489897,
+      "itl_client_ack_ms_p99": 11.41195210999967,
+      "ttft_text_ms_p95": 398.0716175999999,
+      "loop_lag_p99_ms": 0.16552156000000004,
+      "block": 1,
+      "mode": "full",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-2-client-cpu8",
+      "output_tok_s": 1530.0972892730863,
+      "itl_client_ack_ms_p99": 12.216052349999508,
+      "ttft_text_ms_p95": 385.32976635,
+      "loop_lag_p99_ms": 0.14437300000000003,
+      "block": 2,
+      "mode": "full",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-3-client-cpu8",
+      "output_tok_s": 1575.7864860909121,
+      "itl_client_ack_ms_p99": 9.36644758999903,
+      "ttft_text_ms_p95": 374.18949799999996,
+      "loop_lag_p99_ms": 0.07773068000000025,
+      "block": 3,
+      "mode": "full",
+      "affinity": "8"
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-4-client-cpu8",
+      "output_tok_s": 1498.5812058953898,
+      "itl_client_ack_ms_p99": 9.88924340999989,
+      "ttft_text_ms_p95": 399.59888095,
+      "loop_lag_p99_ms": 0.12238733999999976,
+      "block": 4,
+      "mode": "full",
+      "affinity": "8"
+    }
+  ],
+  "collector": {
+    "output_tok_s": {
+      "n": 5,
+      "median_improvement_pct": 0.15454007997062202,
+      "ci95_low_pct": -1.4031480777410565,
+      "ci95_high_pct": 5.682672798593957,
+      "paired_improvements_pct": [
+        0.15454007997062202,
+        -1.4031480777410565,
+        0.008363380232512263,
+        0.4220564099446156,
+        5.682672798593957
+      ]
+    },
+    "itl_client_ack_ms_p99": {
+      "n": 5,
+      "median_improvement_pct": 7.29715114853663,
+      "ci95_low_pct": -14.27974126729945,
+      "ci95_high_pct": 14.667733460518539,
+      "paired_improvements_pct": [
+        8.29132879975919,
+        7.29715114853663,
+        -14.27974126729945,
+        6.69005878994059,
+        14.667733460518539
+      ]
+    }
+  },
+  "client_affinity": {
+    "output_tok_s": {
+      "n": 5,
+      "median_improvement_pct": -3.357466694325084,
+      "ci95_low_pct": -5.661500901493288,
+      "ci95_high_pct": 2.442530274182153,
+      "paired_improvements_pct": [
+        -4.967837988361912,
+        -3.357466694325084,
+        1.8841593240701116,
+        2.442530274182153,
+        -5.661500901493288
+      ]
+    },
+    "itl_client_ack_ms_p99": {
+      "n": 5,
+      "median_improvement_pct": -1.1873852467564783,
+      "ci95_low_pct": -11.319041381898431,
+      "ci95_high_pct": 14.472197168213064,
+      "paired_improvements_pct": [
+        -11.319041381898431,
+        1.9179057659836962,
+        -2.9083703189447085,
+        14.472197168213064,
+        -1.1873852467564783
+      ]
+    }
+  },
+  "limitations": "Short calibration runs; use measured paired CIs and preserve all runs. Off mode still uses common begin/dump boundary control.",
+  "frozen_client_transport": "prewarmed raw HTTP1.1",
+  "server_cpus": "0-7",
+  "client_cpus": "8,9"
+}

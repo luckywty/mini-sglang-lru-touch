@@ -1,0 +1,19 @@
+{
+  "workload": "W1",
+  "experiment": "E01",
+  "seed": 31731,
+  "rate": 1.0,
+  "arrival": "closed",
+  "frozen_config_sha256": "a2e1754fafa44dc38a9f2efc1d9498be7ceb6daeaaf55f09635aa1e43046c13e",
+  "sha256": "0b6fefbec9aff774aec7bf206bac19ff84e32e6853d50a928671faa1eb61982c",
+  "requests": 1000,
+  "classes": {
+    "control": 1000
+  },
+  "input_lengths": [
+    512
+  ],
+  "output_lengths": [
+    128
+  ]
+}

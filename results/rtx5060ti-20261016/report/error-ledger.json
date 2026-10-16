@@ -1,0 +1,3630 @@
+[
+  {
+    "phase": "preflight",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/H-G0-C1/attempt-20261014-223330",
+    "variant": "H0000",
+    "experiment": null,
+    "seed": null,
+    "run_status": "interrupted",
+    "audit_status": null,
+    "failures": null,
+    "request_status_counts": null,
+    "issues": [],
+    "pollution": [],
+    "error": "KeyboardInterrupt()",
+    "started_wall": 1791988410.097159,
+    "finished_wall": 1791988490.0910995
+  },
+  {
+    "phase": "preflight",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/H-G0-C1/attempt-20261014-223517",
+    "variant": "H0000",
+    "experiment": null,
+    "seed": null,
+    "run_status": "complete",
+    "audit_status": "invalid",
+    "failures": 12,
+    "request_status_counts": null,
+    "issues": [
+      {
+        "request": "s31723-000000",
+        "uid": 33,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000001",
+        "uid": 34,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000002",
+        "uid": 35,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000003",
+        "uid": 36,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000004",
+        "uid": 37,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000005",
+        "uid": 38,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000006",
+        "uid": 39,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000007",
+        "uid": 40,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000008",
+        "uid": 41,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000009",
+        "uid": 42,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000010",
+        "uid": 43,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      },
+      {
+        "request": "s31723-000011",
+        "uid": 44,
+        "errors": [
+          "sse_ack_token_mismatch",
+          "ordinal_or_terminal_mismatch"
+        ]
+      }
+    ],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1791988517.9671311,
+    "finished_wall": 1791988619.1020825
+  },
+  {
+    "phase": "preflight",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/H-G0-C1",
+    "variant": "H0000",
+    "experiment": null,
+    "seed": null,
+    "run_status": "interrupted",
+    "audit_status": null,
+    "failures": null,
+    "request_status_counts": null,
+    "issues": [],
+    "pollution": [],
+    "error": "KeyboardInterrupt()",
+    "started_wall": 1791988344.1296594,
+    "finished_wall": 1791988374.3351808
+  },
+  {
+    "phase": "preflight",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/H0000-aborts",
+    "variant": "H0000",
+    "experiment": null,
+    "seed": null,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 48,
+    "request_status_counts": {
+      "timeout": 48,
+      "success": 8
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792041040.1844265,
+    "finished_wall": 1792041054.8053248,
+    "failure_intent": "Intentional short-deadline resource correctness check; not a performance failure rate."
+  },
+  {
+    "phase": "preflight",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/S1010-aborts",
+    "variant": "S1010",
+    "experiment": null,
+    "seed": null,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 48,
+    "request_status_counts": {
+      "timeout": 48,
+      "success": 8
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792041057.3407378,
+    "finished_wall": 1792041073.7347033,
+    "failure_intent": "Intentional short-deadline resource correctness check; not a performance failure rate."
+  },
+  {
+    "phase": "preflight",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/S1111-aborts",
+    "variant": "S1111",
+    "experiment": null,
+    "seed": null,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 48,
+    "request_status_counts": {
+      "timeout": 48,
+      "success": 8
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792041076.4695516,
+    "finished_wall": 1792041093.6150038,
+    "failure_intent": "Intentional short-deadline resource correctness check; not a performance failure rate."
+  },
+  {
+    "phase": "pilot",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/pilot/W4-open-0.8-H",
+    "variant": "H0000",
+    "experiment": null,
+    "seed": null,
+    "run_status": "complete",
+    "audit_status": "invalid",
+    "failures": 6,
+    "request_status_counts": null,
+    "issues": [
+      {
+        "request": "s31734-000043",
+        "uid": null,
+        "errors": [
+          "failure",
+          "input_ids_or_length_mismatch",
+          "generated_length_mismatch",
+          "no_generated_tokens"
+        ]
+      },
+      {
+        "request": "s31734-000044",
+        "uid": null,
+        "errors": [
+          "failure",
+          "input_ids_or_length_mismatch",
+          "generated_length_mismatch",
+          "no_generated_tokens"
+        ]
+      },
+      {
+        "request": "s31734-000056",
+        "uid": null,
+        "errors": [
+          "failure",
+          "input_ids_or_length_mismatch",
+          "generated_length_mismatch",
+          "no_generated_tokens"
+        ]
+      },
+      {
+        "request": "s31734-000091",
+        "uid": null,
+        "errors": [
+          "failure",
+          "input_ids_or_length_mismatch",
+          "generated_length_mismatch",
+          "no_generated_tokens"
+        ]
+      },
+      {
+        "request": "s31734-000096",
+        "uid": null,
+        "errors": [
+          "failure",
+          "input_ids_or_length_mismatch",
+          "generated_length_mismatch",
+          "no_generated_tokens"
+        ]
+      },
+      {
+        "request": "s31734-000097",
+        "uid": null,
+        "errors": [
+          "failure",
+          "input_ids_or_length_mismatch",
+          "generated_length_mismatch",
+          "no_generated_tokens"
+        ]
+      }
+    ],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1791989505.4835458,
+    "finished_wall": 1791989534.8743944
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/attempt-20261015-125725",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "interrupted",
+    "audit_status": null,
+    "failures": null,
+    "request_status_counts": null,
+    "issues": [],
+    "pollution": [],
+    "error": "KeyboardInterrupt()",
+    "started_wall": 1792040245.3015802,
+    "finished_wall": 1792040252.3867605
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/attempt-20261015-125741",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "interrupted",
+    "audit_status": null,
+    "failures": null,
+    "request_status_counts": null,
+    "issues": [],
+    "pollution": [],
+    "error": "KeyboardInterrupt()",
+    "started_wall": 1792040261.7981918,
+    "finished_wall": 1792040688.4749782,
+    "raw_client_status_counts": {
+      "success": 940,
+      "timeout": 60
+    },
+    "raw_client_ack_count": 200757,
+    "server_token_audit": "unavailable: no measurement snapshot, do not substitute ACK count as generated count"
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/attempt-20261015-132045",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "interrupted",
+    "audit_status": null,
+    "failures": null,
+    "request_status_counts": null,
+    "issues": [],
+    "pollution": [],
+    "error": "KeyboardInterrupt()",
+    "started_wall": 1792041645.115266,
+    "finished_wall": 1792041660.0214226
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/attempt-20261015-132129",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 43,
+    "request_status_counts": {
+      "success": 957,
+      "timeout": 43
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792041689.1513114,
+    "finished_wall": 1792042002.0233908
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/quality-retry-1/attempt-20261015-132935",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 52,
+    "request_status_counts": {
+      "success": 948,
+      "timeout": 52
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792042175.4511364,
+    "finished_wall": 1792042488.6174011
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "interrupted",
+    "audit_status": null,
+    "failures": null,
+    "request_status_counts": null,
+    "issues": [],
+    "pollution": [],
+    "error": "KeyboardInterrupt()",
+    "started_wall": 1792042007.4957898,
+    "finished_wall": 1792042034.2247086
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 36,
+    "request_status_counts": {
+      "success": 964,
+      "timeout": 36
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792042493.745613,
+    "finished_wall": 1792042867.0613985
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31723,
+    "run_status": "interrupted",
+    "audit_status": null,
+    "failures": null,
+    "request_status_counts": null,
+    "issues": [],
+    "pollution": [],
+    "error": "KeyboardInterrupt()",
+    "started_wall": 1792039611.2748556,
+    "finished_wall": 1792039794.9225729
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31724/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 13,
+    "request_status_counts": {
+      "success": 987,
+      "timeout": 13
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792043520.4484491,
+    "finished_wall": 1792043893.8016
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31724/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 24,
+    "request_status_counts": {
+      "success": 976,
+      "timeout": 24
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792043898.9477015,
+    "finished_wall": 1792044272.1465683
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31724/S1010",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 30,
+    "request_status_counts": {
+      "success": 970,
+      "timeout": 30
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792043141.9979682,
+    "finished_wall": 1792043515.211519
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31725/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 43,
+    "request_status_counts": {
+      "success": 957,
+      "timeout": 43
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792044930.6711798,
+    "finished_wall": 1792045303.8904173
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31725/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 22,
+    "request_status_counts": {
+      "success": 978,
+      "timeout": 22
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792045309.018633,
+    "finished_wall": 1792045682.1505249
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31725/S1010",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 39,
+    "request_status_counts": {
+      "success": 961,
+      "timeout": 39
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792044552.095579,
+    "finished_wall": 1792044925.2860174
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31726/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792046612.2778144,
+    "finished_wall": 1792046986.9739137
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31726/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792046992.6977022,
+    "finished_wall": 1792047367.5143502
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31726/S1010",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792046231.7244294,
+    "finished_wall": 1792046607.1846108
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31727/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 17,
+    "request_status_counts": {
+      "success": 983,
+      "timeout": 17
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792048564.955188,
+    "finished_wall": 1792048937.0293715
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31727/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 28,
+    "request_status_counts": {
+      "success": 972,
+      "timeout": 28
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792048942.3015277,
+    "finished_wall": 1792049314.517685
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31727/S1010",
+    "variant": "S1010",
+    "experiment": "E02",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 27,
+    "request_status_counts": {
+      "success": 973,
+      "timeout": 27
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792048187.5401475,
+    "finished_wall": 1792048559.7427664
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31723/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792088183.731181,
+    "finished_wall": 1792088558.4112566
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31723/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792088563.1834202,
+    "finished_wall": 1792088937.4033625
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31723/S1010",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792087805.2343922,
+    "finished_wall": 1792088178.5415907
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31724/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792089388.8980935,
+    "finished_wall": 1792089763.9984894
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31724/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792089769.4406323,
+    "finished_wall": 1792090144.2679403
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31724/S1010",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792089068.609142,
+    "finished_wall": 1792089383.9550145
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31725/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792091176.1019642,
+    "finished_wall": 1792091554.4595942
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31725/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792091559.6363368,
+    "finished_wall": 1792091933.6965888
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31725/S1010",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792090796.5838962,
+    "finished_wall": 1792091170.7586884
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31726/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792092394.5508208,
+    "finished_wall": 1792092770.025663
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31726/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792092775.057934,
+    "finished_wall": 1792093151.091173
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31726/S1010",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792092074.160177,
+    "finished_wall": 1792092389.7305677
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31727/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792094206.0638123,
+    "finished_wall": 1792094580.4898489
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31727/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792094585.8156555,
+    "finished_wall": 1792094963.4578447
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02-low/seed-31727/S1010",
+    "variant": "S1010",
+    "experiment": "E02-low",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792093823.6272395,
+    "finished_wall": 1792094200.6725934
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E03/seed-31724/S1000",
+    "variant": "S1000",
+    "experiment": "E03",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792050123.9833715,
+    "finished_wall": 1792050234.5967653
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E03/seed-31732/S1L00",
+    "variant": "S1L00",
+    "experiment": "E03",
+    "seed": 31732,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792054454.6968932,
+    "finished_wall": 1792054625.4792964
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31723/S1000",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792055130.4850478,
+    "finished_wall": 1792055299.872843
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31723/S1L00",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792055476.33393,
+    "finished_wall": 1792055646.1314638
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31724/S1100/quality-retry-1",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792056319.9740148,
+    "finished_wall": 1792056489.7833118
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31724/S1100",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792056148.1745982,
+    "finished_wall": 1792056317.5306222
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31725/S1100/quality-retry-1",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792057339.4475107,
+    "finished_wall": 1792057509.0643327
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31725/S1100/quality-retry-2",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792057512.3235667,
+    "finished_wall": 1792057681.9154685
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31725/S1100",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792057166.6588683,
+    "finished_wall": 1792057336.4109566
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31726/H0000",
+    "variant": "H0000",
+    "experiment": "E04",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792058533.305278,
+    "finished_wall": 1792058702.618245
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31726/S1L00",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792058076.4453058,
+    "finished_wall": 1792058185.4575086
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31727/S1000/quality-retry-1",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792059383.2844906,
+    "finished_wall": 1792059552.7985725
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31727/S1000",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792059210.5042012,
+    "finished_wall": 1792059380.3132546
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31728/S1000",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31728,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792060751.6075516,
+    "finished_wall": 1792060921.2249088
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31728/S1L00",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31728,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792060406.6828234,
+    "finished_wall": 1792060576.115766
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31729/H0000/quality-retry-1",
+    "variant": "H0000",
+    "experiment": "E04",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792061941.8942754,
+    "finished_wall": 1792062112.1565437
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31729/H0000",
+    "variant": "H0000",
+    "experiment": "E04",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792061770.0257425,
+    "finished_wall": 1792061939.4974496
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31729/S1000",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792062348.7816098,
+    "finished_wall": 1792062519.2302585
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31729/S1100",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792061545.3085938,
+    "finished_wall": 1792061654.6080518
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31729/S1L00/quality-retry-1",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792061260.50158,
+    "finished_wall": 1792061430.8658142
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31729/S1L00/quality-retry-2",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792061433.3183963,
+    "finished_wall": 1792061542.7066324
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31729/S1L00",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792061147.7605596,
+    "finished_wall": 1792061257.355198
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31730/H0000/quality-retry-1",
+    "variant": "H0000",
+    "experiment": "E04",
+    "seed": 31730,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792063443.5348833,
+    "finished_wall": 1792063615.1004593
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31730/H0000",
+    "variant": "H0000",
+    "experiment": "E04",
+    "seed": 31730,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792063269.7494369,
+    "finished_wall": 1792063440.9964132
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31730/S1000",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31730,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792062864.781441,
+    "finished_wall": 1792063094.2977672
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31730/S1100",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31730,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792063791.4173825,
+    "finished_wall": 1792063962.1053479
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31731/H0000",
+    "variant": "H0000",
+    "experiment": "E04",
+    "seed": 31731,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792064190.704825,
+    "finished_wall": 1792064300.2134552
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31731/S1000",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31731,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792064475.5462875,
+    "finished_wall": 1792064645.091004
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31731/S1100",
+    "variant": "S1100",
+    "experiment": "E04",
+    "seed": 31731,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792064931.4414594,
+    "finished_wall": 1792065100.8813064
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31732/S1000/quality-retry-1",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31732,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792066004.690352,
+    "finished_wall": 1792066113.9365644
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31732/S1000",
+    "variant": "S1000",
+    "experiment": "E04",
+    "seed": 31732,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792065891.969204,
+    "finished_wall": 1792066001.6155405
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31732/S1L00/quality-retry-1",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31732,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792065667.2573853,
+    "finished_wall": 1792065776.6296499
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31732/S1L00/quality-retry-2",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31732,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792065779.0297406,
+    "finished_wall": 1792065888.6061604
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E04/seed-31732/S1L00",
+    "variant": "S1L00",
+    "experiment": "E04",
+    "seed": 31732,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792065554.4813213,
+    "finished_wall": 1792065664.0794675
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E05/seed-31728/S1010",
+    "variant": "S1010",
+    "experiment": "E05",
+    "seed": 31728,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1008
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792074204.0684345,
+    "finished_wall": 1792074692.1430938
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E05/seed-31729/S1010",
+    "variant": "S1010",
+    "experiment": "E05",
+    "seed": 31729,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1008
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792075777.0304863,
+    "finished_wall": 1792076204.068116
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792096195.2093673,
+    "finished_wall": 1792096560.6914601
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792096565.6624024,
+    "finished_wall": 1792096930.0867174
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1010",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792095824.7311087,
+    "finished_wall": 1792096190.3429356
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1011",
+    "variant": "S1011",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 595,
+    "request_status_counts": {
+      "success": 405,
+      "timeout": 595
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792096936.496502,
+    "finished_wall": 1792097306.8457432
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1110/quality-retry-1",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792097686.274497,
+    "finished_wall": 1792098050.9974427
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1110/quality-retry-2",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792098055.6399438,
+    "finished_wall": 1792098422.4070249
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1110",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792097312.8711596,
+    "finished_wall": 1792097680.9896786
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31723/S1111",
+    "variant": "S1111",
+    "experiment": "E06",
+    "seed": 31723,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 595,
+    "request_status_counts": {
+      "success": 405,
+      "timeout": 595
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792098428.420073,
+    "finished_wall": 1792098798.7195187
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792101414.8831742,
+    "finished_wall": 1792101782.4053657
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792101787.388411,
+    "finished_wall": 1792102153.8051145
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1010",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792101044.5076869,
+    "finished_wall": 1792101409.8537197
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1011",
+    "variant": "S1011",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 575,
+    "request_status_counts": {
+      "success": 425,
+      "timeout": 575
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792100659.9748576,
+    "finished_wall": 1792101038.1671982
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1110/quality-retry-1",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792099918.7256777,
+    "finished_wall": 1792100284.7166188
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1110/quality-retry-2",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792100289.2091596,
+    "finished_wall": 1792100653.688118
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1110",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792099549.1734245,
+    "finished_wall": 1792099913.539816
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31724/S1111",
+    "variant": "S1111",
+    "experiment": "E06",
+    "seed": 31724,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 571,
+    "request_status_counts": {
+      "success": 429,
+      "timeout": 571
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792099164.5945737,
+    "finished_wall": 1792099542.8593955
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792103424.0067577,
+    "finished_wall": 1792103791.192466
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792103796.4481628,
+    "finished_wall": 1792104163.1442966
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1010",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792103052.532855,
+    "finished_wall": 1792103418.9748132
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1011",
+    "variant": "S1011",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 586,
+    "request_status_counts": {
+      "success": 414,
+      "timeout": 586
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792104169.1434526,
+    "finished_wall": 1792104541.6929548
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1110/quality-retry-1",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792104920.0503771,
+    "finished_wall": 1792105285.1230493
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1110/quality-retry-2",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792105290.5072658,
+    "finished_wall": 1792105655.9816911
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1110",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792104547.618444,
+    "finished_wall": 1792104914.8508532
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31725/S1111",
+    "variant": "S1111",
+    "experiment": "E06",
+    "seed": 31725,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 584,
+    "request_status_counts": {
+      "success": 416,
+      "timeout": 584
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792105662.286151,
+    "finished_wall": 1792106034.6715753
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792109724.41556,
+    "finished_wall": 1792110091.4596243
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792110096.7641351,
+    "finished_wall": 1792110462.2166352
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1010",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792109352.0442894,
+    "finished_wall": 1792109719.0796385
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1011",
+    "variant": "S1011",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 586,
+    "request_status_counts": {
+      "success": 414,
+      "timeout": 586
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792108965.5515113,
+    "finished_wall": 1792109345.2902634
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1110/quality-retry-1",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792108222.2993026,
+    "finished_wall": 1792108587.6796737
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1110/quality-retry-2",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792108592.7372148,
+    "finished_wall": 1792108958.860469
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1110",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792107851.8783605,
+    "finished_wall": 1792108216.7616558
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31726/S1111",
+    "variant": "S1111",
+    "experiment": "E06",
+    "seed": 31726,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 561,
+    "request_status_counts": {
+      "success": 439,
+      "timeout": 561
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792107466.2147255,
+    "finished_wall": 1792107845.4812124
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1010/quality-retry-1",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792113625.0040934,
+    "finished_wall": 1792113989.1640975
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1010/quality-retry-2",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792113994.3723428,
+    "finished_wall": 1792114361.2283335
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1010",
+    "variant": "S1010",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792113253.5774543,
+    "finished_wall": 1792113619.8477368
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1011",
+    "variant": "S1011",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 581,
+    "request_status_counts": {
+      "success": 419,
+      "timeout": 581
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792110665.8313508,
+    "finished_wall": 1792110978.991505
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1110/quality-retry-1",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792111356.815384,
+    "finished_wall": 1792111721.5116324
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1110/quality-retry-2",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792111726.298592,
+    "finished_wall": 1792112091.5693698
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1110",
+    "variant": "S1110",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 0,
+    "request_status_counts": {
+      "success": 1000
+    },
+    "issues": [],
+    "pollution": [
+      "client_lag_exceeds_frozen_limit"
+    ],
+    "error": null,
+    "started_wall": 1792110985.3518023,
+    "finished_wall": 1792111351.3724113
+  },
+  {
+    "phase": "measure",
+    "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E06/seed-31727/S1111",
+    "variant": "S1111",
+    "experiment": "E06",
+    "seed": 31727,
+    "run_status": "complete",
+    "audit_status": "valid",
+    "failures": 576,
+    "request_status_counts": {
+      "success": 424,
+      "timeout": 576
+    },
+    "issues": [],
+    "pollution": [],
+    "error": null,
+    "started_wall": 1792112097.9649324,
+    "finished_wall": 1792112470.6864393
+  },
+  {
+    "phase": "gate",
+    "file": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/acceptance.json",
+    "status": "failed",
+    "evidence": {
+      "passed": false,
+      "observations": [
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-0-off",
+          "output_tok_s": 1563.2603021768807,
+          "itl_client_ack_ms_p99": 11.903742860000001,
+          "ttft_text_ms_p95": 365.4936722,
+          "loop_lag_p99_ms": 0.11315036999999999,
+          "block": 0,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-0-full",
+          "output_tok_s": 1565.6761658980138,
+          "itl_client_ack_ms_p99": 10.916764399999543,
+          "ttft_text_ms_p95": 370.15315044999994,
+          "loop_lag_p99_ms": 0.10603399999999981,
+          "block": 0,
+          "mode": "full",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-1-full",
+          "output_tok_s": 1561.1592243519917,
+          "itl_client_ack_ms_p99": 11.635102409999151,
+          "ttft_text_ms_p95": 384.0292346499999,
+          "loop_lag_p99_ms": 0.12304391999999997,
+          "block": 1,
+          "mode": "full",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-1-off",
+          "output_tok_s": 1583.3763390163058,
+          "itl_client_ack_ms_p99": 12.550965319999962,
+          "ttft_text_ms_p95": 363.15838924999997,
+          "loop_lag_p99_ms": 0.10701373000000007,
+          "block": 1,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-2-off",
+          "output_tok_s": 1501.6753755153627,
+          "itl_client_ack_ms_p99": 10.387497589999828,
+          "ttft_text_ms_p95": 390.83179534999994,
+          "loop_lag_p99_ms": 0.1569483000000011,
+          "block": 2,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-2-full",
+          "output_tok_s": 1501.800966336875,
+          "itl_client_ack_ms_p99": 11.87080536999877,
+          "ttft_text_ms_p95": 389.80055649999997,
+          "loop_lag_p99_ms": 0.1073497000000001,
+          "block": 2,
+          "mode": "full",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-3-full",
+          "output_tok_s": 1538.2151161957838,
+          "itl_client_ack_ms_p99": 10.951348309999998,
+          "ttft_text_ms_p95": 383.50456364999997,
+          "loop_lag_p99_ms": 0.15743083999999968,
+          "block": 3,
+          "mode": "full",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-3-off",
+          "output_tok_s": 1531.750266013729,
+          "itl_client_ack_ms_p99": 11.736528999998312,
+          "ttft_text_ms_p95": 390.9631326,
+          "loop_lag_p99_ms": 0.1699053300000006,
+          "block": 3,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-4-off",
+          "output_tok_s": 1503.0988095697426,
+          "itl_client_ack_ms_p99": 11.453109469999996,
+          "ttft_text_ms_p95": 393.0167459,
+          "loop_lag_p99_ms": 0.11196408000000024,
+          "block": 4,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-4-full",
+          "output_tok_s": 1588.514996757152,
+          "itl_client_ack_ms_p99": 9.773197899998989,
+          "ttft_text_ms_p95": 354.49081585,
+          "loop_lag_p99_ms": 0.15810634999999926,
+          "block": 4,
+          "mode": "full",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-0-client-cpu8",
+          "output_tok_s": 1487.895910553804,
+          "itl_client_ack_ms_p99": 12.152437479999847,
+          "ttft_text_ms_p95": 387.4851564,
+          "loop_lag_p99_ms": 0.20855664999999987,
+          "block": 0,
+          "mode": "full",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-1-client-cpu8",
+          "output_tok_s": 1508.7438233489897,
+          "itl_client_ack_ms_p99": 11.41195210999967,
+          "ttft_text_ms_p95": 398.0716175999999,
+          "loop_lag_p99_ms": 0.16552156000000004,
+          "block": 1,
+          "mode": "full",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-2-client-cpu8",
+          "output_tok_s": 1530.0972892730863,
+          "itl_client_ack_ms_p99": 12.216052349999508,
+          "ttft_text_ms_p95": 385.32976635,
+          "loop_lag_p99_ms": 0.14437300000000003,
+          "block": 2,
+          "mode": "full",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-3-client-cpu8",
+          "output_tok_s": 1575.7864860909121,
+          "itl_client_ack_ms_p99": 9.36644758999903,
+          "ttft_text_ms_p95": 374.18949799999996,
+          "loop_lag_p99_ms": 0.07773068000000025,
+          "block": 3,
+          "mode": "full",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration/block-4-client-cpu8",
+          "output_tok_s": 1498.5812058953898,
+          "itl_client_ack_ms_p99": 9.88924340999989,
+          "ttft_text_ms_p95": 399.59888095,
+          "loop_lag_p99_ms": 0.12238733999999976,
+          "block": 4,
+          "mode": "full",
+          "affinity": "8"
+        }
+      ],
+      "collector": {
+        "output_tok_s": {
+          "n": 5,
+          "median_improvement_pct": 0.15454007997062202,
+          "ci95_low_pct": -1.4031480777410565,
+          "ci95_high_pct": 5.682672798593957,
+          "paired_improvements_pct": [
+            0.15454007997062202,
+            -1.4031480777410565,
+            0.008363380232512263,
+            0.4220564099446156,
+            5.682672798593957
+          ]
+        },
+        "itl_client_ack_ms_p99": {
+          "n": 5,
+          "median_improvement_pct": 7.29715114853663,
+          "ci95_low_pct": -14.27974126729945,
+          "ci95_high_pct": 14.667733460518539,
+          "paired_improvements_pct": [
+            8.29132879975919,
+            7.29715114853663,
+            -14.27974126729945,
+            6.69005878994059,
+            14.667733460518539
+          ]
+        }
+      },
+      "client_affinity": {
+        "output_tok_s": {
+          "n": 5,
+          "median_improvement_pct": -3.357466694325084,
+          "ci95_low_pct": -5.661500901493288,
+          "ci95_high_pct": 2.442530274182153,
+          "paired_improvements_pct": [
+            -4.967837988361912,
+            -3.357466694325084,
+            1.8841593240701116,
+            2.442530274182153,
+            -5.661500901493288
+          ]
+        },
+        "itl_client_ack_ms_p99": {
+          "n": 5,
+          "median_improvement_pct": -1.1873852467564783,
+          "ci95_low_pct": -11.319041381898431,
+          "ci95_high_pct": 14.472197168213064,
+          "paired_improvements_pct": [
+            -11.319041381898431,
+            1.9179057659836962,
+            -2.9083703189447085,
+            14.472197168213064,
+            -1.1873852467564783
+          ]
+        }
+      },
+      "limitations": "Short calibration runs; use measured paired CIs and preserve all runs. Off mode still uses common begin/dump boundary control.",
+      "frozen_client_transport": "prewarmed raw HTTP1.1",
+      "server_cpus": "0-7",
+      "client_cpus": "8,9"
+    }
+  },
+  {
+    "phase": "gate",
+    "file": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/acceptance.json",
+    "status": "failed",
+    "evidence": {
+      "passed": false,
+      "observations": [
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-0-off-cpu8_9",
+          "output_tok_s": 1559.3269106905727,
+          "itl_client_ack_ms_p99": 12.477340439999999,
+          "ttft_text_ms_p95": 380.11489575,
+          "loop_lag_p99_ms": 0.1269603700000011,
+          "block": 0,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-0-light-cpu8_9",
+          "output_tok_s": 1543.2894209111862,
+          "itl_client_ack_ms_p99": 13.241744509999986,
+          "ttft_text_ms_p95": 382.90748405,
+          "loop_lag_p99_ms": 0.19152801000000105,
+          "block": 0,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-0-light-cpu8",
+          "output_tok_s": 1511.6081308661055,
+          "itl_client_ack_ms_p99": 11.43145644999999,
+          "ttft_text_ms_p95": 384.69396294999996,
+          "loop_lag_p99_ms": 0.15554639999999917,
+          "block": 0,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-1-off-cpu8_9",
+          "output_tok_s": 1508.6394113981275,
+          "itl_client_ack_ms_p99": 11.386741099999997,
+          "ttft_text_ms_p95": 395.88539525,
+          "loop_lag_p99_ms": 0.13286441000000046,
+          "block": 1,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-1-light-cpu8",
+          "output_tok_s": 1507.0678717798799,
+          "itl_client_ack_ms_p99": 10.711698550000001,
+          "ttft_text_ms_p95": 394.7662233,
+          "loop_lag_p99_ms": 0.12565715000000044,
+          "block": 1,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-1-light-cpu8_9",
+          "output_tok_s": 1508.5935894713614,
+          "itl_client_ack_ms_p99": 12.316324989999977,
+          "ttft_text_ms_p95": 385.32468029999995,
+          "loop_lag_p99_ms": 0.1561208000000002,
+          "block": 1,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-2-light-cpu8",
+          "output_tok_s": 1508.7465137453346,
+          "itl_client_ack_ms_p99": 10.30881263999998,
+          "ttft_text_ms_p95": 389.58737959999996,
+          "loop_lag_p99_ms": 0.1377322000000005,
+          "block": 2,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-2-off-cpu8_9",
+          "output_tok_s": 1520.8835099647201,
+          "itl_client_ack_ms_p99": 11.371054509999894,
+          "ttft_text_ms_p95": 385.26375105,
+          "loop_lag_p99_ms": 0.17401049999999932,
+          "block": 2,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-2-light-cpu8_9",
+          "output_tok_s": 1523.5728950987154,
+          "itl_client_ack_ms_p99": 11.170517589999989,
+          "ttft_text_ms_p95": 381.8884378,
+          "loop_lag_p99_ms": 0.13506015999999982,
+          "block": 2,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-3-light-cpu8",
+          "output_tok_s": 1506.9500487962594,
+          "itl_client_ack_ms_p99": 11.485843689999983,
+          "ttft_text_ms_p95": 386.68463199999997,
+          "loop_lag_p99_ms": 0.18987604000000113,
+          "block": 3,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-3-light-cpu8_9",
+          "output_tok_s": 1513.8118361105096,
+          "itl_client_ack_ms_p99": 11.125624709999808,
+          "ttft_text_ms_p95": 383.7994639,
+          "loop_lag_p99_ms": 0.143321,
+          "block": 3,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-3-off-cpu8_9",
+          "output_tok_s": 1513.6625679321887,
+          "itl_client_ack_ms_p99": 11.276778009999996,
+          "ttft_text_ms_p95": 381.8891104,
+          "loop_lag_p99_ms": 0.163954,
+          "block": 3,
+          "mode": "off",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-4-light-cpu8_9",
+          "output_tok_s": 1545.2483653814895,
+          "itl_client_ack_ms_p99": 12.84078454,
+          "ttft_text_ms_p95": 378.7152386,
+          "loop_lag_p99_ms": 0.16344404000000037,
+          "block": 4,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-4-light-cpu8",
+          "output_tok_s": 1596.896296529835,
+          "itl_client_ack_ms_p99": 10.676614609999994,
+          "ttft_text_ms_p95": 368.6755799,
+          "loop_lag_p99_ms": 0.11109107999999973,
+          "block": 4,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/collector-calibration-light/block-4-off-cpu8_9",
+          "output_tok_s": 1604.5075394266369,
+          "itl_client_ack_ms_p99": 9.23276656999994,
+          "ttft_text_ms_p95": 362.28808115,
+          "loop_lag_p99_ms": 0.13390684000000003,
+          "block": 4,
+          "mode": "off",
+          "affinity": "8,9"
+        }
+      ],
+      "collector": {
+        "output_tok_s": {
+          "n": 5,
+          "median_improvement_pct": -0.003037301453212571,
+          "ci95_low_pct": -3.693293586287749,
+          "ci95_high_pct": 0.17683044864216235,
+          "paired_improvements_pct": [
+            -1.0284879757692433,
+            -0.003037301453212571,
+            0.17683044864216235,
+            0.009861390608656428,
+            -3.693293586287749
+          ]
+        },
+        "itl_client_ack_ms_p99": {
+          "n": 5,
+          "median_improvement_pct": -6.126338170187706,
+          "ci95_low_pct": -39.07840561813405,
+          "ci95_high_pct": 1.7635736406289348,
+          "paired_improvements_pct": [
+            -6.126338170187706,
+            -8.16373957953589,
+            1.7635736406289348,
+            1.340394391608557,
+            -39.07840561813405
+          ]
+        }
+      },
+      "client_affinity": {
+        "output_tok_s": {
+          "n": 5,
+          "median_improvement_pct": -0.4532787464445076,
+          "ci95_low_pct": -2.0528417817038846,
+          "ci95_high_pct": 3.342370864478772,
+          "paired_improvements_pct": [
+            -2.0528417817038846,
+            -0.10113510372373735,
+            -0.9731323917009038,
+            -0.4532787464445076,
+            3.342370864478772
+          ]
+        },
+        "itl_client_ack_ms_p99": {
+          "n": 5,
+          "median_improvement_pct": 13.028451598206637,
+          "ci95_low_pct": -3.23774160453576,
+          "ci95_high_pct": 16.85387620404699,
+          "paired_improvements_pct": [
+            13.671069235876665,
+            13.028451598206637,
+            7.7141004707912515,
+            -3.23774160453576,
+            16.85387620404699
+          ]
+        }
+      },
+      "limitations": "Short calibration runs; use measured paired CIs and preserve all runs. Off mode still uses common begin/dump boundary control.",
+      "frozen_client_transport": "prewarmed raw HTTP1.1",
+      "server_cpus": "0-7",
+      "client_cpus": "8,9"
+    }
+  },
+  {
+    "phase": "gate",
+    "file": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/acceptance.json",
+    "status": "failed",
+    "evidence": {
+      "passed": false,
+      "protocol": "fixed-arrival server-tail + closed-loop capacity",
+      "observer_server_itl_p99": {
+        "n": 5,
+        "median_improvement_pct": 6.680051914944485,
+        "ci95_low_pct": -12.027549838274254,
+        "ci95_high_pct": 21.136468390257512,
+        "paired_improvements_pct": [
+          -7.801183504131082,
+          6.680051914944485,
+          21.136468390257512,
+          7.270661326567218,
+          -12.027549838274254
+        ]
+      },
+      "affinity_server_itl_p99": {
+        "n": 5,
+        "median_improvement_pct": 1.560755553445814,
+        "ci95_low_pct": -24.213943959246585,
+        "ci95_high_pct": 12.043713407570934,
+        "paired_improvements_pct": [
+          5.024005949476507,
+          -1.1251171256418946,
+          1.560755553445814,
+          -24.213943959246585,
+          12.043713407570934
+        ]
+      },
+      "saturated_capacity_light_vs_off": {
+        "n": 5,
+        "median_improvement_pct": -0.003037301453212571,
+        "ci95_low_pct": -3.693293586287749,
+        "ci95_high_pct": 0.17683044864216235,
+        "paired_improvements_pct": [
+          -1.0284879757692433,
+          -0.003037301453212571,
+          0.17683044864216235,
+          0.009861390608656428,
+          -3.693293586287749
+        ]
+      },
+      "saturated_capacity_affinity": {
+        "n": 5,
+        "median_improvement_pct": -0.4532787464445076,
+        "ci95_low_pct": -2.0528417817038846,
+        "ci95_high_pct": 3.342370864478772,
+        "paired_improvements_pct": [
+          -2.0528417817038846,
+          -0.10113510372373735,
+          -0.9731323917009038,
+          -0.4532787464445076,
+          3.342370864478772
+        ]
+      },
+      "observations": [
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-0-token-cpu8_9",
+          "output_tok_s": 963.1392521327283,
+          "itl_server_ms_p99": 31.742517,
+          "itl_client_ack_ms_p99": 31.917936929999982,
+          "tpot_server_ms_p95": 9.671048922834645,
+          "loop_lag_p99_ms": 0.12201763000000021,
+          "send_lag_ms_p99": 0.39776342999999986,
+          "client_cpu_fraction": 0.12292024645534791,
+          "client_timing_clean": true,
+          "block": 0,
+          "mode": "token",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-0-light-cpu8_9",
+          "output_tok_s": 963.2049875490769,
+          "itl_server_ms_p99": 34.218809,
+          "itl_client_ack_ms_p99": 34.20205228,
+          "tpot_server_ms_p95": 9.779727116535433,
+          "loop_lag_p99_ms": 0.11224415999999833,
+          "send_lag_ms_p99": 0.3411373399999997,
+          "client_cpu_fraction": 0.12298952068002672,
+          "client_timing_clean": true,
+          "block": 0,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-0-light-cpu8",
+          "output_tok_s": 963.2802246883132,
+          "itl_server_ms_p99": 32.499654,
+          "itl_client_ack_ms_p99": 32.209286219999996,
+          "tpot_server_ms_p95": 9.460978582677166,
+          "loop_lag_p99_ms": 0.2112875399999998,
+          "send_lag_ms_p99": 0.47416896,
+          "client_cpu_fraction": 0.12394957781040204,
+          "client_timing_clean": true,
+          "block": 0,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-1-light-cpu8_9",
+          "output_tok_s": 963.3273006048875,
+          "itl_server_ms_p99": 31.36589,
+          "itl_client_ack_ms_p99": 31.21721972,
+          "tpot_server_ms_p95": 9.563438172440945,
+          "loop_lag_p99_ms": 0.09376481999999989,
+          "send_lag_ms_p99": 0.2996355199999992,
+          "client_cpu_fraction": 0.11582274666562008,
+          "client_timing_clean": true,
+          "block": 1,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-1-light-cpu8",
+          "output_tok_s": 962.9462144299297,
+          "itl_server_ms_p99": 31.718793,
+          "itl_client_ack_ms_p99": 31.71976811,
+          "tpot_server_ms_p95": 9.666158073622048,
+          "loop_lag_p99_ms": 0.09992508999999937,
+          "send_lag_ms_p99": 0.38187849999999973,
+          "client_cpu_fraction": 0.11932209833429089,
+          "client_timing_clean": true,
+          "block": 1,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-1-token-cpu8_9",
+          "output_tok_s": 963.1499159739751,
+          "itl_server_ms_p99": 33.611131,
+          "itl_client_ack_ms_p99": 33.44146935999996,
+          "tpot_server_ms_p95": 9.724134290944882,
+          "loop_lag_p99_ms": 0.116126,
+          "send_lag_ms_p99": 0.15071825999999972,
+          "client_cpu_fraction": 0.11917607982673235,
+          "client_timing_clean": true,
+          "block": 1,
+          "mode": "token",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-2-light-cpu8",
+          "output_tok_s": 963.1132787079603,
+          "itl_server_ms_p99": 30.027852,
+          "itl_client_ack_ms_p99": 29.97755421,
+          "tpot_server_ms_p95": 9.580177283464566,
+          "loop_lag_p99_ms": 0.096846,
+          "send_lag_ms_p99": 0.1622672599999998,
+          "client_cpu_fraction": 0.11760424493086294,
+          "client_timing_clean": true,
+          "block": 2,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-2-token-cpu8_9",
+          "output_tok_s": 962.8584213827721,
+          "itl_server_ms_p99": 38.679404,
+          "itl_client_ack_ms_p99": 39.35807276,
+          "tpot_server_ms_p95": 10.037000486614174,
+          "loop_lag_p99_ms": 0.07486145000000048,
+          "send_lag_ms_p99": 0.1894336699999992,
+          "client_cpu_fraction": 0.11749475231361532,
+          "client_timing_clean": true,
+          "block": 2,
+          "mode": "token",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-2-light-cpu8_9",
+          "output_tok_s": 962.9902277609309,
+          "itl_server_ms_p99": 30.503944,
+          "itl_client_ack_ms_p99": 31.18586758,
+          "tpot_server_ms_p95": 9.525196058661418,
+          "loop_lag_p99_ms": 0.08706923999999998,
+          "send_lag_ms_p99": 0.1759467099999998,
+          "client_cpu_fraction": 0.11508193169424405,
+          "client_timing_clean": true,
+          "block": 2,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-3-token-cpu8_9",
+          "output_tok_s": 962.6663380342911,
+          "itl_server_ms_p99": 32.671801,
+          "itl_client_ack_ms_p99": 32.68588638,
+          "tpot_server_ms_p95": 9.664823590944883,
+          "loop_lag_p99_ms": 0.09109684,
+          "send_lag_ms_p99": 0.31075403999999995,
+          "client_cpu_fraction": 0.11477162037588123,
+          "client_timing_clean": true,
+          "block": 3,
+          "mode": "token",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-3-light-cpu8_9",
+          "output_tok_s": 963.0986151671246,
+          "itl_server_ms_p99": 30.296345,
+          "itl_client_ack_ms_p99": 30.479783759999997,
+          "tpot_server_ms_p95": 9.422824410629921,
+          "loop_lag_p99_ms": 0.08165627999999998,
+          "send_lag_ms_p99": 0.24180080999999992,
+          "client_cpu_fraction": 0.11821274805736771,
+          "client_timing_clean": true,
+          "block": 3,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-3-light-cpu8",
+          "output_tok_s": 960.6510093463139,
+          "itl_server_ms_p99": 37.632285,
+          "itl_client_ack_ms_p99": 38.38605577999999,
+          "tpot_server_ms_p95": 10.771900974803145,
+          "loop_lag_p99_ms": 0.4066130699999956,
+          "send_lag_ms_p99": 13.350717799999948,
+          "client_cpu_fraction": 0.11899331503148085,
+          "client_timing_clean": false,
+          "block": 3,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-4-light-cpu8_9",
+          "output_tok_s": 962.7757459350512,
+          "itl_server_ms_p99": 37.937834,
+          "itl_client_ack_ms_p99": 37.11179302,
+          "tpot_server_ms_p95": 9.94752792519685,
+          "loop_lag_p99_ms": 0.24013823999999998,
+          "send_lag_ms_p99": 0.3304459599999999,
+          "client_cpu_fraction": 0.12357047978988663,
+          "client_timing_clean": true,
+          "block": 4,
+          "mode": "light",
+          "affinity": "8,9"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-4-light-cpu8",
+          "output_tok_s": 962.4268452555182,
+          "itl_server_ms_p99": 33.36871,
+          "itl_client_ack_ms_p99": 33.53968200999999,
+          "tpot_server_ms_p95": 9.781617308661417,
+          "loop_lag_p99_ms": 0.12725247999999936,
+          "send_lag_ms_p99": 0.12128394999999992,
+          "client_cpu_fraction": 0.12073895336098205,
+          "client_timing_clean": true,
+          "block": 4,
+          "mode": "light",
+          "affinity": "8"
+        },
+        {
+          "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/fixed-arrival-calibration/block-4-token-cpu8_9",
+          "output_tok_s": 962.6193499672275,
+          "itl_server_ms_p99": 33.864736,
+          "itl_client_ack_ms_p99": 33.85519562999996,
+          "tpot_server_ms_p95": 10.02791085984252,
+          "loop_lag_p99_ms": 0.190354,
+          "send_lag_ms_p99": 0.11104976999999978,
+          "client_cpu_fraction": 0.1272745258916487,
+          "client_timing_clean": true,
+          "block": 4,
+          "mode": "token",
+          "affinity": "8,9"
+        }
+      ],
+      "limitations": "Token observer itself is required to define host emit time. Fully-off client ACK P99 is not substituted for server ITL. Closed-loop tail checks are retained as confounded diagnostics, not accepted evidence.",
+      "threshold": {
+        "capacity_bias_pct": 1,
+        "server_tail_increment_pct": 2,
+        "affinity_main_metric_pct": 3
+      }
+    }
+  },
+  {
+    "phase": "environment_or_numerics",
+    "file": "/home/wangwei/ai-infra/Promotion/benchmark-results/environment/compiler-failures.json",
+    "evidence": [
+      {
+        "run": "preflight/H-G0-C1",
+        "phase": "warmup_first_forward",
+        "cause": "CUDA12.9 rejects default GCC15",
+        "action": "pin GCC14"
+      },
+      {
+        "run": "preflight/H-G0-C1/attempt-20261014-223330",
+        "phase": "warmup_first_forward",
+        "cause": "CUDA12.9 math_functions.h rsqrt/rsqrtf exception specification conflicts with Ubuntu26.04 glibc2.43",
+        "action": "Toolkit13.2 + GCC14 passed standalone sm120 compilation; run next functional smoke"
+      }
+    ]
+  },
+  {
+    "phase": "environment_or_numerics",
+    "file": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/numerics/decision.json",
+    "evidence": {
+      "strict_HF_threshold_passed": false,
+      "strict_result_file": "comparison.json",
+      "optimizer_fixed_input_equal_to_upstream": true,
+      "bitwise_equal_logit_values": 2430976,
+      "fixed_input_contexts": 16,
+      "identical_math_source_files": 51,
+      "upstream_changes_argmax_when_only_chunk_size_changes": 7,
+      "upstream_chunk_max_logit_difference": 0.4375,
+      "conclusion": "BF16 chunk-shape sensitivity is reproduced in unoptimized upstream itself; H/S logits are bitwise equal at matched chunk size. The strict HF absolute tolerance was NOT met and is not relaxed.",
+      "scope": "Optimizer semantic equivalence to upstream at fixed shape is supported. Bitwise text invariance across batch/chunk shapes and HF parity at the initially chosen tolerance are NOT claimed.",
+      "proceed": "Fixed-length timing experiments may proceed with this explicit numerical limitation; all length, EOS, ACK, terminal and resource gates remain strict."
+    }
+  },
+  {
+    "phase": "environment_or_numerics",
+    "file": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-gpu-incident.json",
+    "evidence": {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/measure/E02/seed-31723/S1010/attempt-20261015-125741",
+      "client_success": 940,
+      "client_timeout": 60,
+      "worker_error": "RuntimeError: CacheManager integrity check failed: free_pages(2878) + cache_pages(15554) != num_pages(16384)",
+      "worker_snapshot_available": false,
+      "root_cause": "Abort frees final prefill before its delayed host result; stale result recaches and returns the same pages again. Exact CPU reproduction in H/S.",
+      "remedy": "Shared Abort adds released Req to existing finished_reqs guard; no normal hot-path additions.",
+      "previous_formal_data": "Preserved and superseded for uniform correctness-version pairing."
+    }
+  },
+  {
+    "phase": "environment_or_numerics",
+    "file": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/natural-hf-reference.json",
+    "evidence": {
+      "model": "/home/wangwei/ai-infra/models/Qwen3-0.6B",
+      "dtype": "bfloat16",
+      "backend": "HF SDPA",
+      "role": "semantic diagnostic, not performance measurement",
+      "rows": [
+        {
+          "request_id": "natural-0",
+          "input_ids": [
+            151644,
+            872,
+            198,
+            3838,
+            374,
+            220,
+            17,
+            488,
+            220,
+            17,
+            30,
+            21806,
+            448,
+            1172,
+            279,
+            1372,
+            13,
+            151645,
+            198,
+            151644,
+            77091,
+            198,
+            151667,
+            271,
+            151668,
+            271
+          ],
+          "generated_ids": [
+            17,
+            151645
+          ],
+          "output_text": "2",
+          "first_token_top10": [
+            {
+              "id": 17,
+              "text": "2",
+              "logit": 33.0
+            },
+            {
+              "id": 785,
+              "text": "The",
+              "logit": 26.375
+            },
+            {
+              "id": 16141,
+              "text": "Answer",
+              "logit": 22.5
+            },
+            {
+              "id": 16,
+              "text": "1",
+              "logit": 20.75
+            },
+            {
+              "id": 3,
+              "text": "$",
+              "logit": 20.375
+            },
+            {
+              "id": 10061,
+              "text": "Let",
+              "logit": 19.5
+            },
+            {
+              "id": 15,
+              "text": "0",
+              "logit": 19.375
+            },
+            {
+              "id": 18,
+              "text": "3",
+              "logit": 19.125
+            },
+            {
+              "id": 23,
+              "text": "8",
+              "logit": 18.875
+            },
+            {
+              "id": 2132,
+              "text": "It",
+              "logit": 18.375
+            }
+          ]
+        },
+        {
+          "request_id": "natural-1",
+          "input_ids": [
+            151644,
+            872,
+            198,
+            3838,
+            374,
+            279,
+            6722,
+            315,
+            9625,
+            30,
+            21806,
+            448,
+            825,
+            3409,
+            13,
+            151645,
+            198,
+            151644,
+            77091,
+            198,
+            151667,
+            271,
+            151668,
+            271
+          ],
+          "generated_ids": [
+            59604,
+            151645
+          ],
+          "output_text": "Paris",
+          "first_token_top10": [
+            {
+              "id": 59604,
+              "text": "Paris",
+              "logit": 23.375
+            },
+            {
+              "id": 43,
+              "text": "L",
+              "logit": 20.5
+            },
+            {
+              "id": 49000,
+              "text": "France",
+              "logit": 20.0
+            },
+            {
+              "id": 65063,
+              "text": "capital",
+              "logit": 20.0
+            },
+            {
+              "id": 2304,
+              "text": "Le",
+              "logit": 19.875
+            },
+            {
+              "id": 33,
+              "text": "B",
+              "logit": 19.625
+            },
+            {
+              "id": 44,
+              "text": "M",
+              "logit": 19.5
+            },
+            {
+              "id": 51,
+              "text": "T",
+              "logit": 19.375
+            },
+            {
+              "id": 31400,
+              "text": "CAP",
+              "logit": 19.0
+            },
+            {
+              "id": 49,
+              "text": "R",
+              "logit": 18.875
+            }
+          ]
+        },
+        {
+          "request_id": "natural-2",
+          "input_ids": [
+            151644,
+            872,
+            198,
+            27473,
+            279,
+            6364,
+            3409,
+            8251,
+            1119,
+            15154,
+            13,
+            21806,
+            448,
+            825,
+            3409,
+            13,
+            151645,
+            198,
+            151644,
+            77091,
+            198,
+            151667,
+            271,
+            151668,
+            271
+          ],
+          "generated_ids": [
+            70,
+            4330,
+            151645
+          ],
+          "output_text": "gato",
+          "first_token_top10": [
+            {
+              "id": 70,
+              "text": "g",
+              "logit": 21.375
+            },
+            {
+              "id": 66,
+              "text": "c",
+              "logit": 20.0
+            },
+            {
+              "id": 712,
+              "text": "per",
+              "logit": 19.75
+            },
+            {
+              "id": 20199,
+              "text": "cu",
+              "logit": 18.25
+            },
+            {
+              "id": 4616,
+              "text": "cat",
+              "logit": 18.0
+            },
+            {
+              "id": 301,
+              "text": "el",
+              "logit": 17.375
+            },
+            {
+              "id": 4814,
+              "text": "can",
+              "logit": 17.0
+            },
+            {
+              "id": 273,
+              "text": "le",
+              "logit": 17.0
+            },
+            {
+              "id": 79,
+              "text": "p",
+              "logit": 16.5
+            },
+            {
+              "id": 75,
+              "text": "l",
+              "logit": 16.375
+            }
+          ]
+        },
+        {
+          "request_id": "natural-3",
+          "input_ids": [
+            151644,
+            872,
+            198,
+            23526,
+            25,
+            7014,
+            11,
+            7589,
+            11,
+            7920,
+            11,
+            151645,
+            198,
+            151644,
+            77091,
+            198,
+            151667,
+            271,
+            151668,
+            271
+          ],
+          "generated_ids": [
+            35239,
+            11,
+            7589,
+            11,
+            7920,
+            11,
+            7794,
+            11,
+            6602,
+            11,
+            7728,
+            11,
+            7270,
+            13,
+            151645
+          ],
+          "output_text": "Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday.",
+          "first_token_top10": [
+            {
+              "id": 35239,
+              "text": "Monday",
+              "logit": 25.75
+            },
+            {
+              "id": 11095,
+              "text": "Mon",
+              "logit": 20.875
+            },
+            {
+              "id": 7014,
+              "text": " Monday",
+              "logit": 18.875
+            },
+            {
+              "id": 37788,
+              "text": "Thursday",
+              "logit": 18.75
+            },
+            {
+              "id": 40519,
+              "text": "Wednesday",
+              "logit": 18.625
+            },
+            {
+              "id": 34620,
+              "text": "Friday",
+              "logit": 18.375
+            },
+            {
+              "id": 40199,
+              "text": "Tuesday",
+              "logit": 18.375
+            },
+            {
+              "id": 1645,
+              "text": "mon",
+              "logit": 18.0
+            },
+            {
+              "id": 12,
+              "text": "-",
+              "logit": 17.75
+            },
+            {
+              "id": 9454,
+              "text": "Yes",
+              "logit": 17.125
+            }
+          ]
+        }
+      ],
+      "peak_reserved_mib": 1166.0
+    }
+  }
+]

@@ -1,0 +1,12 @@
+--- a/python/minisgl/scheduler/scheduler.py
++++ b/python/minisgl/scheduler/scheduler.py
+@@ -88,6 +88,9 @@
+         # Initialize the I/O mixin
+         super().__init__(config, self.engine.tp_cpu_group)
+ 
++        from minisgl.benchmark.collector import install
++        install(self, config)
++
+     def run_when_idle(self) -> None:
+         """Called when the scheduler is idle to perform background tasks."""
+ 

@@ -1,0 +1,10 @@
+{
+  "watcher_pid": 69939,
+  "driver_pid": 68981,
+  "driver_start_ticks": "1845475",
+  "driver_command": "python -u benchmarks/serving/suite.py --phase measure ",
+  "status": "controller exited before completion; inspect receipts before resuming",
+  "started_wall": 1792040511.3852808,
+  "heartbeat_wall": 1792040701.4058366,
+  "finished_wall": 1792040706.406323
+}

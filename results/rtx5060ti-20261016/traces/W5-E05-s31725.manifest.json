@@ -1,0 +1,22 @@
+{
+  "workload": "W5",
+  "experiment": "E05",
+  "seed": 31725,
+  "rate": 1.0,
+  "arrival": "poisson",
+  "frozen_config_sha256": "a2e1754fafa44dc38a9f2efc1d9498be7ceb6daeaaf55f09635aa1e43046c13e",
+  "sha256": "60d9eef192a1ce781169b0cda5e128ac8957c15034a0ffc50d5e0e949e48c118",
+  "requests": 1008,
+  "classes": {
+    "long": 336,
+    "background": 672
+  },
+  "input_lengths": [
+    128,
+    2048
+  ],
+  "output_lengths": [
+    32,
+    256
+  ]
+}

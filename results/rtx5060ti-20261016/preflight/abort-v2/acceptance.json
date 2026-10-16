@@ -1,0 +1,81 @@
+{
+  "passed": true,
+  "role": "common Abort repair, fixed-length and intentional-timeout resource acceptance",
+  "runs": [
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/H0000-fixed",
+      "variant": "H0000",
+      "status": "valid",
+      "success": 48,
+      "failed": 0,
+      "request_status_counts": {
+        "success": 48
+      },
+      "issues": [],
+      "sampled_min_free_mib": 3183.0
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/S1000-fixed",
+      "variant": "S1000",
+      "status": "valid",
+      "success": 48,
+      "failed": 0,
+      "request_status_counts": {
+        "success": 48
+      },
+      "issues": [],
+      "sampled_min_free_mib": 3248.0
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/S1111-fixed",
+      "variant": "S1111",
+      "status": "valid",
+      "success": 48,
+      "failed": 0,
+      "request_status_counts": {
+        "success": 48
+      },
+      "issues": [],
+      "sampled_min_free_mib": 3082.0
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/H0000-aborts",
+      "variant": "H0000",
+      "status": "valid",
+      "success": 8,
+      "failed": 48,
+      "request_status_counts": {
+        "timeout": 48,
+        "success": 8
+      },
+      "issues": [],
+      "sampled_min_free_mib": 3465.0
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/S1010-aborts",
+      "variant": "S1010",
+      "status": "valid",
+      "success": 8,
+      "failed": 48,
+      "request_status_counts": {
+        "timeout": 48,
+        "success": 8
+      },
+      "issues": [],
+      "sampled_min_free_mib": 3225.0
+    },
+    {
+      "directory": "/home/wangwei/ai-infra/Promotion/benchmark-results/preflight/abort-v2/S1111-aborts",
+      "variant": "S1111",
+      "status": "valid",
+      "success": 8,
+      "failed": 48,
+      "request_status_counts": {
+        "timeout": 48,
+        "success": 8
+      },
+      "issues": [],
+      "sampled_min_free_mib": 3433.0
+    }
+  ]
+}

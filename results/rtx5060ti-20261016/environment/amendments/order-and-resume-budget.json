@@ -1,0 +1,18 @@
+{
+  "reason": "Rotation+reversal cancelled for n=2; corrected before any affected family measured. Resume loop now counts preserved quality attempts instead of granting fresh retries.",
+  "affected_unmeasured_families": [
+    "E01",
+    "E02-low"
+  ],
+  "affected_family_measured_runs": 0,
+  "unchanged_order_sizes": [
+    3,
+    4,
+    7
+  ],
+  "tests": "261 passed10.60s; includes AB/BA equivalence and retry-budget resume tests",
+  "earlier_runtime_client_trace_resources": "unchanged; completed E02 H/S1000 reused",
+  "C64_measured_quality_failures_so_far": 1,
+  "previous_config_sha256": "a7a749537a9f34d5c7dd07afd84fe7ab2b914b620b3f079c295675cb99e2dc4c",
+  "wall": 1792042163.052489
+}

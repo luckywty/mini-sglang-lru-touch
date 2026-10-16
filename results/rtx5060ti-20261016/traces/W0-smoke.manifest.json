@@ -1,0 +1,24 @@
+{
+  "model_path": "/home/wangwei/ai-infra/models/Qwen3-0.6B",
+  "workload": "W0",
+  "seed": 31723,
+  "requests": 12,
+  "rate": 1.0,
+  "arrival_mode": "closed",
+  "cycle_s": 6.0,
+  "background_output": 256,
+  "output": "/home/wangwei/ai-infra/Promotion/benchmark-results/traces/W0-smoke.jsonl",
+  "sha256": "bad4866c7d4b8716098cf20991728f4bf8fd16245aaa7e05251a727f8bad22dc",
+  "classes": {
+    "correctness": 12
+  },
+  "input_lengths": [
+    128,
+    512,
+    2048
+  ],
+  "output_lengths": [
+    32,
+    128
+  ]
+}

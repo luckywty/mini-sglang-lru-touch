@@ -31,3 +31,7 @@ env/
 # .vscode
 .vscode/
 .coverage
+
+# Published evidence; large raw datasets remain outside this repository.
+!results/rtx5060ti-20261016/**/*.json
+!results/rtx5060ti-20261016/**/*.tar.gz

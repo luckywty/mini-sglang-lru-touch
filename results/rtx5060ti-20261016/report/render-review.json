@@ -1,0 +1,21 @@
+{
+  "reviewed_utc": "2026-10-16T02:52:33.752407+00:00",
+  "method": "Visual inspection of all11 final PNG files with view_image; Markdown/HTML local-link validation.",
+  "figures": [
+    "F1-throughput.png",
+    "F2-tail-latency.png",
+    "F2b-class-ttft.png",
+    "F3-ablation.png",
+    "F4-cache.png",
+    "F5-timeline.png",
+    "F6-fairness.png",
+    "F6b-wait-cdf.png",
+    "F7-dynamic.png",
+    "F8-goodput.png",
+    "F9-memory.png"
+  ],
+  "figure_data_changed": false,
+  "repair": "F4 x tick count and wrapped y label only; plot-source SHA256 unchanged.",
+  "html_browser_layout_reviewed": false,
+  "acceptance_scope": "Static figures reviewed; numerical, natural semantic and ITL calibration failures remain unchanged."
+}

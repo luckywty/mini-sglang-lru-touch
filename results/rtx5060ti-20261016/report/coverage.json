@@ -1,0 +1,827 @@
+[
+  {
+    "experiment": "E02",
+    "variant": "H0000",
+    "attempts": 6,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E02",
+    "variant": "S1000",
+    "attempts": 6,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E02",
+    "variant": "S1010",
+    "attempts": 20,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": false
+  },
+  {
+    "experiment": "E03",
+    "variant": "S1000",
+    "attempts": 11,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E03",
+    "variant": "S1L00",
+    "attempts": 11,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E03",
+    "variant": "S1100",
+    "attempts": 10,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E04",
+    "variant": "H0000",
+    "attempts": 16,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E04",
+    "variant": "S1000",
+    "attempts": 19,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E04",
+    "variant": "S1L00",
+    "attempts": 17,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31730,
+      31731
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E04",
+    "variant": "S1100",
+    "attempts": 17,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E05",
+    "variant": "S1010",
+    "attempts": 12,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E05",
+    "variant": "fixed24",
+    "attempts": 10,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E05",
+    "variant": "S1011",
+    "attempts": 10,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E01",
+    "variant": "H0000",
+    "attempts": 10,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E01",
+    "variant": "S1000",
+    "attempts": 10,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727,
+      31728,
+      31729,
+      31730,
+      31731,
+      31732
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E02-low",
+    "variant": "S1000",
+    "attempts": 5,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E02-low",
+    "variant": "S1010",
+    "attempts": 15,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": false
+  },
+  {
+    "experiment": "E06",
+    "variant": "H0000",
+    "attempts": 5,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E06",
+    "variant": "S1000",
+    "attempts": 5,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E06",
+    "variant": "S1100",
+    "attempts": 5,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E06",
+    "variant": "S1010",
+    "attempts": 15,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": false
+  },
+  {
+    "experiment": "E06",
+    "variant": "S1011",
+    "attempts": 5,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  },
+  {
+    "experiment": "E06",
+    "variant": "S1110",
+    "attempts": 15,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": false
+  },
+  {
+    "experiment": "E06",
+    "variant": "S1111",
+    "attempts": 5,
+    "attempted_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "completed_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "eligible_seeds": [
+      31723,
+      31724,
+      31725,
+      31726,
+      31727
+    ],
+    "minimum_five_attempted": true,
+    "minimum_five_eligible": true
+  }
+]

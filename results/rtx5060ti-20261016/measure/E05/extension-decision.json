@@ -1,0 +1,19 @@
+{
+  "primary": "itl_server_ms_p99",
+  "reference": "fixed24",
+  "variant": "S1011",
+  "ci": {
+    "n": 5,
+    "median_improvement_pct": 0.7582802377685383,
+    "ci95_low_pct": -1.452016405979606,
+    "ci95_high_pct": 0.937506109749564,
+    "paired_improvements_pct": [
+      0.7582802377685383,
+      -1.452016405979606,
+      -0.6738930496056561,
+      0.937506109749564,
+      0.8678429134397647
+    ]
+  },
+  "extend_to_10": true
+}

@@ -1,0 +1,215 @@
+{
+  "formal_attempts": 260,
+  "audited_runs": 157,
+  "figures": [
+    {
+      "id": "F1-throughput",
+      "title": "Whole-system comparison on the same W4-X trace",
+      "caption": "E06，同一绝对到达率、每次1000请求。H*为官方固定提交加共有正确性补丁；不是原样上游。误差线是运行间IQR。",
+      "svg": "figures/F1-throughput.svg",
+      "png": "figures/F1-throughput.png",
+      "source": "figures/F1-throughput-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 15
+    },
+    {
+      "id": "F2-tail-latency",
+      "title": "Stage scheduling: tail latency and its timing boundaries",
+      "caption": "E02。TTFT-text从HTTP调用前开始；server ITL从既有D2H后的host emit采集；TPOT是每请求平均间隔后求分位数。ACK经逐请求与服务端token数量/序号对账。",
+      "svg": "figures/F2-tail-latency.svg",
+      "png": "figures/F2-tail-latency.png",
+      "source": "figures/F2-tail-latency-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 15
+    },
+    {
+      "id": "F2b-class-ttft",
+      "title": "Stage scheduling: short and long request TTFT costs",
+      "caption": "与F2相同的E02高rate，按实际trace class分别统计；long cohort不足1000，不以其P99作为主结论。",
+      "svg": "figures/F2b-class-ttft.svg",
+      "png": "figures/F2b-class-ttft.png",
+      "source": "figures/F2b-class-ttft-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 10
+    },
+    {
+      "id": "F3-ablation",
+      "title": "Legal ablations on a shared workload (E06)",
+      "caption": "A0+C、A0+C+D尚未移植；A0+B和C0+D受依赖阻断，均未填数。B依赖A，D依赖C。H→S1000只表示默认实现净差异，不作A的独立归因。",
+      "svg": "figures/F3-ablation.svg",
+      "png": "figures/F3-ablation.png",
+      "source": "figures/F3-ablation-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 25
+    },
+    {
+      "id": "F4-cache",
+      "title": "Cache competition: reuse, recomputation and throughput",
+      "caption": "W3/B32，hot已prime、cold工作集32组。命中长度来自实际首次准入handle；重算只计此前已完整计算/prime的共享区，首次必要计算单列。散点关联不等于完整因果归因。",
+      "svg": "figures/F4-cache.svg",
+      "png": "figures/F4-cache.png",
+      "source": "figures/F4-cache-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 37
+    },
+    {
+      "id": "F5-timeline",
+      "title": "Dynamic-budget execution trace (paired seed 31727)",
+      "caption": "代表run按S1011 ITL P99最接近该配置运行中位数选定，同分取较小seed。固定展示前两个12秒周期，散点每4点展示1点；轨迹保留部分失败token，主统计只计校验成功请求并保留失败分母。",
+      "svg": "figures/F5-timeline.svg",
+      "png": "figures/F5-timeline.png",
+      "source": "figures/F5-timeline-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 1
+    },
+    {
+      "id": "F6-fairness",
+      "title": "Cold fairness versus throughput",
+      "caption": "W6，hot/cold长度相同。cold每run约200，主报告P95/max与超5s比例，cold P99仅探索；未准入/超时另外列出。有限trace不能证明绝对无饥饿。",
+      "svg": "figures/F6-fairness.svg",
+      "png": "figures/F6-fairness.png",
+      "source": "figures/F6-fairness-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 30
+    },
+    {
+      "id": "F6b-wait-cdf",
+      "title": "Admitted hot and cold waiting-time distributions",
+      "caption": "固定取三策略首个共有seed。分布含所有已准入请求（包括后来超时者），以已准入为条件；图例列准入/总请求数，逐类超时与删失下界见补充核算，不把未准入当作等待0。",
+      "svg": "figures/F6b-wait-cdf.svg",
+      "png": "figures/F6b-wait-cdf.png",
+      "source": "figures/F6b-wait-cdf-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 3
+    },
+    {
+      "id": "F7-dynamic",
+      "title": "Dynamic budget versus both fixed64 and matched fixed24",
+      "caption": "相同K=4、相同冻结W5波次与O256/O32。气泡面积表示输出吞吐。公式只在有Decode竞争的保护性Prefill执行；G1 running≤16且T32使floor8结构性不可达，本轮不验收该边界。",
+      "svg": "figures/F7-dynamic.svg",
+      "png": "figures/F7-dynamic.png",
+      "source": "figures/F7-dynamic-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 30
+    },
+    {
+      "id": "F8-goodput",
+      "title": "SLO goodput and failure rate at both frozen arrival rates",
+      "caption": "每点为一独立run，统一client TTFT短500ms/长2000ms及冻结E2E阈值；不同策略不各自调阈值。仅两个已测rate，不估计未测容量拐点。",
+      "svg": "figures/F8-goodput.svg",
+      "png": "figures/F8-goodput.png",
+      "source": "figures/F8-goodput-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 15
+    },
+    {
+      "id": "F9-memory",
+      "title": "8GB feasibility and memory headroom",
+      "caption": "包含正式目录全部有遥测的尝试，包括污染、失败、中断及superseded版本。整卡free含启动/预热，来自0.5秒采样，不能证明不存在瞬时峰值；worker峰值只在有测量snapshot时可得，缺失不是0。allocated与reserved不能相加。",
+      "svg": "figures/F9-memory.svg",
+      "png": "figures/F9-memory.png",
+      "source": "figures/F9-memory-source.json",
+      "data_status": "measured observations",
+      "source_run_count": 260
+    }
+  ],
+  "primary_comparisons": [
+    {
+      "experiment": "E03",
+      "reference": "S1L00",
+      "variant": "S1100",
+      "metric": "cold_wait_ms_p95",
+      "scope": "exploratory: tail calibration failed",
+      "reference_median": 372.112981575,
+      "candidate_median": 373.0522178,
+      "n": 10,
+      "median_improvement_pct": -1.8929886914723526,
+      "ci95_low_pct": -5.937168479610766,
+      "ci95_high_pct": 2.0564190449612663,
+      "paired_improvements_pct": [
+        -2.619171186723035,
+        -5.937168479610766,
+        -1.1668061962216703,
+        1.7456034469675252,
+        -15.365708818588919,
+        1.8643952069162806,
+        4.104022623607251,
+        -6.810202543263544,
+        -3.678105337029236,
+        2.3672346429550073
+      ]
+    },
+    {
+      "experiment": "E04",
+      "reference": "S1000",
+      "variant": "S1L00",
+      "metric": "output_tok_s",
+      "scope": "conditional fixed-length timing",
+      "reference_median": 1652.8309139489381,
+      "candidate_median": 1678.4645849698163,
+      "n": 8,
+      "median_improvement_pct": 1.4644999917471146,
+      "ci95_low_pct": -0.07417633648223454,
+      "ci95_high_pct": 4.121712255965693,
+      "paired_improvements_pct": [
+        2.3448903804496712,
+        4.121712255965693,
+        0.36641364706349044,
+        0.5841096030445581,
+        4.151535430402298,
+        -0.07417633648223454,
+        -0.7679860234566682,
+        3.3323175566384755
+      ]
+    },
+    {
+      "experiment": "E05",
+      "reference": "fixed24",
+      "variant": "S1011",
+      "metric": "itl_server_ms_p99",
+      "scope": "exploratory: tail calibration failed",
+      "reference_median": 23.91119725,
+      "candidate_median": 24.0263825,
+      "n": 10,
+      "median_improvement_pct": 0.7572853977543925,
+      "ci95_low_pct": -1.452016405979606,
+      "ci95_high_pct": 1.0966104860508197,
+      "paired_improvements_pct": [
+        0.8678429134397647,
+        1.4541547058512405,
+        -1.6239681857373123,
+        1.3253780586618746,
+        0.7582802377685383,
+        0.937506109749564,
+        -1.9309842093648166,
+        -1.452016405979606,
+        0.7562905577402468,
+        -0.6738930496056561
+      ]
+    },
+    {
+      "experiment": "E06",
+      "reference": "H0000",
+      "variant": "S1111",
+      "metric": "output_tok_s",
+      "scope": "conditional fixed-length timing",
+      "reference_median": 2025.7686588181007,
+      "candidate_median": 402.08053600446857,
+      "n": 5,
+      "median_improvement_pct": -79.90163399490082,
+      "ci95_low_pct": -80.95458190525369,
+      "ci95_high_pct": -79.19527832530255,
+      "paired_improvements_pct": [
+        -80.75577455954965,
+        -80.95458190525369,
+        -79.19527832530255,
+        -79.90163399490082,
+        -79.52719397877496
+      ]
+    }
+  ],
+  "evidence_cutoff": "2026-10-16T09:14:09+08:00",
+  "measurement_complete": true,
+  "numeric_limitations": "preflight/numerics/decision.json",
+  "raw_error_ledger": "report/errors.json"
+}

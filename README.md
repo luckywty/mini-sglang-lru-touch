@@ -4,6 +4,19 @@
 
 # Mini-SGLang
 
+## RTX 5060 Ti 8GB 实测结果（2026-10-16）
+
+本分支包含固定源码的 Qwen3-0.6B BF16 单卡评测工具及实际结果：
+[结果导航与指标解释](results/rtx5060ti-20261016/README.md)、
+[完整报告与图表](results/rtx5060ti-20261016/REPORT.md)、
+[逐次 CSV](results/rtx5060ti-20261016/report/runs.csv)、
+[工具与复现说明](benchmarks/serving/README.md)。
+
+完成7类实验、260次正式尝试，其中157次满足记录/资源与运行质量筛选规则。
+完整组合在E06混合负载下成功输出吞吐下降79.90%，存在大量超时；部分局部
+Goodput改善不代表整体收益。ITL校准、严格跨形状数值及自然语义验收存在失败，
+均在报告保留。历史规划与原版介绍中的性能描述不构成本轮已验证结论。
+
 A **lightweight yet high-performance** inference framework for Large Language Models.
 
 ---

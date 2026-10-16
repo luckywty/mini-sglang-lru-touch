@@ -1,0 +1,13 @@
+{
+  "strict_HF_threshold_passed": false,
+  "strict_result_file": "comparison.json",
+  "optimizer_fixed_input_equal_to_upstream": true,
+  "bitwise_equal_logit_values": 2430976,
+  "fixed_input_contexts": 16,
+  "identical_math_source_files": 51,
+  "upstream_changes_argmax_when_only_chunk_size_changes": 7,
+  "upstream_chunk_max_logit_difference": 0.4375,
+  "conclusion": "BF16 chunk-shape sensitivity is reproduced in unoptimized upstream itself; H/S logits are bitwise equal at matched chunk size. The strict HF absolute tolerance was NOT met and is not relaxed.",
+  "scope": "Optimizer semantic equivalence to upstream at fixed shape is supported. Bitwise text invariance across batch/chunk shapes and HF parity at the initially chosen tolerance are NOT claimed.",
+  "proceed": "Fixed-length timing experiments may proceed with this explicit numerical limitation; all length, EOS, ACK, terminal and resource gates remain strict."
+}

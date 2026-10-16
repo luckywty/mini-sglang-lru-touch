@@ -1,0 +1,10 @@
+{
+  "watcher_pid": 74789,
+  "driver_pid": 74788,
+  "driver_start_ticks": "1988002",
+  "driver_command": "/home/wangwei/ai-infra/Promotion/benchmark-env/bin/python -u /home/wangwei/ai-infra/Promotion/mini-sglang-lru-touch/benchmarks/serving/suite.py --phase measure ",
+  "status": "controller exited before completion; inspect receipts before resuming",
+  "started_wall": 1792041686.107539,
+  "heartbeat_wall": 1792042036.1478887,
+  "finished_wall": 1792042041.1485343
+}

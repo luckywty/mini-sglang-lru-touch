@@ -1,0 +1,1443 @@
+[
+  {
+    "experiment": "E01",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -0.08362554950850365,
+    "ci95_low_pct": -0.8878817689335627,
+    "ci95_high_pct": 0.5924199970182258,
+    "paired_improvements_pct": [
+      0.5243462077171746,
+      0.5250753325058977,
+      -0.5867948407333956,
+      0.8186038955478869,
+      -1.212706109166628,
+      0.36218199312378907,
+      -0.5294330921407964,
+      -1.015567699917308,
+      1.6030762853466385,
+      -0.8878817689335627
+    ]
+  },
+  {
+    "experiment": "E01",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": -2.574711436170829,
+    "ci95_low_pct": -13.270928917537884,
+    "ci95_high_pct": 8.689478731526373,
+    "paired_improvements_pct": [
+      3.2820544117928008,
+      -5.0800357459705126,
+      88.52549215453537,
+      6.424811064658886,
+      -21.461822089105254,
+      -2.3229288594537545,
+      -48.03513501805969,
+      -2.8264940128879035,
+      14.096903051259947,
+      -5.889364165675004
+    ]
+  },
+  {
+    "experiment": "E02",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -0.3352529630051393,
+    "ci95_low_pct": -0.4988323281611584,
+    "ci95_high_pct": 1.2546674523789214,
+    "paired_improvements_pct": [
+      -0.4988323281611584,
+      -0.4121252021899391,
+      -0.3352529630051393,
+      -0.08058441028093721,
+      1.2546674523789214
+    ]
+  },
+  {
+    "experiment": "E02",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 0.04702952193998966,
+    "ci95_low_pct": -1.122879091693929,
+    "ci95_high_pct": 5.953450239162361,
+    "paired_improvements_pct": [
+      -1.122879091693929,
+      0.04702952193998966,
+      1.342745759634667,
+      0.03593894856113167,
+      5.953450239162361
+    ]
+  },
+  {
+    "experiment": "E02",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -1.9361710250167308,
+    "ci95_low_pct": -12.246431068499852,
+    "ci95_high_pct": 20.134503765996172,
+    "paired_improvements_pct": [
+      -12.246431068499852,
+      -3.2469627930426403,
+      0.9118762558282367,
+      -1.9361710250167308,
+      20.134503765996172
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -0.01193019138133744,
+    "ci95_low_pct": -0.11085258452712687,
+    "ci95_high_pct": 0.15035173154025472,
+    "paired_improvements_pct": [
+      -0.05368882833169941,
+      -0.0341311296537139,
+      0.15894147540149728,
+      0.18024208087914495,
+      0.010270746891039018,
+      -0.1802015134171664,
+      0.0986334709831782,
+      0.15035173154025472,
+      -0.041503655637087356,
+      -0.22118883554650415
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": -47.50481252528659,
+    "ci95_low_pct": -59.37052621371905,
+    "ci95_high_pct": -28.334899839279437,
+    "paired_improvements_pct": [
+      -26.553709474013942,
+      -53.42587674811603,
+      -59.37052621371905,
+      -59.81668020341435,
+      -28.334899839279437,
+      -47.51066441319818,
+      -28.009348642947927,
+      -47.498960637375,
+      -69.23586918043283,
+      -46.165061609281224
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -1.8748334725391391,
+    "ci95_low_pct": -4.876528570839467,
+    "ci95_high_pct": 1.1921593809580244,
+    "paired_improvements_pct": [
+      -6.816287845128044,
+      -2.712618640011355,
+      3.3962865217705085,
+      -1.0370483050669232,
+      -14.292855620975885,
+      -4.095932960037407,
+      4.5955778056189,
+      -1.0119677598544596,
+      -2.9367692965508896,
+      0.5629752009451039
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1000",
+    "variant": "S1L00",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": 0.016061166361536205,
+    "ci95_low_pct": -0.029636844583807997,
+    "ci95_high_pct": 0.12087858180565014,
+    "paired_improvements_pct": [
+      -0.014472780260177398,
+      -0.12409511945052909,
+      0.16250379465772014,
+      0.2708606204326003,
+      -0.0006641340303703558,
+      -0.05860955513724564,
+      0.12087858180565014,
+      0.019283352252608132,
+      0.012838980470464278,
+      0.07093559676905059
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1000",
+    "variant": "S1L00",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": -44.01876061128406,
+    "ci95_low_pct": -57.15167863131623,
+    "ci95_high_pct": -34.060350835048105,
+    "paired_improvements_pct": [
+      -34.06109712829526,
+      -38.585306164773,
+      -57.15167863131623,
+      -63.56589745320262,
+      -49.49074080076012,
+      -29.5353955053232,
+      -39.45184700069089,
+      -48.58567422187723,
+      -67.81732447806779,
+      -27.646805688258436
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1000",
+    "variant": "S1L00",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": 0.613814165337051,
+    "ci95_low_pct": -2.9689994145160825,
+    "ci95_high_pct": 3.0438323827958635,
+    "paired_improvements_pct": [
+      -4.089992746840698,
+      3.0438323827958635,
+      4.510464340587827,
+      -2.832088791601839,
+      0.9299584847175635,
+      -6.0735633917178955,
+      0.5125920768107806,
+      5.428540200605358,
+      0.7150362538633215,
+      -1.8480060821914668
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1100",
+    "variant": "S1L00",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": 0.03073015266791268,
+    "ci95_low_pct": -0.04321901988409427,
+    "ci95_high_pct": 0.09045550067676711,
+    "paired_improvements_pct": [
+      0.039237114018320085,
+      -0.08999470600660198,
+      0.0035566662384134418,
+      0.09045550067676711,
+      -0.010933757942799271,
+      0.12181146438225987,
+      0.022223191317505275,
+      -0.13087161155357352,
+      0.05436519965280606,
+      0.29277201131818753
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1100",
+    "variant": "S1L00",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": 0.05072276806111775,
+    "ci95_low_pct": -5.932175110064897,
+    "ci95_high_pct": 9.672795031640746,
+    "paired_improvements_pct": [
+      -5.932175110064897,
+      9.672795031640746,
+      1.392257172714173,
+      -2.345948648799534,
+      -16.484869655857647,
+      12.185741945764484,
+      -8.938798985423425,
+      -0.7367601641437238,
+      0.8382057002659593,
+      12.669413413257791
+    ]
+  },
+  {
+    "experiment": "E03",
+    "reference": "S1100",
+    "variant": "S1L00",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": 1.8528351836649026,
+    "ci95_low_pct": -2.1006237377853565,
+    "ci95_high_pct": 5.60442436287455,
+    "paired_improvements_pct": [
+      2.5523215169583224,
+      5.60442436287455,
+      1.1533488503714828,
+      -1.7766161191833607,
+      13.319130074215801,
+      -1.8998152717836891,
+      -4.279660874093727,
+      6.375985047406929,
+      3.5476201316302247,
+      -2.4246313563873523
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -0.3840858293428284,
+    "ci95_low_pct": -2.5207428563197687,
+    "ci95_high_pct": -0.1407163775462017,
+    "paired_improvements_pct": [
+      -2.6429224111362726,
+      -3.9820983445039815,
+      -0.32420087604075887,
+      -0.2393950330431549,
+      -0.4062566354088526,
+      -0.36191502327680425,
+      -0.777874113982191,
+      0.08048226818440085,
+      0.185758743933917,
+      -2.5207428563197687
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": 0.32463581645199024,
+    "ci95_low_pct": -4.268503960444514,
+    "ci95_high_pct": 3.227063296152682,
+    "paired_improvements_pct": [
+      6.12064402409117,
+      1.8068872551019521,
+      4.956176214698404,
+      0.3138961970985954,
+      -4.268503960444514,
+      1.4979503776069603,
+      0.3353754358053851,
+      -4.887824475970026,
+      0.25392334759826163,
+      -12.874990158285193
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -30.554053296948325,
+    "ci95_low_pct": -80.37275406436316,
+    "ci95_high_pct": 1.648185215415876,
+    "paired_improvements_pct": [
+      -116.20461465525929,
+      -156.33666177994075,
+      -44.54089347346704,
+      14.315355729045276,
+      -3.3543193229571555,
+      2.2445534316015703,
+      -37.7684555177874,
+      1.648185215415876,
+      -23.33965107610925,
+      -77.8794499511224
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1100",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 9,
+    "median_improvement_pct": 0.13379311521728443,
+    "ci95_low_pct": -0.4988531648209782,
+    "ci95_high_pct": 0.7847350967938649,
+    "paired_improvements_pct": [
+      0.06675903466872857,
+      0.13379311521728443,
+      0.2421360911202486,
+      -0.3581718272349099,
+      0.7847350967938649,
+      2.7663374423872344,
+      -1.2412018277152104,
+      -0.4988531648209782,
+      0.7390429158936618
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1100",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 9,
+    "median_improvement_pct": -72.179566544316,
+    "ci95_low_pct": -79.52968823781133,
+    "ci95_high_pct": -50.333367783456275,
+    "paired_improvements_pct": [
+      -66.8604331057682,
+      -72.179566544316,
+      -46.64985248547004,
+      -84.3686372810134,
+      -69.2813037539492,
+      -76.1101096304053,
+      -78.60044500397194,
+      -79.52968823781133,
+      -50.333367783456275
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1100",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 9,
+    "median_improvement_pct": -4.164488660313115,
+    "ci95_low_pct": -26.022789115630896,
+    "ci95_high_pct": 18.767598608693547,
+    "paired_improvements_pct": [
+      -6.5295304165809975,
+      -4.164488660313115,
+      9.714845948990336,
+      -12.301520300136604,
+      13.667162777193187,
+      41.06906632255306,
+      -26.022789115630896,
+      -28.79927189400304,
+      18.767598608693547
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1L00",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 8,
+    "median_improvement_pct": 0.0236355438365754,
+    "ci95_low_pct": -0.3040853023809076,
+    "ci95_high_pct": 0.7275755435598441,
+    "paired_improvements_pct": [
+      -0.3600056640680749,
+      -0.024516724048306848,
+      0.041024854769022845,
+      0.34331624062418076,
+      3.3413675969742096,
+      0.006246232904127957,
+      -0.5836538807135083,
+      0.7275755435598441
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1L00",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 8,
+    "median_improvement_pct": -68.4992373731637,
+    "ci95_low_pct": -73.99442842471791,
+    "ci95_high_pct": -53.6622809723278,
+    "paired_improvements_pct": [
+      -53.43067007237965,
+      -73.9274451942448,
+      -76.0564328879275,
+      -71.84914061567305,
+      -51.23160308493346,
+      -73.99442842471791,
+      -65.14933413065434,
+      -56.092958859722145
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "H0000",
+    "variant": "S1L00",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 8,
+    "median_improvement_pct": -1.9200472970650362,
+    "ci95_low_pct": -30.003989501400806,
+    "ci95_high_pct": 25.210707747941484,
+    "paired_improvements_pct": [
+      -43.17410823933257,
+      -10.32914522922841,
+      -16.83387076346905,
+      11.211160468530645,
+      44.392853254407186,
+      6.489050635098337,
+      -39.37462341924349,
+      25.210707747941484
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 9,
+    "median_improvement_pct": 0.482686652033526,
+    "ci95_low_pct": -0.6833425402353877,
+    "ci95_high_pct": 3.3440814668998398,
+    "paired_improvements_pct": [
+      2.7832403281946583,
+      0.45948364124821506,
+      0.482686652033526,
+      0.04828095274811428,
+      1.1508150927815874,
+      3.571997197924248,
+      -1.3206212299796016,
+      -0.6833425402353877,
+      3.3440814668998398
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 9,
+    "median_improvement_pct": -76.70272717173752,
+    "ci95_low_pct": -79.9867165336658,
+    "ci95_high_pct": -47.11163029846668,
+    "paired_improvements_pct": [
+      -77.73921792623678,
+      -81.15808022755853,
+      -47.11163029846668,
+      -76.82102483311337,
+      -71.85561559671902,
+      -76.70272717173752,
+      -70.27757596868605,
+      -79.9867165336658,
+      -33.185719504952324
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 9,
+    "median_improvement_pct": 11.68488278307781,
+    "ci95_low_pct": -8.656823474616093,
+    "ci95_high_pct": 54.332891509599655,
+    "paired_improvements_pct": [
+      50.727448354215966,
+      27.934243273904833,
+      -5.369118141527274,
+      -8.656823474616093,
+      11.68488278307781,
+      57.2246538904994,
+      -28.13468606721021,
+      -4.426492835239837,
+      54.332891509599655
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1000",
+    "variant": "S1L00",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 8,
+    "median_improvement_pct": 1.4644999917471146,
+    "ci95_low_pct": -0.07417633648223454,
+    "ci95_high_pct": 4.121712255965693,
+    "paired_improvements_pct": [
+      2.3448903804496712,
+      4.121712255965693,
+      0.36641364706349044,
+      0.5841096030445581,
+      4.151535430402298,
+      -0.07417633648223454,
+      -0.7679860234566682,
+      3.3323175566384755
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1000",
+    "variant": "S1L00",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 8,
+    "median_improvement_pct": -65.72797821640508,
+    "ci95_low_pct": -77.12794750289834,
+    "ci95_high_pct": -51.74050345970473,
+    "paired_improvements_pct": [
+      -63.43387582649456,
+      -77.12794750289834,
+      -85.2371104992878,
+      -72.3902671082941,
+      -51.74050345970473,
+      -65.88620203918931,
+      -65.56975439362085,
+      -38.288347702916425
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1000",
+    "variant": "S1L00",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 8,
+    "median_improvement_pct": 26.473703517070923,
+    "ci95_low_pct": -3.622813967341032,
+    "ci95_high_pct": 57.95506885555972,
+    "paired_improvements_pct": [
+      33.77842167354971,
+      56.95927985363891,
+      19.16898536059214,
+      -3.622813967341032,
+      59.63724312898802,
+      4.921988913255138,
+      -13.000662968666532,
+      57.95506885555972
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1100",
+    "variant": "S1L00",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 7,
+    "median_improvement_pct": -0.011383245266072262,
+    "ci95_low_pct": -0.09264430874151852,
+    "ci95_high_pct": 0.5595510834560447,
+    "paired_improvements_pct": [
+      -0.42647998481589733,
+      -0.09264430874151852,
+      0.10093574763008206,
+      0.5595510834560447,
+      1.2631260036631398,
+      -0.08522586783145103,
+      -0.011383245266072262
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1100",
+    "variant": "S1L00",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 7,
+    "median_improvement_pct": 2.5789502255448515,
+    "ci95_low_pct": -3.8312126982760875,
+    "ci95_high_pct": 8.048500644173561,
+    "paired_improvements_pct": [
+      8.048500644173561,
+      -2.2516413657097,
+      -17.183302746724372,
+      14.126677109953134,
+      2.5789502255448515,
+      8.010014526459974,
+      -3.8312126982760875
+    ]
+  },
+  {
+    "experiment": "E04",
+    "reference": "S1100",
+    "variant": "S1L00",
+    "metric": "cold_wait_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 7,
+    "median_improvement_pct": 1.6573206694590281,
+    "ci95_low_pct": -12.162861130602366,
+    "ci95_high_pct": 7.9316984711687795,
+    "paired_improvements_pct": [
+      -34.398516241885126,
+      -12.162861130602366,
+      1.6573206694590281,
+      5.640139608251527,
+      25.79838137124416,
+      -8.210723065223192,
+      7.9316984711687795
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1010",
+    "variant": "S1011",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -0.32872018840517936,
+    "ci95_low_pct": -0.3439851189647847,
+    "ci95_high_pct": -0.3115222012197605,
+    "paired_improvements_pct": [
+      -0.3279442455765724,
+      -0.29510015686294855,
+      -0.3280063285666768,
+      -0.32943404824368194,
+      -0.3336186359015447,
+      -0.31790288809732115,
+      -0.36889928710801545,
+      -0.24628072648932298,
+      -0.3543516020280246,
+      -0.3348689429812146
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1010",
+    "variant": "S1011",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": 3.211477015212383,
+    "ci95_low_pct": 2.5083625780883856,
+    "ci95_high_pct": 4.045419985014509,
+    "paired_improvements_pct": [
+      3.577063856086371,
+      4.045419985014509,
+      2.453766986555428,
+      4.216877249295092,
+      2.384303760372286,
+      3.567077768054272,
+      2.612971572476641,
+      4.064568067908835,
+      2.5083625780883856,
+      2.8558762623704936
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1010",
+    "variant": "S1011",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -42.55130983532538,
+    "ci95_low_pct": -43.486875905975594,
+    "ci95_high_pct": -41.29694936836138,
+    "paired_improvements_pct": [
+      -42.95512008423277,
+      -40.80192947483883,
+      -42.664357244557905,
+      -39.933526916693005,
+      -43.619479761895796,
+      -41.791969261883935,
+      -41.69678587667447,
+      -44.71447661087886,
+      -43.486875905975594,
+      -42.438262426092855
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1010",
+    "variant": "fixed24",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -0.34593026208526445,
+    "ci95_low_pct": -0.3892448831560924,
+    "ci95_high_pct": -0.30333678540961917,
+    "paired_improvements_pct": [
+      -0.34117918247855705,
+      -0.2654943883406813,
+      -0.39479171946505964,
+      -0.34603306135371215,
+      -0.3892448831560924,
+      -0.34582746281681676,
+      -0.39414176127912093,
+      -0.2526144861718205,
+      -0.3674108960642686,
+      -0.3128561621105086
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1010",
+    "variant": "fixed24",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": 2.8316378968291813,
+    "ci95_low_pct": 2.2099405558593412,
+    "ci95_high_pct": 4.012572275115156,
+    "paired_improvements_pct": [
+      2.7329385562355535,
+      2.6295023107555937,
+      4.012572275115156,
+      2.9303372374228087,
+      1.638447546555477,
+      2.654457358218709,
+      4.457874921042892,
+      5.437629205724981,
+      1.7654237534999728,
+      3.506141666973106
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1010",
+    "variant": "fixed24",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -45.63993174428016,
+    "ci95_low_pct": -46.804982212206795,
+    "ci95_high_pct": -45.18069340527021,
+    "paired_improvements_pct": [
+      -46.01796412787527,
+      -45.539481203305,
+      -45.2959961435222,
+      -44.97461359304795,
+      -47.79309728679944,
+      -46.65101212691103,
+      -45.74038228525532,
+      -42.66131676719436,
+      -47.592000296538316,
+      -45.38677321749247
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1011",
+    "variant": "fixed24",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -0.014966179786352063,
+    "ci95_low_pct": -0.0405741931244652,
+    "ci95_high_pct": 0.004490504047899302,
+    "paired_improvements_pct": [
+      -0.013278482922629564,
+      0.029693393773877474,
+      -0.06700517210335155,
+      -0.01665387665007456,
+      -0.05581244798217311,
+      -0.028013630861067895,
+      -0.025335938266757285,
+      -0.006349397023619474,
+      -0.013105734416096748,
+      0.022086742511895352
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1011",
+    "variant": "fixed24",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 10,
+    "median_improvement_pct": -0.7630639798983707,
+    "ci95_low_pct": -1.1093103179448005,
+    "ci95_high_pct": 1.431234644138657,
+    "paired_improvements_pct": [
+      -0.8754403605703676,
+      -1.4756123929027476,
+      1.5980168996837407,
+      -1.3431802753192335,
+      -0.7640740603702456,
+      -0.9463784656867258,
+      1.8944035754610233,
+      1.431234644138657,
+      -0.7620538994264958,
+      0.6693821299565861
+    ]
+  },
+  {
+    "experiment": "E05",
+    "reference": "S1011",
+    "variant": "fixed24",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 10,
+    "median_improvement_pct": -2.857336075608252,
+    "ci95_low_pct": -3.364692334924846,
+    "ci95_high_pct": -1.993578983707045,
+    "paired_improvements_pct": [
+      -2.1425214024078265,
+      -3.364692334924846,
+      -1.8446365650062635,
+      -3.602486685950579,
+      -2.906024678423158,
+      -3.4268815718700107,
+      -2.8536966336697223,
+      1.4187660362447563,
+      -2.860975517546782,
+      -2.0700272112133655
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -0.004774390791872918,
+    "ci95_low_pct": -0.12707808279601718,
+    "ci95_high_pct": 0.6346387264603459,
+    "paired_improvements_pct": [
+      0.6346387264603459,
+      0.17054433859717832,
+      -0.01666675909137716,
+      -0.004774390791872918,
+      -0.12707808279601718
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 0.24530284903853117,
+    "ci95_low_pct": -0.3818893227867326,
+    "ci95_high_pct": 0.7684724774329466,
+    "paired_improvements_pct": [
+      0.4084428100739168,
+      0.24530284903853117,
+      0.18090702997897168,
+      0.7684724774329466,
+      -0.3818893227867326
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1000",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": 1.9492201765530015,
+    "ci95_low_pct": -3.9918906284660105,
+    "ci95_high_pct": 6.840015718020609,
+    "paired_improvements_pct": [
+      2.1262089163654907,
+      -0.3259994179333203,
+      -3.9918906284660105,
+      6.840015718020609,
+      1.9492201765530015
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1011",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -80.43689244405708,
+    "ci95_low_pct": -80.95449009638462,
+    "ci95_high_pct": -79.75808686023879,
+    "paired_improvements_pct": [
+      -80.87721887539277,
+      -80.95449009638462,
+      -80.43689244405708,
+      -80.1381403762105,
+      -79.75808686023879
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1011",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 73.439822355161,
+    "ci95_low_pct": 73.330723906388,
+    "ci95_high_pct": 73.87185011018967,
+    "paired_improvements_pct": [
+      73.439822355161,
+      73.56588745439639,
+      73.42902928157594,
+      73.87185011018967,
+      73.330723906388
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1011",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -4702.017306073484,
+    "ci95_low_pct": -14938.727639246335,
+    "ci95_high_pct": -3539.3607394260093,
+    "paired_improvements_pct": [
+      -4214.946872793098,
+      -3539.3607394260093,
+      -14938.727639246335,
+      -4702.017306073484,
+      -7275.324540381098
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1100",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -0.034824663393773214,
+    "ci95_low_pct": -0.21018723044166077,
+    "ci95_high_pct": 0.26211020544468777,
+    "paired_improvements_pct": [
+      0.26211020544468777,
+      0.0885712166361241,
+      -0.034824663393773214,
+      -0.04334606250609996,
+      -0.21018723044166077
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1100",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 0.1004678465004405,
+    "ci95_low_pct": -0.4830762432269653,
+    "ci95_high_pct": 1.195350753218627,
+    "paired_improvements_pct": [
+      -0.4830762432269653,
+      0.1004678465004405,
+      1.195350753218627,
+      0.5989027240432709,
+      -0.306154314449536
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1100",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": 8.530928352656675,
+    "ci95_low_pct": -4.446428055752372,
+    "ci95_high_pct": 10.20451401070287,
+    "paired_improvements_pct": [
+      10.20451401070287,
+      9.165686584900401,
+      -4.446428055752372,
+      4.849143628750063,
+      8.530928352656675
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1111",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -79.90163399490082,
+    "ci95_low_pct": -80.95458190525369,
+    "ci95_high_pct": -79.19527832530255,
+    "paired_improvements_pct": [
+      -80.75577455954965,
+      -80.95458190525369,
+      -79.19527832530255,
+      -79.90163399490082,
+      -79.52719397877496
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1111",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 73.23405293265786,
+    "ci95_low_pct": 73.0880141353117,
+    "ci95_high_pct": 73.90500095876578,
+    "paired_improvements_pct": [
+      73.0880141353117,
+      73.23405293265786,
+      73.90500095876578,
+      73.1896574198615,
+      73.7356214564339
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "H0000",
+    "variant": "S1111",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -4762.97861960283,
+    "ci95_low_pct": -14783.400045814646,
+    "ci95_high_pct": -3547.854681417569,
+    "paired_improvements_pct": [
+      -4206.079128633335,
+      -3547.854681417569,
+      -14783.400045814646,
+      -4762.97861960283,
+      -7299.492403495307
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1011",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -80.43363136453368,
+    "ci95_low_pct": -80.9978141059504,
+    "ci95_high_pct": -79.73233109516708,
+    "paired_improvements_pct": [
+      -80.9978141059504,
+      -80.9869158350207,
+      -80.43363136453368,
+      -80.13719204813664,
+      -79.73233109516708
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1011",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 73.43218356066738,
+    "ci95_low_pct": 73.33089431046106,
+    "ci95_high_pct": 73.6695075223262,
+    "paired_improvements_pct": [
+      73.33089431046106,
+      73.50088436878299,
+      73.38087341025609,
+      73.6695075223262,
+      73.43218356066738
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1011",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -5054.592224423951,
+    "ci95_low_pct": -14361.44266477038,
+    "ci95_high_pct": -3527.5349964522475,
+    "paired_improvements_pct": [
+      -4308.684720412961,
+      -3527.5349964522475,
+      -14361.44266477038,
+      -5054.592224423951,
+      -7421.94378633328
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -0.08183355945832194,
+    "ci95_low_pct": -0.37017922032616113,
+    "ci95_high_pct": -0.018160931141042447,
+    "paired_improvements_pct": [
+      -0.37017922032616113,
+      -0.08183355945832194,
+      -0.018160931141042447,
+      -0.038573513364503764,
+      -0.08321489553949624
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": -0.14519116059157344,
+    "ci95_low_pct": -0.8951753325843637,
+    "ci95_high_pct": 1.016282249273015,
+    "paired_improvements_pct": [
+      -0.8951753325843637,
+      -0.14519116059157344,
+      1.016282249273015,
+      -0.1708829417657709,
+      0.07544688473999361
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1100",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": 6.712550566099407,
+    "ci95_low_pct": -2.137046398853526,
+    "ci95_high_pct": 9.460843707415956,
+    "paired_improvements_pct": [
+      8.253798085162922,
+      9.460843707415956,
+      -0.43708930046315597,
+      -2.137046398853526,
+      6.712550566099407
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1111",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -79.90067437454893,
+    "ci95_low_pct": -80.98700748758152,
+    "ci95_high_pct": -79.19181027444972,
+    "paired_improvements_pct": [
+      -80.87713566224552,
+      -80.98700748758152,
+      -79.19181027444972,
+      -79.90067437454893,
+      -79.50114442611653
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1111",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 73.16823384583432,
+    "ci95_low_pct": 72.97764326210323,
+    "ci95_high_pct": 73.85770771422315,
+    "paired_improvements_pct": [
+      72.97764326210323,
+      73.16823384583432,
+      73.85770771422315,
+      72.98203177005279,
+      73.83554073274044
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1000",
+    "variant": "S1111",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -5120.029454796195,
+    "ci95_low_pct": -14212.07756284466,
+    "ci95_high_pct": -3536.0013382189272,
+    "paired_improvements_pct": [
+      -4299.624333498772,
+      -3536.0013382189272,
+      -14212.07756284466,
+      -5120.029454796195,
+      -7446.592099337754
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1011",
+    "variant": "S1100",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": 410.9882213280506,
+    "ci95_low_pct": 392.9860734040061,
+    "ci95_high_pct": 425.5231901018121,
+    "paired_improvements_pct": [
+      424.30715779321025,
+      425.5231901018121,
+      410.9882213280506,
+      403.25929107751347,
+      392.9860734040061
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1011",
+    "variant": "S1100",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": -277.91899380451986,
+    "ci95_low_pct": -280.43679975489573,
+    "ci95_high_pct": -271.8518615440389,
+    "paired_improvements_pct": [
+      -278.32230486889137,
+      -277.91899380451986,
+      -271.8518615440389,
+      -280.43679975489573,
+      -276.1112748706198
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1011",
+    "variant": "S1100",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": 98.01852325165706,
+    "ci95_low_pct": 97.50411349908046,
+    "ci95_high_pct": 99.30548361163758,
+    "paired_improvements_pct": [
+      97.91896659132742,
+      97.50411349908046,
+      99.30548361163758,
+      98.01852325165706,
+      98.75979597715958
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1011",
+    "variant": "S1111",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": 1.1406672870772239,
+    "ci95_low_pct": -0.00048204994005374147,
+    "ci95_high_pct": 6.346712122314857,
+    "paired_improvements_pct": [
+      0.635076640012544,
+      -0.00048204994005374147,
+      6.346712122314857,
+      1.1907564839820362,
+      1.1406672870772239
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1011",
+    "variant": "S1111",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": -1.2553268855387323,
+    "ci95_low_pct": -2.6109490844363537,
+    "ci95_high_pct": 1.791322124561312,
+    "paired_improvements_pct": [
+      -1.324570281696369,
+      -1.2553268855387323,
+      1.791322124561312,
+      -2.6109490844363537,
+      1.5182172497846147
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1011",
+    "variant": "S1111",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -0.23339104309012537,
+    "ci95_low_pct": -1.269493832357571,
+    "ci95_high_pct": 1.0328506317671016,
+    "paired_improvements_pct": [
+      0.2055122443262558,
+      -0.23339104309012537,
+      1.0328506317671016,
+      -1.269493832357571,
+      -0.32768541888410496
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1100",
+    "variant": "S1111",
+    "metric": "output_tok_s",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -79.89291836672791,
+    "ci95_low_pct": -80.97143573613059,
+    "ci95_high_pct": -79.1880306270228,
+    "paired_improvements_pct": [
+      -80.80608377280564,
+      -80.97143573613059,
+      -79.1880306270228,
+      -79.89291836672791,
+      -79.48407211816071
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1100",
+    "variant": "S1111",
+    "metric": "itl_server_ms_p99",
+    "evidence_scope": "exploratory ITL: global tail calibration failed",
+    "n": 5,
+    "median_improvement_pct": 73.21739453960805,
+    "ci95_low_pct": 73.02812210844336,
+    "ci95_high_pct": 73.8157855586508,
+    "paired_improvements_pct": [
+      73.21739453960805,
+      73.20713471789315,
+      73.58930046291896,
+      73.02812210844336,
+      73.8157855586508
+    ]
+  },
+  {
+    "experiment": "E06",
+    "reference": "S1100",
+    "variant": "S1111",
+    "metric": "long_ttft_text_ms_p95",
+    "evidence_scope": "conditional fixed-length measurement",
+    "n": 5,
+    "median_improvement_pct": -5010.809093119409,
+    "ci95_low_pct": -14149.79324124904,
+    "ci95_high_pct": -3915.9434736379885,
+    "paired_improvements_pct": [
+      -4695.4293929057685,
+      -3915.9434736379885,
+      -14149.79324124904,
+      -5010.809093119409,
+      -7989.611351937475
+    ]
+  }
+]

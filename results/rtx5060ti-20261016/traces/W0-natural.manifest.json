@@ -1,0 +1,18 @@
+{
+  "role": "natural EOS correctness",
+  "thinking": false,
+  "sha256": "83a388f86e7b46bef29997cb104794acbf199f0c8fddc7a01b51a6042d231d1c",
+  "requests": 4,
+  "classes": {
+    "natural": 4
+  },
+  "input_lengths": [
+    20,
+    24,
+    25,
+    26
+  ],
+  "output_lengths": [
+    64
+  ]
+}
